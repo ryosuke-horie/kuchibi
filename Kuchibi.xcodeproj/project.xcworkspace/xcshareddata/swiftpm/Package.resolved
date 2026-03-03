@@ -1,0 +1,24 @@
+{
+  "originHash" : "ffdafbdc0faebb3ebb2c9bbe9372b93cab4009adaca1c9b38b03f2b860c2424b",
+  "pins" : [
+    {
+      "identity" : "hotkey",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/soffes/HotKey",
+      "state" : {
+        "revision" : "a3cf605d7a96f6ff50e04fcb6dea6e2613cfcbe4",
+        "version" : "0.2.1"
+      }
+    },
+    {
+      "identity" : "moonshine-swift",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/moonshine-ai/moonshine-swift",
+      "state" : {
+        "revision" : "1b99ab3a0c981bf8b761d519e3f638fb820a5490",
+        "version" : "0.0.49"
+      }
+    }
+  ],
+  "version" : 3
+}

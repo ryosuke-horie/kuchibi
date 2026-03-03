@@ -1,0 +1,41 @@
+name: Kuchibi
+
+options:
+  bundleIdPrefix: com.kuchibi
+  deploymentTarget:
+    macOS: "14.0"
+  createIntermediateGroups: true
+
+packages:
+  HotKey:
+    url: https://github.com/soffes/HotKey
+    from: "0.2.0"
+  MoonshineSwift:
+    url: https://github.com/moonshine-ai/moonshine-swift
+    from: "0.0.49"
+
+targets:
+  Kuchibi:
+    type: application
+    platform: macOS
+    sources:
+      - path: Sources
+    dependencies:
+      - package: HotKey
+      - package: MoonshineSwift
+        product: Moonshine
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.kuchibi.app
+        INFOPLIST_FILE: Sources/Info.plist
+
+  KuchibiTests:
+    type: bundle.unit-test
+    platform: macOS
+    sources:
+      - path: Tests
+    dependencies:
+      - target: Kuchibi
+    settings:
+      base:
+        GENERATE_INFOPLIST_FILE: YES

@@ -1,7 +1,7 @@
 # Implementation Plan
 
 - [ ] 1. プロジェクト基盤のセットアップ
-- [ ] 1.1 Xcodeプロジェクトとパッケージ構成の初期化
+- [x] 1.1 Xcodeプロジェクトとパッケージ構成の初期化
   - Swift Package ManagerベースのmacOSアプリケーションプロジェクトを作成する
   - SPM依存としてMoonshine v2パッケージとHotKeyパッケージを追加する
   - macOS 14以上をデプロイメントターゲットに設定する

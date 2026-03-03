@@ -1,0 +1,452 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 77;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		063E89076BBF7ED9186ACF13 /* KuchibiError.swift in Sources */ = {isa = PBXBuildFile; fileRef = F210E248F410C33E8DD354BB /* KuchibiError.swift */; };
+		0B40562C1E761FAA2AD4CCAE /* OutputMode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D61FB5D132074721A6308B6 /* OutputMode.swift */; };
+		11FE8E3B330EE2ACEAAF09E2 /* SessionState.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6B7BEA988E0B1018B66C656 /* SessionState.swift */; };
+		3D896B5A4244B1D4DCF1BFFC /* HotKey in Frameworks */ = {isa = PBXBuildFile; productRef = C51938C3B8E29F96DA379568 /* HotKey */; };
+		723DB1904E5938F1E2B87FFD /* ModelsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 42412DB8F6EC05A959ABE916 /* ModelsTests.swift */; };
+		94A26725752116D062AB00CB /* Moonshine in Frameworks */ = {isa = PBXBuildFile; productRef = 15F30F0D08FB173F3E97476C /* Moonshine */; };
+		A2C3BBB86FBA1CA25BBEE200 /* KuchibiApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = C32DA2D991DEFB3190AA572F /* KuchibiApp.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		553A32D73912D97DA25749A0 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 8CD8E5CD07533A0490F96182 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 67D65CF044EDBDE78E4B5809;
+			remoteInfo = Kuchibi;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		18009A0EB4ACCBA03198413F /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		3D61FB5D132074721A6308B6 /* OutputMode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OutputMode.swift; sourceTree = "<group>"; };
+		42412DB8F6EC05A959ABE916 /* ModelsTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModelsTests.swift; sourceTree = "<group>"; };
+		C32DA2D991DEFB3190AA572F /* KuchibiApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KuchibiApp.swift; sourceTree = "<group>"; };
+		C60BE26F4FD2896422DC6AD2 /* Kuchibi.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Kuchibi.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		F210E248F410C33E8DD354BB /* KuchibiError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KuchibiError.swift; sourceTree = "<group>"; };
+		F6B7BEA988E0B1018B66C656 /* SessionState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionState.swift; sourceTree = "<group>"; };
+		F6CAF48EF818CFA8942FA4D3 /* KuchibiTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = KuchibiTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		A83575D7F074560A4041037E /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				3D896B5A4244B1D4DCF1BFFC /* HotKey in Frameworks */,
+				94A26725752116D062AB00CB /* Moonshine in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		6B5EB7526EBAF30BD60CF7A7 /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				F210E248F410C33E8DD354BB /* KuchibiError.swift */,
+				3D61FB5D132074721A6308B6 /* OutputMode.swift */,
+				F6B7BEA988E0B1018B66C656 /* SessionState.swift */,
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
+		6F1FEFD6F7CFA0A01FC6D6E8 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				C60BE26F4FD2896422DC6AD2 /* Kuchibi.app */,
+				F6CAF48EF818CFA8942FA4D3 /* KuchibiTests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		7052F76247CB62E8E362FB95 /* Sources */ = {
+			isa = PBXGroup;
+			children = (
+				18009A0EB4ACCBA03198413F /* Info.plist */,
+				C32DA2D991DEFB3190AA572F /* KuchibiApp.swift */,
+				6B5EB7526EBAF30BD60CF7A7 /* Models */,
+			);
+			path = Sources;
+			sourceTree = "<group>";
+		};
+		9C53FD4D2BF3F79D268AC5ED = {
+			isa = PBXGroup;
+			children = (
+				7052F76247CB62E8E362FB95 /* Sources */,
+				AA5264FD43458EAF46C5C962 /* Tests */,
+				6F1FEFD6F7CFA0A01FC6D6E8 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		AA5264FD43458EAF46C5C962 /* Tests */ = {
+			isa = PBXGroup;
+			children = (
+				42412DB8F6EC05A959ABE916 /* ModelsTests.swift */,
+			);
+			path = Tests;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		67D65CF044EDBDE78E4B5809 /* Kuchibi */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 82D10357708499FF2EC5D4D6 /* Build configuration list for PBXNativeTarget "Kuchibi" */;
+			buildPhases = (
+				882DC4C4B0F6F2FD33C3ABFE /* Sources */,
+				A83575D7F074560A4041037E /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = Kuchibi;
+			packageProductDependencies = (
+				C51938C3B8E29F96DA379568 /* HotKey */,
+				15F30F0D08FB173F3E97476C /* Moonshine */,
+			);
+			productName = Kuchibi;
+			productReference = C60BE26F4FD2896422DC6AD2 /* Kuchibi.app */;
+			productType = "com.apple.product-type.application";
+		};
+		77B1271A2689AED1C2D2E75A /* KuchibiTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = FC62B00ED2638A21C0EF9544 /* Build configuration list for PBXNativeTarget "KuchibiTests" */;
+			buildPhases = (
+				B498A317F7F766D11A5A8159 /* Sources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				881492C2D3CB5DCA378AA1C7 /* PBXTargetDependency */,
+			);
+			name = KuchibiTests;
+			packageProductDependencies = (
+			);
+			productName = KuchibiTests;
+			productReference = F6CAF48EF818CFA8942FA4D3 /* KuchibiTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		8CD8E5CD07533A0490F96182 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = YES;
+				LastUpgradeCheck = 1430;
+			};
+			buildConfigurationList = 7746F260D2DE8D1F571B6C2B /* Build configuration list for PBXProject "Kuchibi" */;
+			compatibilityVersion = "Xcode 14.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				Base,
+				en,
+			);
+			mainGroup = 9C53FD4D2BF3F79D268AC5ED;
+			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				BEB727BF0A9FD067B3D4C160 /* XCRemoteSwiftPackageReference "HotKey" */,
+				B315BC6C97CFE8EB105863D0 /* XCRemoteSwiftPackageReference "moonshine-swift" */,
+			);
+			preferredProjectObjectVersion = 77;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				67D65CF044EDBDE78E4B5809 /* Kuchibi */,
+				77B1271A2689AED1C2D2E75A /* KuchibiTests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXSourcesBuildPhase section */
+		882DC4C4B0F6F2FD33C3ABFE /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A2C3BBB86FBA1CA25BBEE200 /* KuchibiApp.swift in Sources */,
+				063E89076BBF7ED9186ACF13 /* KuchibiError.swift in Sources */,
+				0B40562C1E761FAA2AD4CCAE /* OutputMode.swift in Sources */,
+				11FE8E3B330EE2ACEAAF09E2 /* SessionState.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		B498A317F7F766D11A5A8159 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				723DB1904E5938F1E2B87FFD /* ModelsTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		881492C2D3CB5DCA378AA1C7 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 67D65CF044EDBDE78E4B5809 /* Kuchibi */;
+			targetProxy = 553A32D73912D97DA25749A0 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		1DF971EC9FB576681CA56E3A /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				COMBINE_HIDPI_IMAGES = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@loader_path/../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.kuchibi.KuchibiTests;
+				SDKROOT = macosx;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Kuchibi.app/Contents/MacOS/Kuchibi";
+			};
+			name = Debug;
+		};
+		33CEDFB359D38B9F90D1DCF1 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"$(inherited)",
+					"DEBUG=1",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		63F6321CEC506731DF0A8177 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				COMBINE_HIDPI_IMAGES = YES;
+				INFOPLIST_FILE = Sources/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.kuchibi.app;
+				SDKROOT = macosx;
+			};
+			name = Release;
+		};
+		65F37AD3D68C3987F1CE3CA0 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
+		8E2DAC8838FE5A9228B3D7A9 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				COMBINE_HIDPI_IMAGES = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@loader_path/../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.kuchibi.KuchibiTests;
+				SDKROOT = macosx;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Kuchibi.app/Contents/MacOS/Kuchibi";
+			};
+			name = Release;
+		};
+		B9A6984ACD5B32EF5B1B496B /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				COMBINE_HIDPI_IMAGES = YES;
+				INFOPLIST_FILE = Sources/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.kuchibi.app;
+				SDKROOT = macosx;
+			};
+			name = Debug;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		7746F260D2DE8D1F571B6C2B /* Build configuration list for PBXProject "Kuchibi" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				33CEDFB359D38B9F90D1DCF1 /* Debug */,
+				65F37AD3D68C3987F1CE3CA0 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		82D10357708499FF2EC5D4D6 /* Build configuration list for PBXNativeTarget "Kuchibi" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				B9A6984ACD5B32EF5B1B496B /* Debug */,
+				63F6321CEC506731DF0A8177 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		FC62B00ED2638A21C0EF9544 /* Build configuration list for PBXNativeTarget "KuchibiTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				1DF971EC9FB576681CA56E3A /* Debug */,
+				8E2DAC8838FE5A9228B3D7A9 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+/* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		B315BC6C97CFE8EB105863D0 /* XCRemoteSwiftPackageReference "moonshine-swift" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/moonshine-ai/moonshine-swift";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 0.0.49;
+			};
+		};
+		BEB727BF0A9FD067B3D4C160 /* XCRemoteSwiftPackageReference "HotKey" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/soffes/HotKey";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 0.2.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		15F30F0D08FB173F3E97476C /* Moonshine */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = B315BC6C97CFE8EB105863D0 /* XCRemoteSwiftPackageReference "moonshine-swift" */;
+			productName = Moonshine;
+		};
+		C51938C3B8E29F96DA379568 /* HotKey */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = BEB727BF0A9FD067B3D4C160 /* XCRemoteSwiftPackageReference "HotKey" */;
+			productName = HotKey;
+		};
+/* End XCSwiftPackageProductDependency section */
+	};
+	rootObject = 8CD8E5CD07533A0490F96182 /* Project object */;
+}
