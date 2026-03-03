@@ -6,7 +6,7 @@ import SwiftUI
 struct KuchibiApp: App {
     @StateObject private var sessionManager: SessionManagerImpl
     private let hotKeyController: HotKeyControllerImpl
-    private let overlayController: OverlayWindowController
+    private let feedbackBarController: FeedbackBarWindowController
 
     init() {
         // サービス構築
@@ -31,7 +31,7 @@ struct KuchibiApp: App {
             }
         })
 
-        overlayController = OverlayWindowController(sessionManager: sm)
+        feedbackBarController = FeedbackBarWindowController(sessionManager: sm)
 
         // ホットキー登録
         hotKeyController.register()

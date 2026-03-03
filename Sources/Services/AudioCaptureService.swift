@@ -8,6 +8,7 @@ final class AudioCaptureServiceImpl: AudioCapturing {
     private let engine = AVAudioEngine()
     private var continuation: AsyncStream<AVAudioPCMBuffer>.Continuation?
     private(set) var isCapturing: Bool = false
+    private(set) var currentAudioLevel: Float = 0.0
 
     func startCapture() throws -> AsyncStream<AVAudioPCMBuffer> {
         let stream = AsyncStream<AVAudioPCMBuffer> { continuation in
@@ -18,6 +19,7 @@ final class AudioCaptureServiceImpl: AudioCapturing {
         let format = inputNode.outputFormat(forBus: 0)
 
         inputNode.installTap(onBus: 0, bufferSize: 1024, format: format) { [weak self] buffer, _ in
+            self?.updateAudioLevel(from: buffer)
             self?.continuation?.yield(buffer)
         }
 
@@ -41,7 +43,23 @@ final class AudioCaptureServiceImpl: AudioCapturing {
         continuation?.finish()
         continuation = nil
         isCapturing = false
+        currentAudioLevel = 0.0
         Self.logger.info("音声キャプチャを停止")
+    }
+
+    private func updateAudioLevel(from buffer: AVAudioPCMBuffer) {
+        guard let channelData = buffer.floatChannelData else { return }
+        let frames = Int(buffer.frameLength)
+        guard frames > 0 else { return }
+
+        let samples = channelData[0]
+        var sumOfSquares: Float = 0.0
+        for i in 0..<frames {
+            let sample = samples[i]
+            sumOfSquares += sample * sample
+        }
+        let rms = sqrtf(sumOfSquares / Float(frames))
+        currentAudioLevel = min(rms * 3.0, 1.0)
     }
 
     func requestMicrophonePermission() async -> Bool {

@@ -3,6 +3,7 @@ import AVFoundation
 
 final class MockAudioCaptureService: AudioCapturing {
     var isCapturing: Bool = false
+    var currentAudioLevel: Float = 0.0
     var micPermissionGranted: Bool = true
     var shouldThrowOnStart: Bool = false
     private var continuation: AsyncStream<AVAudioPCMBuffer>.Continuation?

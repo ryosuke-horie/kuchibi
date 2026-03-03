@@ -167,6 +167,33 @@ struct SessionManagerTests {
         try await Task.sleep(for: .milliseconds(50))
     }
 
+    @Test("初期状態のaudioLevelは0.0")
+    func initialAudioLevel() async {
+        let sm = await createSessionManager()
+        let level = await sm.audioLevel
+        #expect(level == 0.0)
+    }
+
+    @Test("セッション終了後にaudioLevelが0.0にリセットされる")
+    func audioLevelResetAfterSession() async throws {
+        let mockAudio = MockAudioCaptureService()
+        mockAudio.currentAudioLevel = 0.5
+        let mockASR = MockSpeechRecognitionService()
+        mockASR.isModelLoaded = true
+        mockASR.eventsToEmit = [
+            RecognitionEvent(kind: .textChanged(partial: "テスト")),
+            RecognitionEvent(kind: .lineCompleted(final: "テスト"))
+        ]
+        let sm = await createSessionManager(audioService: mockAudio, speechService: mockASR)
+
+        await sm.startSession()
+        await sm.stopSession()
+
+        try await Task.sleep(for: .milliseconds(200))
+        let level = await sm.audioLevel
+        #expect(level == 0.0)
+    }
+
     // MARK: - Helper
 
     private func createSessionManager(

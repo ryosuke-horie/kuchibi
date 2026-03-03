@@ -9,6 +9,7 @@ final class SessionManagerImpl: ObservableObject {
 
     @Published private(set) var state: SessionState = .idle
     @Published private(set) var partialText: String = ""
+    @Published private(set) var audioLevel: Float = 0.0
     @Published var outputMode: OutputMode = .clipboard {
         didSet { UserDefaults.standard.set(outputMode.rawValue, forKey: "outputMode") }
     }
@@ -114,9 +115,11 @@ final class SessionManagerImpl: ObservableObject {
     private func handleRecognitionEvent(_ event: RecognitionEvent) async {
         switch event.kind {
         case .lineStarted:
+            audioLevel = audioService.currentAudioLevel
             Self.logger.debug("行の認識を開始")
         case .textChanged(let partial):
             partialText = partial
+            audioLevel = audioService.currentAudioLevel
             startSilenceTimeout()
         case .lineCompleted(let final_):
             let mode = outputMode
@@ -127,6 +130,7 @@ final class SessionManagerImpl: ObservableObject {
 
     private func finishSession() {
         state = .idle
+        audioLevel = 0.0
         recordingTask = nil
         timeoutTask?.cancel()
         timeoutTask = nil

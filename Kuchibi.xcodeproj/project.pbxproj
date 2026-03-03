@@ -15,7 +15,6 @@
 		11FE8E3B330EE2ACEAAF09E2 /* SessionState.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6B7BEA988E0B1018B66C656 /* SessionState.swift */; };
 		12334760C1F97A555C292A59 /* MoonshineAdapting.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF6B8FA94DE9C36C7FFA3F4E /* MoonshineAdapting.swift */; };
 		141BB489588E01D5C1BFDFDE /* OutputManagerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C531F963B68CB7998DD9D1B9 /* OutputManagerTests.swift */; };
-		1E69E6EBEF17EEACC9D84686 /* RecordingOverlayView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 70FB1C0B54CC61CD3E160575 /* RecordingOverlayView.swift */; };
 		21E3191C5591D65D08DB2BA7 /* NotificationServicing.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8FF8890BCFF032E69155777 /* NotificationServicing.swift */; };
 		38D05F27F1E438EECA7E9594 /* SpeechRecognitionServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B334D7BD062516AB599119D2 /* SpeechRecognitionServiceTests.swift */; };
 		3D896B5A4244B1D4DCF1BFFC /* HotKey in Frameworks */ = {isa = PBXBuildFile; productRef = C51938C3B8E29F96DA379568 /* HotKey */; };
@@ -35,6 +34,7 @@
 		9A97EAB982046264987BEAA2 /* MockClipboardService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B3061795806AC0CA836AAB7 /* MockClipboardService.swift */; };
 		A2C3BBB86FBA1CA25BBEE200 /* KuchibiApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = C32DA2D991DEFB3190AA572F /* KuchibiApp.swift */; };
 		A545B0010DBEB690DCB7E6E2 /* SessionManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1BBF3BF9F624BDACFFBEE6B7 /* SessionManager.swift */; };
+		B6B59DCFE1D7124F94B5EC3B /* FeedbackBarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 59F2C2477208487EC2512D63 /* FeedbackBarView.swift */; };
 		BAAD6B03864F546F3E3367ED /* MockNotificationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC030E08D9FB798B68FFADA4 /* MockNotificationService.swift */; };
 		C45FEACCB46A4EA1576DD6BF /* NotificationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 98D0E0C1DB5386C565834D9A /* NotificationService.swift */; };
 		C9ED9B8F8BC9732CA5DA47D2 /* MoonshineAdapter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 938FC83ECB63582855D1E278 /* MoonshineAdapter.swift */; };
@@ -67,8 +67,8 @@
 		438FE5EE29F95ABC7530E1DC /* OutputManaging.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OutputManaging.swift; sourceTree = "<group>"; };
 		46755D2BEBFC333AA9C5C8CC /* MockMoonshineAdapter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockMoonshineAdapter.swift; sourceTree = "<group>"; };
 		4DF746512D0786CC00E872E5 /* SessionManagerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionManagerTests.swift; sourceTree = "<group>"; };
+		59F2C2477208487EC2512D63 /* FeedbackBarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeedbackBarView.swift; sourceTree = "<group>"; };
 		5DEE9711076CD9BCFC277B74 /* SpeechRecognizing.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpeechRecognizing.swift; sourceTree = "<group>"; };
-		70FB1C0B54CC61CD3E160575 /* RecordingOverlayView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecordingOverlayView.swift; sourceTree = "<group>"; };
 		775A3E31ED46212C7EF9C5F4 /* RecognitionEvent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecognitionEvent.swift; sourceTree = "<group>"; };
 		7A53A1440803CD3EA276D791 /* AudioCapturing.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioCapturing.swift; sourceTree = "<group>"; };
 		8B3061795806AC0CA836AAB7 /* MockClipboardService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockClipboardService.swift; sourceTree = "<group>"; };
@@ -107,7 +107,7 @@
 		148AAA59FCA0DEA8B51F64C8 /* Views */ = {
 			isa = PBXGroup;
 			children = (
-				70FB1C0B54CC61CD3E160575 /* RecordingOverlayView.swift */,
+				59F2C2477208487EC2512D63 /* FeedbackBarView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -292,6 +292,7 @@
 				7CC8122E6EDBD0BD5C5596DD /* AudioCapturing.swift in Sources */,
 				8A25A25F336AA98A1BF41B6E /* ClipboardService.swift in Sources */,
 				5DC1D1F518BAB6216592076F /* ClipboardServicing.swift in Sources */,
+				B6B59DCFE1D7124F94B5EC3B /* FeedbackBarView.swift in Sources */,
 				5FEFC91E55EC69384E6CE020 /* HotKeyController.swift in Sources */,
 				0D8FCFBAB02F67DF7EF606A6 /* HotKeyControlling.swift in Sources */,
 				A2C3BBB86FBA1CA25BBEE200 /* KuchibiApp.swift in Sources */,
@@ -304,7 +305,6 @@
 				3F60CDB02BB89D6F2D42CEDD /* OutputManaging.swift in Sources */,
 				0B40562C1E761FAA2AD4CCAE /* OutputMode.swift in Sources */,
 				052A16321B04F62C4A78FC99 /* RecognitionEvent.swift in Sources */,
-				1E69E6EBEF17EEACC9D84686 /* RecordingOverlayView.swift in Sources */,
 				A545B0010DBEB690DCB7E6E2 /* SessionManager.swift in Sources */,
 				11FE8E3B330EE2ACEAAF09E2 /* SessionState.swift in Sources */,
 				E95FEACC830651D7DF4009BC /* SpeechRecognitionService.swift in Sources */,

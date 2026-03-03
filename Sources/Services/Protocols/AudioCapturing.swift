@@ -3,6 +3,7 @@ import AVFoundation
 /// マイク音声キャプチャのプロトコル
 protocol AudioCapturing {
     var isCapturing: Bool { get }
+    var currentAudioLevel: Float { get }
 
     func startCapture() throws -> AsyncStream<AVAudioPCMBuffer>
     func stopCapture()
