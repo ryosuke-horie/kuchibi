@@ -9,7 +9,7 @@ final class AudioCaptureServiceImpl: AudioCapturing {
     private var continuation: AsyncStream<AVAudioPCMBuffer>.Continuation?
     private(set) var isCapturing: Bool = false
 
-    func startCapture() -> AsyncStream<AVAudioPCMBuffer> {
+    func startCapture() throws -> AsyncStream<AVAudioPCMBuffer> {
         let stream = AsyncStream<AVAudioPCMBuffer> { continuation in
             self.continuation = continuation
         }
@@ -27,7 +27,9 @@ final class AudioCaptureServiceImpl: AudioCapturing {
             Self.logger.info("音声キャプチャを開始")
         } catch {
             Self.logger.error("音声キャプチャの開始に失敗: \(error.localizedDescription)")
+            engine.inputNode.removeTap(onBus: 0)
             continuation?.finish()
+            throw KuchibiError.microphoneUnavailable
         }
 
         return stream

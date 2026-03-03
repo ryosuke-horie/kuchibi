@@ -1,3 +1,4 @@
+import os
 import ServiceManagement
 import SwiftUI
 
@@ -24,9 +25,9 @@ struct KuchibiApp: App {
         )
         _sessionManager = StateObject(wrappedValue: sm)
 
-        hotKeyController = HotKeyControllerImpl(onToggle: { [weak sm] in
+        hotKeyController = HotKeyControllerImpl(onToggle: {
             Task { @MainActor in
-                sm?.toggleSession()
+                sm.toggleSession()
             }
         })
 
@@ -61,6 +62,8 @@ struct KuchibiApp: App {
 }
 
 struct MenuBarView: View {
+    private static let logger = Logger(subsystem: "com.kuchibi.app", category: "MenuBarView")
+
     @ObservedObject var sessionManager: SessionManagerImpl
     @State private var launchAtLogin = false
 
@@ -108,6 +111,7 @@ struct MenuBarView: View {
                 try SMAppService.mainApp.unregister()
             }
         } catch {
+            Self.logger.error("ログイン時起動の設定に失敗: \(error.localizedDescription)")
             launchAtLogin = !enabled
         }
     }

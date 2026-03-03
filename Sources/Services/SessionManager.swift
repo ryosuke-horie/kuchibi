@@ -45,11 +45,32 @@ final class SessionManagerImpl: ObservableObject {
             return
         }
 
+        guard speechService.isModelLoaded else {
+            Self.logger.error("モデルが未読み込みのためセッション開始を拒否")
+            Task {
+                await notificationService.sendErrorNotification(
+                    error: .modelLoadFailed(underlying: NSError(
+                        domain: "com.kuchibi.app", code: -1,
+                        userInfo: [NSLocalizedDescriptionKey: "モデルがまだ読み込まれていません"])))
+            }
+            return
+        }
+
+        let audioStream: AsyncStream<AVAudioPCMBuffer>
+        do {
+            audioStream = try audioService.startCapture()
+        } catch {
+            Self.logger.error("音声キャプチャの開始に失敗: \(error.localizedDescription)")
+            Task {
+                await notificationService.sendErrorNotification(error: .microphoneUnavailable)
+            }
+            return
+        }
+
         state = .recording
         partialText = ""
         Self.logger.info("セッションを開始")
 
-        let audioStream = audioService.startCapture()
         let eventStream = speechService.processAudioStream(audioStream)
 
         recordingTask = Task {
@@ -96,7 +117,7 @@ final class SessionManagerImpl: ObservableObject {
             Self.logger.debug("行の認識を開始")
         case .textChanged(let partial):
             partialText = partial
-            resetSilenceTimeout()
+            startSilenceTimeout()
         case .lineCompleted(let final_):
             let mode = outputMode
             await outputManager.output(text: final_, mode: mode)
@@ -122,9 +143,5 @@ final class SessionManagerImpl: ObservableObject {
             await notificationService.sendErrorNotification(error: .silenceTimeout)
             finishSession()
         }
-    }
-
-    private func resetSilenceTimeout() {
-        startSilenceTimeout()
     }
 }

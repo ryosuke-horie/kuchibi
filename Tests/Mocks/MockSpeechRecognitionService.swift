@@ -5,6 +5,8 @@ final class MockSpeechRecognitionService: SpeechRecognizing {
     var isModelLoaded: Bool = false
     var shouldThrowOnLoad: Bool = false
     var eventsToEmit: [RecognitionEvent] = []
+    var holdStream: Bool = false
+    private var streamContinuation: AsyncStream<RecognitionEvent>.Continuation?
 
     func loadModel() async throws {
         if shouldThrowOnLoad {
@@ -15,7 +17,11 @@ final class MockSpeechRecognitionService: SpeechRecognizing {
 
     func processAudioStream(_ stream: AsyncStream<AVAudioPCMBuffer>) -> AsyncStream<RecognitionEvent> {
         let events = eventsToEmit
+        let hold = holdStream
         return AsyncStream { continuation in
+            if hold {
+                self.streamContinuation = continuation
+            }
             Task {
                 // 入力ストリームを消費
                 for await _ in stream {}
@@ -23,8 +29,15 @@ final class MockSpeechRecognitionService: SpeechRecognizing {
                 for event in events {
                     continuation.yield(event)
                 }
-                continuation.finish()
+                if !hold {
+                    continuation.finish()
+                }
             }
         }
+    }
+
+    func finishStream() {
+        streamContinuation?.finish()
+        streamContinuation = nil
     }
 }

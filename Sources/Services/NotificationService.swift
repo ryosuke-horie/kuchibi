@@ -9,6 +9,8 @@ final class NotificationServiceImpl: NotificationServicing {
         UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .sound]) { granted, error in
             if let error {
                 Self.logger.error("通知権限の取得に失敗: \(error.localizedDescription)")
+            } else if !granted {
+                Self.logger.warning("通知権限が拒否されました。エラー通知が表示されない可能性があります")
             }
         }
     }

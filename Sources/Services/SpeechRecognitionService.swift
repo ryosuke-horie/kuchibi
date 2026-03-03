@@ -26,23 +26,22 @@ final class SpeechRecognitionServiceImpl: SpeechRecognizing {
             Task {
                 continuation.yield(RecognitionEvent(kind: .lineStarted))
 
-                // MoonshineAdapterImplの場合はストリーミングセッションを開始
-                if let moonshineAdapter = adapter as? MoonshineAdapterImpl {
-                    do {
-                        try moonshineAdapter.startStream(
-                            onTextChanged: { partial in
-                                continuation.yield(RecognitionEvent(kind: .textChanged(partial: partial)))
-                            },
-                            onLineCompleted: { final_ in
-                                continuation.yield(RecognitionEvent(kind: .lineCompleted(final: final_)))
-                            }
-                        )
-                    } catch {
-                        Self.logger.error("ストリーム開始に失敗: \(error.localizedDescription)")
-                        continuation.yield(RecognitionEvent(kind: .lineCompleted(final: "")))
-                        continuation.finish()
-                        return
-                    }
+                let lineCompletedEmitted = OSAllocatedUnfairLock(initialState: false)
+
+                do {
+                    try adapter.startStream(
+                        onTextChanged: { partial in
+                            continuation.yield(RecognitionEvent(kind: .textChanged(partial: partial)))
+                        },
+                        onLineCompleted: { final_ in
+                            lineCompletedEmitted.withLock { $0 = true }
+                            continuation.yield(RecognitionEvent(kind: .lineCompleted(final: final_)))
+                        }
+                    )
+                } catch {
+                    Self.logger.error("ストリーム開始に失敗: \(error.localizedDescription)")
+                    continuation.finish()
+                    return
                 }
 
                 // 音声ストリームを消費してアダプターに送る
@@ -50,9 +49,10 @@ final class SpeechRecognitionServiceImpl: SpeechRecognizing {
                     adapter.addAudio(buffer)
                 }
 
-                // ストリーム終了 → 最終テキストを取得
+                // ストリーム終了 → lineCompletedがまだなら最終テキストを取得
                 let finalText = await adapter.finalize()
-                if !finalText.isEmpty {
+                let wasEmitted = lineCompletedEmitted.withLock { $0 }
+                if !wasEmitted && !finalText.isEmpty {
                     continuation.yield(RecognitionEvent(kind: .lineCompleted(final: finalText)))
                 }
                 continuation.finish()

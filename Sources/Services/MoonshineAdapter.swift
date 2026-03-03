@@ -37,10 +37,16 @@ final class MoonshineAdapterImpl: MoonshineAdapting {
     }
 
     func addAudio(_ buffer: AVAudioPCMBuffer) {
-        guard let stream else { return }
+        guard let stream else {
+            Self.logger.warning("音声データを破棄: ストリームが未初期化")
+            return
+        }
 
         // AVAudioPCMBufferから[Float]に変換
-        guard let channelData = buffer.floatChannelData else { return }
+        guard let channelData = buffer.floatChannelData else {
+            Self.logger.error("音声データを破棄: floatChannelDataがnil (format: \(buffer.format))")
+            return
+        }
         let frameLength = Int(buffer.frameLength)
         let floatData = Array(UnsafeBufferPointer(start: channelData[0], count: frameLength))
         let sampleRate = Int32(buffer.format.sampleRate)
@@ -57,7 +63,10 @@ final class MoonshineAdapterImpl: MoonshineAdapting {
     }
 
     func finalize() async -> String {
-        guard let stream else { return latestText }
+        guard let stream else {
+            Self.logger.warning("finalize()がストリームなしで呼ばれた")
+            return ""
+        }
 
         do {
             try stream.stop()
@@ -68,7 +77,7 @@ final class MoonshineAdapterImpl: MoonshineAdapting {
         } catch {
             Self.logger.error("ストリーム終了に失敗: \(error.localizedDescription)")
             self.stream = nil
-            return latestText
+            return ""
         }
     }
 

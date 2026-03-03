@@ -1,8 +1,10 @@
+import Combine
 import SwiftUI
 
 /// 録音中に表示されるフローティングオーバーレイ
 struct RecordingOverlayView: View {
     @ObservedObject var sessionManager: SessionManagerImpl
+    @State private var isPulsing = false
 
     var body: some View {
         VStack(spacing: 12) {
@@ -10,8 +12,8 @@ struct RecordingOverlayView: View {
                 Circle()
                     .fill(.red)
                     .frame(width: 10, height: 10)
-                    .opacity(pulseOpacity)
-                    .animation(.easeInOut(duration: 0.8).repeatForever(autoreverses: true), value: pulseOpacity)
+                    .opacity(isPulsing ? 1.0 : 0.3)
+                    .animation(.easeInOut(duration: 0.8).repeatForever(autoreverses: true), value: isPulsing)
 
                 Text("録音中...")
                     .font(.system(size: 13, weight: .medium))
@@ -32,20 +34,32 @@ struct RecordingOverlayView: View {
         .background(.ultraThinMaterial)
         .clipShape(RoundedRectangle(cornerRadius: 12))
         .shadow(radius: 8)
-    }
-
-    private var pulseOpacity: Double {
-        sessionManager.state == .recording ? 1.0 : 0.3
+        .onAppear {
+            isPulsing = true
+        }
     }
 }
 
 /// オーバーレイウィンドウの管理
+@MainActor
 final class OverlayWindowController {
     private var window: NSWindow?
     private let sessionManager: SessionManagerImpl
+    private var cancellable: AnyCancellable?
 
     init(sessionManager: SessionManagerImpl) {
         self.sessionManager = sessionManager
+
+        // セッション状態を監視してオーバーレイの表示/非表示を制御
+        cancellable = sessionManager.$state
+            .receive(on: RunLoop.main)
+            .sink { [weak self] state in
+                if state == .recording {
+                    self?.show()
+                } else {
+                    self?.hide()
+                }
+            }
     }
 
     func show() {

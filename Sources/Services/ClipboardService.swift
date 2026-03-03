@@ -27,28 +27,37 @@ final class ClipboardServiceImpl: ClipboardServicing {
         pasteboard.setString(text, forType: .string)
 
         // Cmd+V を送信
-        sendPasteKeyEvent()
+        let pasteSucceeded = sendPasteKeyEvent()
 
-        // 短い遅延後にクリップボード復元
-        try? await Task.sleep(for: .milliseconds(100))
+        if pasteSucceeded {
+            // 短い遅延後にクリップボード復元
+            try? await Task.sleep(for: .milliseconds(100))
 
-        pasteboard.clearContents()
-        for (type, data) in savedItems {
-            pasteboard.setData(data, forType: type)
+            pasteboard.clearContents()
+            for (type, data) in savedItems {
+                pasteboard.setData(data, forType: type)
+            }
+            Self.logger.info("テキストをアクティブアプリに直接入力")
+        } else {
+            // ペースト失敗時はテキストをクリップボードに残す
+            Self.logger.warning("ペースト失敗: テキストはクリップボードに残しました")
         }
-
-        Self.logger.info("テキストをアクティブアプリに直接入力")
     }
 
-    private func sendPasteKeyEvent() {
+    @discardableResult
+    private func sendPasteKeyEvent() -> Bool {
         // Cmd+V のキーコード: V = 0x09
-        let keyDown = CGEvent(keyboardEventSource: nil, virtualKey: 0x09, keyDown: true)
-        let keyUp = CGEvent(keyboardEventSource: nil, virtualKey: 0x09, keyDown: false)
+        guard let keyDown = CGEvent(keyboardEventSource: nil, virtualKey: 0x09, keyDown: true),
+              let keyUp = CGEvent(keyboardEventSource: nil, virtualKey: 0x09, keyDown: false) else {
+            Self.logger.error("CGEventの作成に失敗: アクセシビリティ権限を確認してください")
+            return false
+        }
 
-        keyDown?.flags = .maskCommand
-        keyUp?.flags = .maskCommand
+        keyDown.flags = .maskCommand
+        keyUp.flags = .maskCommand
 
-        keyDown?.post(tap: .cghidEventTap)
-        keyUp?.post(tap: .cghidEventTap)
+        keyDown.post(tap: .cghidEventTap)
+        keyUp.post(tap: .cghidEventTap)
+        return true
     }
 }

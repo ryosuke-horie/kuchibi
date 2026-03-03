@@ -4,7 +4,7 @@ import AVFoundation
 protocol AudioCapturing {
     var isCapturing: Bool { get }
 
-    func startCapture() -> AsyncStream<AVAudioPCMBuffer>
+    func startCapture() throws -> AsyncStream<AVAudioPCMBuffer>
     func stopCapture()
     func requestMicrophonePermission() async -> Bool
 }
