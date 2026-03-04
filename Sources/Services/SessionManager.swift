@@ -21,6 +21,7 @@ final class SessionManagerImpl: ObservableObject {
 
     private var recordingTask: Task<Void, Never>?
     private var timeoutTask: Task<Void, Never>?
+    private var accumulatedLines: [String] = []
 
     init(
         audioService: AudioCapturing,
@@ -74,6 +75,7 @@ final class SessionManagerImpl: ObservableObject {
 
         state = .recording
         partialText = ""
+        accumulatedLines = []
         if appSettings.monitoringEnabled {
             monitoring.sessionStarted()
         }
@@ -92,7 +94,7 @@ final class SessionManagerImpl: ObservableObject {
             }
             // イベントストリームが完了してもまだidleでなければ終了処理
             if state != .idle {
-                finishSession()
+                await finishSession()
             }
         }
 
@@ -140,16 +142,21 @@ final class SessionManagerImpl: ObservableObject {
             let outputText = appSettings.textPostprocessingEnabled
                 ? textPostprocessor.process(final_)
                 : final_
-            let mode = appSettings.outputMode
-            await outputManager.output(text: outputText, mode: mode)
+            accumulatedLines.append(outputText)
             partialText = ""
             startSilenceTimeout()
         }
     }
 
-    private func finishSession(error: KuchibiError? = nil) {
+    private func finishSession(error: KuchibiError? = nil) async {
         if audioService.isCapturing {
             audioService.stopCapture()
+        }
+        if !accumulatedLines.isEmpty {
+            let joinedText = accumulatedLines.joined(separator: "\n")
+            let mode = appSettings.outputMode
+            await outputManager.output(text: joinedText, mode: mode)
+            accumulatedLines = []
         }
         if appSettings.monitoringEnabled {
             if let error {
@@ -175,7 +182,7 @@ final class SessionManagerImpl: ObservableObject {
             Self.logger.info("無音タイムアウト")
             audioService.stopCapture()
             await notificationService.sendErrorNotification(error: .silenceTimeout)
-            finishSession(error: .silenceTimeout)
+            await finishSession(error: .silenceTimeout)
         }
     }
 }

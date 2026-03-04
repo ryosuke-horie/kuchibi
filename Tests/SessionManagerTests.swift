@@ -298,6 +298,188 @@ struct SessionManagerTests {
         try await Task.sleep(for: .milliseconds(50))
     }
 
+    // MARK: - テキスト蓄積テスト
+
+    @Test("lineCompleted発生時にOutputManagerが即座に呼ばれない")
+    @MainActor
+    func outputNotCalledDuringRecording() async throws {
+        let mockOutput = MockOutputManager()
+        let mockASR = MockSpeechRecognitionService()
+        mockASR.isModelLoaded = true
+        mockASR.holdStream = true
+        mockASR.eventsToEmit = [
+            RecognitionEvent(kind: .lineCompleted(final: "テスト行"))
+        ]
+        let sm = createSessionManager(outputManager: mockOutput, speechService: mockASR)
+
+        await sm.startSession()
+        // イベントが処理されるのを待つが、ストリームはまだ終了しない
+        try await Task.sleep(for: .milliseconds(100))
+
+        // recording中はOutputManagerが呼ばれない
+        #expect(mockOutput.outputCalls.isEmpty)
+
+        mockASR.finishStream()
+        try await Task.sleep(for: .milliseconds(100))
+    }
+
+    @Test("複数のlineCompleted後にセッション終了で改行結合テキストが出力される")
+    func multipleLineCompletedOutputsJoinedText() async throws {
+        let mockOutput = MockOutputManager()
+        let mockASR = MockSpeechRecognitionService()
+        mockASR.isModelLoaded = true
+        mockASR.eventsToEmit = [
+            RecognitionEvent(kind: .lineCompleted(final: "1行目")),
+            RecognitionEvent(kind: .lineCompleted(final: "2行目")),
+            RecognitionEvent(kind: .lineCompleted(final: "3行目"))
+        ]
+        let sm = await createSessionManager(outputManager: mockOutput, speechService: mockASR)
+
+        await sm.startSession()
+        await sm.stopSession()
+
+        try await Task.sleep(for: .milliseconds(200))
+        #expect(mockOutput.outputCalls.count == 1)
+        #expect(mockOutput.outputCalls.first?.text == "1行目\n2行目\n3行目")
+    }
+
+    @Test("lineCompletedが発生せずセッション終了した場合にOutputManagerが呼ばれない")
+    func noOutputWhenNoLineCompleted() async throws {
+        let mockOutput = MockOutputManager()
+        let mockASR = MockSpeechRecognitionService()
+        mockASR.isModelLoaded = true
+        mockASR.eventsToEmit = []
+        let sm = await createSessionManager(outputManager: mockOutput, speechService: mockASR)
+
+        await sm.startSession()
+        await sm.stopSession()
+
+        try await Task.sleep(for: .milliseconds(200))
+        #expect(mockOutput.outputCalls.isEmpty)
+    }
+
+    @Test("後処理有効時に処理済みテキストがバッファに蓄積される")
+    @MainActor
+    func postprocessedTextAccumulated() async throws {
+        let mockOutput = MockOutputManager()
+        let mockASR = MockSpeechRecognitionService()
+        mockASR.isModelLoaded = true
+        mockASR.eventsToEmit = [
+            RecognitionEvent(kind: .lineCompleted(final: "テスト 文"))
+        ]
+        let mockPostprocessor = MockTextPostprocessor()
+        mockPostprocessor.transformFunction = { text in
+            text.replacingOccurrences(of: " ", with: "")
+        }
+        let settings = AppSettings(defaults: UserDefaults(suiteName: "test.accumulate.\(UUID().uuidString)")!)
+        settings.textPostprocessingEnabled = true
+
+        let sm = createSessionManager(
+            outputManager: mockOutput,
+            speechService: mockASR,
+            appSettings: settings,
+            textPostprocessor: mockPostprocessor
+        )
+
+        await sm.startSession()
+        await sm.stopSession()
+        try await Task.sleep(for: .milliseconds(200))
+
+        #expect(mockPostprocessor.processCalls == ["テスト 文"])
+        #expect(mockOutput.outputCalls.first?.text == "テスト文")
+    }
+
+    @Test("後処理無効時に元テキストがそのままバッファに蓄積される")
+    @MainActor
+    func rawTextAccumulatedWhenPostprocessingDisabled() async throws {
+        let mockOutput = MockOutputManager()
+        let mockASR = MockSpeechRecognitionService()
+        mockASR.isModelLoaded = true
+        mockASR.eventsToEmit = [
+            RecognitionEvent(kind: .lineCompleted(final: "テスト 文"))
+        ]
+        let mockPostprocessor = MockTextPostprocessor()
+        let settings = AppSettings(defaults: UserDefaults(suiteName: "test.accumulate.\(UUID().uuidString)")!)
+        settings.textPostprocessingEnabled = false
+
+        let sm = createSessionManager(
+            outputManager: mockOutput,
+            speechService: mockASR,
+            appSettings: settings,
+            textPostprocessor: mockPostprocessor
+        )
+
+        await sm.startSession()
+        await sm.stopSession()
+        try await Task.sleep(for: .milliseconds(200))
+
+        #expect(mockPostprocessor.processCalls.isEmpty)
+        #expect(mockOutput.outputCalls.first?.text == "テスト 文")
+    }
+
+    @Test("無音タイムアウト時に蓄積テキストが出力される")
+    @MainActor
+    func accumulatedTextOutputOnSilenceTimeout() async throws {
+        let mockOutput = MockOutputManager()
+        let mockASR = MockSpeechRecognitionService()
+        mockASR.isModelLoaded = true
+        mockASR.holdStream = true
+        let settings = AppSettings(defaults: UserDefaults(suiteName: "test.accumulate.\(UUID().uuidString)")!)
+        settings.silenceTimeout = 0.3
+
+        let sm = createSessionManager(
+            outputManager: mockOutput,
+            speechService: mockASR,
+            appSettings: settings
+        )
+
+        await sm.startSession()
+
+        // ストリーム中にイベントを手動注入
+        mockASR.yieldEvent(RecognitionEvent(kind: .lineCompleted(final: "タイムアウト前テキスト")))
+        try await Task.sleep(for: .milliseconds(50))
+
+        // recording中はOutputManagerが呼ばれない
+        #expect(mockOutput.outputCalls.isEmpty)
+
+        // タイムアウトを待つ
+        try await Task.sleep(for: .milliseconds(400))
+
+        #expect(mockOutput.outputCalls.count == 1)
+        #expect(mockOutput.outputCalls.first?.text == "タイムアウト前テキスト")
+
+        mockASR.finishStream()
+        try await Task.sleep(for: .milliseconds(50))
+    }
+
+    @Test("セッション開始時にバッファが初期化される")
+    func bufferInitializedOnSessionStart() async throws {
+        let mockOutput = MockOutputManager()
+        let mockASR = MockSpeechRecognitionService()
+        mockASR.isModelLoaded = true
+        mockASR.eventsToEmit = [
+            RecognitionEvent(kind: .lineCompleted(final: "1回目"))
+        ]
+        let sm = await createSessionManager(outputManager: mockOutput, speechService: mockASR)
+
+        // 1回目のセッション
+        await sm.startSession()
+        await sm.stopSession()
+        try await Task.sleep(for: .milliseconds(200))
+        #expect(mockOutput.outputCalls.count == 1)
+        #expect(mockOutput.outputCalls.first?.text == "1回目")
+
+        // 2回目のセッション — バッファが初期化されているので1回目のテキストは含まれない
+        mockASR.eventsToEmit = [
+            RecognitionEvent(kind: .lineCompleted(final: "2回目"))
+        ]
+        await sm.startSession()
+        await sm.stopSession()
+        try await Task.sleep(for: .milliseconds(200))
+        #expect(mockOutput.outputCalls.count == 2)
+        #expect(mockOutput.outputCalls.last?.text == "2回目")
+    }
+
     // MARK: - Helper
 
     @MainActor
@@ -307,6 +489,7 @@ struct SessionManagerTests {
         speechService: SpeechRecognizing? = nil,
         notificationService: NotificationServicing? = nil,
         appSettings: AppSettings? = nil,
+        textPostprocessor: TextPostprocessing? = nil,
         monitoring: SessionMonitoring? = nil
     ) -> SessionManagerImpl {
         let audio = audioService ?? MockAudioCaptureService()
@@ -327,8 +510,8 @@ struct SessionManagerTests {
             outputManager: output,
             notificationService: notification,
             appSettings: settings,
+            textPostprocessor: textPostprocessor ?? MockTextPostprocessor(),
             monitoring: monitoring ?? MockSessionMonitoringService()
         )
-
     }
 }

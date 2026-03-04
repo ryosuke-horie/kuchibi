@@ -36,6 +36,10 @@ final class MockSpeechRecognitionService: SpeechRecognizing {
         }
     }
 
+    func yieldEvent(_ event: RecognitionEvent) {
+        streamContinuation?.yield(event)
+    }
+
     func finishStream() {
         streamContinuation?.finish()
         streamContinuation = nil

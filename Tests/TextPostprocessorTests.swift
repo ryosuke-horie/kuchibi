@@ -33,6 +33,11 @@ struct TextPostprocessorTests {
         #expect(processor.process("お 元気 です か") == "お元気ですか")
     }
 
+    @Test("各文字間にスペースがある日本語テキストのスペースがすべて除去される")
+    func removesAllSpacesBetweenEveryJapaneseChar() {
+        #expect(processor.process("こ れ か ら 動 作 確 認") == "これから動作確認")
+    }
+
     @Test("英数字と日本語文字の間のスペースは保持される")
     func preservesSpacesBetweenAlphanumAndJapanese() {
         #expect(processor.process("Hello こんにちは") == "Hello こんにちは")

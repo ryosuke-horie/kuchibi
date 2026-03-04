@@ -3,9 +3,10 @@ import Foundation
 
 final class MockTextPostprocessor: TextPostprocessing {
     var processCalls: [String] = []
+    var transformFunction: ((String) -> String)?
 
     func process(_ text: String) -> String {
         processCalls.append(text)
-        return text
+        return transformFunction?(text) ?? text
     }
 }

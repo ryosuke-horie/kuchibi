@@ -15,10 +15,11 @@ struct TextPostprocessorImpl: TextPostprocessing {
 
         // 3. 日本語文字間のスペースを除去
         // 日本語文字: ひらがな、カタカナ、漢字、全角句読点・記号
+        // 先読み(lookahead)により後続文字を消費せず、連続するスペースをすべて除去する
         result = result.replacing(
-            /([\p{Hiragana}\p{Katakana}\p{Han}\u{3000}-\u{303F}\u{FF00}-\u{FFEF}])\s+([\p{Hiragana}\p{Katakana}\p{Han}\u{3000}-\u{303F}\u{FF00}-\u{FFEF}])/
+            /([\p{Hiragana}\p{Katakana}\p{Han}\u{3000}-\u{303F}\u{FF00}-\u{FFEF}])\s+(?=[\p{Hiragana}\p{Katakana}\p{Han}\u{3000}-\u{303F}\u{FF00}-\u{FFEF}])/
         ) { match in
-            "\(match.output.1)\(match.output.2)"
+            "\(match.output.1)"
         }
 
         // 4. 3文字以上の繰り返しフレーズを1つに集約
