@@ -8,10 +8,13 @@ final class MockAudioCaptureService: AudioCapturing {
     var shouldThrowOnStart: Bool = false
     private var continuation: AsyncStream<AVAudioPCMBuffer>.Continuation?
 
-    func startCapture() throws -> AsyncStream<AVAudioPCMBuffer> {
+    var lastNoiseSuppressionEnabled: Bool?
+
+    func startCapture(noiseSuppressionEnabled: Bool) throws -> AsyncStream<AVAudioPCMBuffer> {
         if shouldThrowOnStart {
             throw KuchibiError.microphoneUnavailable
         }
+        lastNoiseSuppressionEnabled = noiseSuppressionEnabled
         isCapturing = true
         return AsyncStream { continuation in
             self.continuation = continuation

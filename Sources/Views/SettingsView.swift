@@ -13,7 +13,7 @@ struct SettingsView: View {
             RecognitionSettingsTab(appSettings: appSettings)
                 .tabItem { Label("音声認識", systemImage: "waveform") }
         }
-        .frame(width: 400, height: 250)
+        .frame(width: 400, height: 380)
     }
 }
 
@@ -73,6 +73,24 @@ private struct RecognitionSettingsTab: View {
                     .frame(width: 60)
                     Text("秒")
                 }
+            }
+
+            Divider()
+
+            Section("前処理") {
+                Toggle("ノイズ抑制", isOn: $appSettings.noiseSuppressionEnabled)
+
+                Toggle("音声アクティビティ検出 (VAD)", isOn: $appSettings.vadEnabled)
+
+                LabeledContent("VAD 感度") {
+                    HStack {
+                        Slider(value: $appSettings.vadThreshold, in: 0.0...1.0, step: 0.001)
+                        Text(String(format: "%.3f", appSettings.vadThreshold))
+                            .monospacedDigit()
+                            .frame(width: 45)
+                    }
+                }
+                .disabled(!appSettings.vadEnabled)
             }
 
             Divider()

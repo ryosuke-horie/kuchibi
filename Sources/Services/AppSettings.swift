@@ -11,6 +11,9 @@ final class AppSettings: ObservableObject {
     static let defaultModelName: String = "moonshine-tiny-ja"
     static let defaultUpdateInterval: Double = 0.5
     static let defaultBufferSize: Int = 1024
+    static let defaultNoiseSuppressionEnabled: Bool = true
+    static let defaultVadEnabled: Bool = true
+    static let defaultVadThreshold: Float = 0.01
 
     // MARK: - UserDefaults Keys
 
@@ -20,6 +23,9 @@ final class AppSettings: ObservableObject {
         static let modelName = "setting.modelName"
         static let updateInterval = "setting.updateInterval"
         static let bufferSize = "setting.bufferSize"
+        static let noiseSuppressionEnabled = "setting.noiseSuppressionEnabled"
+        static let vadEnabled = "setting.vadEnabled"
+        static let vadThreshold = "setting.vadThreshold"
     }
 
     // MARK: - Published Properties
@@ -71,6 +77,31 @@ final class AppSettings: ObservableObject {
         }
     }
 
+    @Published var noiseSuppressionEnabled: Bool {
+        didSet {
+            guard !isResetting else { return }
+            defaults.set(noiseSuppressionEnabled, forKey: Keys.noiseSuppressionEnabled)
+        }
+    }
+
+    @Published var vadEnabled: Bool {
+        didSet {
+            guard !isResetting else { return }
+            defaults.set(vadEnabled, forKey: Keys.vadEnabled)
+        }
+    }
+
+    @Published var vadThreshold: Float {
+        didSet {
+            guard !isResetting else { return }
+            guard vadThreshold >= 0.0, vadThreshold <= 1.0 else {
+                vadThreshold = Self.defaultVadThreshold
+                return
+            }
+            defaults.set(vadThreshold, forKey: Keys.vadThreshold)
+        }
+    }
+
     // MARK: - Private
 
     private let defaults: UserDefaults
@@ -103,6 +134,26 @@ final class AppSettings: ObservableObject {
 
         let savedBuffer = defaults.integer(forKey: Keys.bufferSize)
         self.bufferSize = savedBuffer > 0 ? savedBuffer : Self.defaultBufferSize
+
+        // Bool の復元: UserDefaults にキーが存在しない場合はデフォルト値を使用
+        if defaults.object(forKey: Keys.noiseSuppressionEnabled) != nil {
+            self.noiseSuppressionEnabled = defaults.bool(forKey: Keys.noiseSuppressionEnabled)
+        } else {
+            self.noiseSuppressionEnabled = Self.defaultNoiseSuppressionEnabled
+        }
+
+        if defaults.object(forKey: Keys.vadEnabled) != nil {
+            self.vadEnabled = defaults.bool(forKey: Keys.vadEnabled)
+        } else {
+            self.vadEnabled = Self.defaultVadEnabled
+        }
+
+        let savedThreshold = defaults.float(forKey: Keys.vadThreshold)
+        if defaults.object(forKey: Keys.vadThreshold) != nil, savedThreshold >= 0.0, savedThreshold <= 1.0 {
+            self.vadThreshold = savedThreshold
+        } else {
+            self.vadThreshold = Self.defaultVadThreshold
+        }
     }
 
     // MARK: - Reset
@@ -116,11 +167,17 @@ final class AppSettings: ObservableObject {
         defaults.removeObject(forKey: Keys.modelName)
         defaults.removeObject(forKey: Keys.updateInterval)
         defaults.removeObject(forKey: Keys.bufferSize)
+        defaults.removeObject(forKey: Keys.noiseSuppressionEnabled)
+        defaults.removeObject(forKey: Keys.vadEnabled)
+        defaults.removeObject(forKey: Keys.vadThreshold)
 
         outputMode = Self.defaultOutputMode
         silenceTimeout = Self.defaultSilenceTimeout
         modelName = Self.defaultModelName
         updateInterval = Self.defaultUpdateInterval
         bufferSize = Self.defaultBufferSize
+        noiseSuppressionEnabled = Self.defaultNoiseSuppressionEnabled
+        vadEnabled = Self.defaultVadEnabled
+        vadThreshold = Self.defaultVadThreshold
     }
 }

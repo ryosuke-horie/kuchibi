@@ -15,6 +15,7 @@ final class SessionManagerImpl: ObservableObject {
     private let outputManager: OutputManaging
     private let notificationService: NotificationServicing
     private let appSettings: AppSettings
+    private let preprocessor: AudioPreprocessing
 
     private var recordingTask: Task<Void, Never>?
     private var timeoutTask: Task<Void, Never>?
@@ -24,13 +25,15 @@ final class SessionManagerImpl: ObservableObject {
         speechService: SpeechRecognizing,
         outputManager: OutputManaging,
         notificationService: NotificationServicing,
-        appSettings: AppSettings
+        appSettings: AppSettings,
+        preprocessor: AudioPreprocessing = AudioPreprocessorImpl()
     ) {
         self.audioService = audioService
         self.speechService = speechService
         self.outputManager = outputManager
         self.notificationService = notificationService
         self.appSettings = appSettings
+        self.preprocessor = preprocessor
     }
 
     func startSession() {
@@ -52,7 +55,9 @@ final class SessionManagerImpl: ObservableObject {
 
         let audioStream: AsyncStream<AVAudioPCMBuffer>
         do {
-            audioStream = try audioService.startCapture()
+            audioStream = try audioService.startCapture(
+                noiseSuppressionEnabled: appSettings.noiseSuppressionEnabled
+            )
         } catch {
             Self.logger.error("音声キャプチャの開始に失敗: \(error.localizedDescription)")
             Task {
@@ -65,7 +70,12 @@ final class SessionManagerImpl: ObservableObject {
         partialText = ""
         Self.logger.info("セッションを開始")
 
-        let eventStream = speechService.processAudioStream(audioStream)
+        let processedStream = preprocessor.process(
+            audioStream,
+            vadEnabled: appSettings.vadEnabled,
+            vadThreshold: appSettings.vadThreshold
+        )
+        let eventStream = speechService.processAudioStream(processedStream)
 
         recordingTask = Task {
             for await event in eventStream {

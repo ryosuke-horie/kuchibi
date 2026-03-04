@@ -137,4 +137,78 @@ struct AppSettingsTests {
         settings.bufferSize = 0
         #expect(settings.bufferSize == AppSettings.defaultBufferSize)
     }
+
+    // MARK: - 前処理設定テスト
+
+    @Test("前処理設定のデフォルト値で初期化される")
+    @MainActor
+    func preprocessingInitWithDefaults() {
+        let defaults = createCleanDefaults()
+        let settings = AppSettings(defaults: defaults)
+
+        #expect(settings.noiseSuppressionEnabled == AppSettings.defaultNoiseSuppressionEnabled)
+        #expect(settings.vadEnabled == AppSettings.defaultVadEnabled)
+        #expect(settings.vadThreshold == AppSettings.defaultVadThreshold)
+    }
+
+    @Test("前処理設定がUserDefaultsに永続化される")
+    @MainActor
+    func preprocessingPersistsToUserDefaults() {
+        let defaults = createCleanDefaults()
+        let settings = AppSettings(defaults: defaults)
+
+        settings.noiseSuppressionEnabled = false
+        settings.vadEnabled = false
+        settings.vadThreshold = 0.05
+
+        #expect(defaults.bool(forKey: "setting.noiseSuppressionEnabled") == false)
+        #expect(defaults.bool(forKey: "setting.vadEnabled") == false)
+        #expect(defaults.float(forKey: "setting.vadThreshold") == 0.05)
+    }
+
+    @Test("前処理設定がinitで復元される")
+    @MainActor
+    func preprocessingRestoresFromUserDefaults() {
+        let defaults = createCleanDefaults()
+
+        defaults.set(false, forKey: "setting.noiseSuppressionEnabled")
+        defaults.set(false, forKey: "setting.vadEnabled")
+        defaults.set(Float(0.08), forKey: "setting.vadThreshold")
+
+        let settings = AppSettings(defaults: defaults)
+
+        #expect(settings.noiseSuppressionEnabled == false)
+        #expect(settings.vadEnabled == false)
+        #expect(settings.vadThreshold == 0.08)
+    }
+
+    @Test("resetToDefaultsで前処理設定もデフォルト値に戻る")
+    @MainActor
+    func preprocessingResetToDefaults() {
+        let defaults = createCleanDefaults()
+        let settings = AppSettings(defaults: defaults)
+
+        settings.noiseSuppressionEnabled = false
+        settings.vadEnabled = false
+        settings.vadThreshold = 0.05
+
+        settings.resetToDefaults()
+
+        #expect(settings.noiseSuppressionEnabled == AppSettings.defaultNoiseSuppressionEnabled)
+        #expect(settings.vadEnabled == AppSettings.defaultVadEnabled)
+        #expect(settings.vadThreshold == AppSettings.defaultVadThreshold)
+    }
+
+    @Test("vadThresholdの範囲外の値は拒否される")
+    @MainActor
+    func rejectsInvalidVadThreshold() {
+        let defaults = createCleanDefaults()
+        let settings = AppSettings(defaults: defaults)
+
+        settings.vadThreshold = -0.1
+        #expect(settings.vadThreshold == AppSettings.defaultVadThreshold)
+
+        settings.vadThreshold = 1.5
+        #expect(settings.vadThreshold == AppSettings.defaultVadThreshold)
+    }
 }

@@ -10,12 +10,24 @@ final class AudioCaptureServiceImpl: AudioCapturing {
     private(set) var isCapturing: Bool = false
     private(set) var currentAudioLevel: Float = 0.0
 
-    func startCapture() throws -> AsyncStream<AVAudioPCMBuffer> {
+    func startCapture(noiseSuppressionEnabled: Bool) throws -> AsyncStream<AVAudioPCMBuffer> {
         let stream = AsyncStream<AVAudioPCMBuffer> { continuation in
             self.continuation = continuation
         }
 
         let inputNode = engine.inputNode
+
+        // Voice Processing の設定（エンジン起動前にのみ可能）
+        if noiseSuppressionEnabled {
+            do {
+                try inputNode.setVoiceProcessingEnabled(true)
+                Self.logger.info("Voice Processing を有効化")
+            } catch {
+                Self.logger.warning("Voice Processing の有効化に失敗: \(error.localizedDescription)")
+            }
+        }
+
+        // Voice Processing 有効化後にフォーマットを取得（フォーマットが変わる場合がある）
         let format = inputNode.outputFormat(forBus: 0)
 
         inputNode.installTap(onBus: 0, bufferSize: 1024, format: format) { [weak self] buffer, _ in
