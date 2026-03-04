@@ -25,6 +25,9 @@
   - ストリーミングAPI: `add_audio()`メソッドで逐次音声データを投入可能
   - イベントリスナー: `on_line_started()`, `on_line_text_changed()`, `on_line_completed()`コールバック
   - 日本語モデルはMoonshine Community License（非商用）で利用可能（個人用途では問題なし）
+  - 日本語モデル（moonshine-tiny-ja）はストリーミング版が存在せず、`.tiny`（非ストリーミング）アーキテクチャのみ利用可能
+  - モデルファイルは `moonshine-voice` Python パッケージの `download` コマンドで取得し、`~/.kuchibi/models/moonshine-tiny-ja/` に配置して使用
+  - 非ストリーミングモデルでも Moonshine Swift SDK の統一 API（`createStream`, `addAudio`, `updateTranscription`）がそのまま動作する
 - Implications: PythonKit等のbridge不要でSwiftネイティブアプリとして構築可能。SPMでの依存管理が可能。
 
 ### macOS メニューバーアプリアーキテクチャ

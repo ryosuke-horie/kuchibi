@@ -161,7 +161,7 @@ Implementation Notes:
 Responsibilities & Constraints:
 - NSWindow を画面最下部に全幅で配置
 - フローティングレベルでフォーカスを奪わない
-- SessionManager の `$state` を Combine で監視し recording 時に表示、それ以外で非表示
+- SessionManager の `$state` を Combine で監視し recording 時に表示、それ以外で非表示。lineCompleted ではセッションが継続するため、ユーザーがホットキーで停止するか無音タイムアウトになるまで表示を維持
 
 Dependencies:
 - Inbound: SessionManager — state監視 (P0)
@@ -235,7 +235,7 @@ Implementation Notes:
 Responsibilities & Constraints:
 - `@Published audioLevel: Float` を追加
 - 音声認識イベント処理時に `audioService.currentAudioLevel` を読み取り更新
-- セッション終了時に 0.0 にリセット
+- セッション終了時（ホットキー再押下または無音タイムアウト）に 0.0 にリセット。lineCompleted ではリセットしない
 
 Dependencies:
 - Outbound: AudioCaptureService — currentAudioLevel (P0)
