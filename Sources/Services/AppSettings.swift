@@ -14,6 +14,7 @@ final class AppSettings: ObservableObject {
     static let defaultNoiseSuppressionEnabled: Bool = true
     static let defaultVadEnabled: Bool = true
     static let defaultVadThreshold: Float = 0.01
+    static let defaultTextPostprocessingEnabled: Bool = true
 
     // MARK: - UserDefaults Keys
 
@@ -26,6 +27,7 @@ final class AppSettings: ObservableObject {
         static let noiseSuppressionEnabled = "setting.noiseSuppressionEnabled"
         static let vadEnabled = "setting.vadEnabled"
         static let vadThreshold = "setting.vadThreshold"
+        static let textPostprocessingEnabled = "setting.textPostprocessingEnabled"
     }
 
     // MARK: - Published Properties
@@ -102,6 +104,13 @@ final class AppSettings: ObservableObject {
         }
     }
 
+    @Published var textPostprocessingEnabled: Bool {
+        didSet {
+            guard !isResetting else { return }
+            defaults.set(textPostprocessingEnabled, forKey: Keys.textPostprocessingEnabled)
+        }
+    }
+
     // MARK: - Private
 
     private let defaults: UserDefaults
@@ -154,6 +163,12 @@ final class AppSettings: ObservableObject {
         } else {
             self.vadThreshold = Self.defaultVadThreshold
         }
+
+        if defaults.object(forKey: Keys.textPostprocessingEnabled) != nil {
+            self.textPostprocessingEnabled = defaults.bool(forKey: Keys.textPostprocessingEnabled)
+        } else {
+            self.textPostprocessingEnabled = Self.defaultTextPostprocessingEnabled
+        }
     }
 
     // MARK: - Reset
@@ -170,6 +185,7 @@ final class AppSettings: ObservableObject {
         defaults.removeObject(forKey: Keys.noiseSuppressionEnabled)
         defaults.removeObject(forKey: Keys.vadEnabled)
         defaults.removeObject(forKey: Keys.vadThreshold)
+        defaults.removeObject(forKey: Keys.textPostprocessingEnabled)
 
         outputMode = Self.defaultOutputMode
         silenceTimeout = Self.defaultSilenceTimeout
@@ -179,5 +195,6 @@ final class AppSettings: ObservableObject {
         noiseSuppressionEnabled = Self.defaultNoiseSuppressionEnabled
         vadEnabled = Self.defaultVadEnabled
         vadThreshold = Self.defaultVadThreshold
+        textPostprocessingEnabled = Self.defaultTextPostprocessingEnabled
     }
 }

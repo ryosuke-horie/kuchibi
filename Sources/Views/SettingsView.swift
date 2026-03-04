@@ -13,7 +13,7 @@ struct SettingsView: View {
             RecognitionSettingsTab(appSettings: appSettings)
                 .tabItem { Label("音声認識", systemImage: "waveform") }
         }
-        .frame(width: 400, height: 380)
+        .frame(width: 400, height: 420)
     }
 }
 
@@ -91,6 +91,10 @@ private struct RecognitionSettingsTab: View {
                     }
                 }
                 .disabled(!appSettings.vadEnabled)
+            }
+
+            Section("後処理") {
+                Toggle("テキスト後処理", isOn: $appSettings.textPostprocessingEnabled)
             }
 
             Divider()

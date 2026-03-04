@@ -211,4 +211,49 @@ struct AppSettingsTests {
         settings.vadThreshold = 1.5
         #expect(settings.vadThreshold == AppSettings.defaultVadThreshold)
     }
+
+    // MARK: - テキスト後処理設定テスト
+
+    @Test("テキスト後処理設定のデフォルト値で初期化される")
+    @MainActor
+    func textPostprocessingInitWithDefaults() {
+        let defaults = createCleanDefaults()
+        let settings = AppSettings(defaults: defaults)
+
+        #expect(settings.textPostprocessingEnabled == AppSettings.defaultTextPostprocessingEnabled)
+    }
+
+    @Test("テキスト後処理設定がUserDefaultsに永続化される")
+    @MainActor
+    func textPostprocessingPersistsToUserDefaults() {
+        let defaults = createCleanDefaults()
+        let settings = AppSettings(defaults: defaults)
+
+        settings.textPostprocessingEnabled = false
+
+        #expect(defaults.bool(forKey: "setting.textPostprocessingEnabled") == false)
+    }
+
+    @Test("テキスト後処理設定がinitで復元される")
+    @MainActor
+    func textPostprocessingRestoresFromUserDefaults() {
+        let defaults = createCleanDefaults()
+        defaults.set(false, forKey: "setting.textPostprocessingEnabled")
+
+        let settings = AppSettings(defaults: defaults)
+
+        #expect(settings.textPostprocessingEnabled == false)
+    }
+
+    @Test("resetToDefaultsでテキスト後処理設定もデフォルト値に戻る")
+    @MainActor
+    func textPostprocessingResetToDefaults() {
+        let defaults = createCleanDefaults()
+        let settings = AppSettings(defaults: defaults)
+
+        settings.textPostprocessingEnabled = false
+        settings.resetToDefaults()
+
+        #expect(settings.textPostprocessingEnabled == AppSettings.defaultTextPostprocessingEnabled)
+    }
 }

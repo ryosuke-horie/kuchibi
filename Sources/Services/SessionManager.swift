@@ -16,6 +16,7 @@ final class SessionManagerImpl: ObservableObject {
     private let notificationService: NotificationServicing
     private let appSettings: AppSettings
     private let preprocessor: AudioPreprocessing
+    private let textPostprocessor: TextPostprocessing
 
     private var recordingTask: Task<Void, Never>?
     private var timeoutTask: Task<Void, Never>?
@@ -26,7 +27,8 @@ final class SessionManagerImpl: ObservableObject {
         outputManager: OutputManaging,
         notificationService: NotificationServicing,
         appSettings: AppSettings,
-        preprocessor: AudioPreprocessing = AudioPreprocessorImpl()
+        preprocessor: AudioPreprocessing = AudioPreprocessorImpl(),
+        textPostprocessor: TextPostprocessing = TextPostprocessorImpl()
     ) {
         self.audioService = audioService
         self.speechService = speechService
@@ -34,6 +36,7 @@ final class SessionManagerImpl: ObservableObject {
         self.notificationService = notificationService
         self.appSettings = appSettings
         self.preprocessor = preprocessor
+        self.textPostprocessor = textPostprocessor
     }
 
     func startSession() {
@@ -125,8 +128,11 @@ final class SessionManagerImpl: ObservableObject {
             audioLevel = audioService.currentAudioLevel
             startSilenceTimeout()
         case .lineCompleted(let final_):
+            let outputText = appSettings.textPostprocessingEnabled
+                ? textPostprocessor.process(final_)
+                : final_
             let mode = appSettings.outputMode
-            await outputManager.output(text: final_, mode: mode)
+            await outputManager.output(text: outputText, mode: mode)
             partialText = ""
             startSilenceTimeout()
         }
