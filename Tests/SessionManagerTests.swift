@@ -99,6 +99,23 @@ struct SessionManagerTests {
         let mockASR = MockSpeechRecognitionService()
         mockASR.isModelLoaded = true
         mockASR.eventsToEmit = [
+            RecognitionEvent(kind: .textChanged(partial: "途中テキスト"))
+        ]
+        let sm = await createSessionManager(speechService: mockASR)
+
+        await sm.startSession()
+        await sm.stopSession()
+
+        try await Task.sleep(for: .milliseconds(200))
+        let partial = await sm.partialText
+        #expect(partial == "途中テキスト")
+    }
+
+    @Test("lineCompleted後にpartialTextがリセットされる")
+    func partialTextResetAfterLineCompleted() async throws {
+        let mockASR = MockSpeechRecognitionService()
+        mockASR.isModelLoaded = true
+        mockASR.eventsToEmit = [
             RecognitionEvent(kind: .textChanged(partial: "途中テキスト")),
             RecognitionEvent(kind: .lineCompleted(final: "完了テキスト"))
         ]
@@ -109,7 +126,7 @@ struct SessionManagerTests {
 
         try await Task.sleep(for: .milliseconds(200))
         let partial = await sm.partialText
-        #expect(partial == "途中テキスト")
+        #expect(partial == "")
     }
 
     @Test("モデル未読み込みではstartSessionが拒否される")

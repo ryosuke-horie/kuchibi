@@ -124,11 +124,15 @@ final class SessionManagerImpl: ObservableObject {
         case .lineCompleted(let final_):
             let mode = outputMode
             await outputManager.output(text: final_, mode: mode)
-            finishSession()
+            partialText = ""
+            startSilenceTimeout()
         }
     }
 
     private func finishSession() {
+        if audioService.isCapturing {
+            audioService.stopCapture()
+        }
         state = .idle
         audioLevel = 0.0
         recordingTask = nil
