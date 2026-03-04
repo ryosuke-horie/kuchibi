@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		014B4FEF231C4ECC8AB67954 /* AppSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = C2567DD24F7F2384CAFF09A9 /* AppSettings.swift */; };
 		03B762943B04FBA12F3D7CA4 /* MockSpeechRecognitionService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0950301454AEB49BA6A24954 /* MockSpeechRecognitionService.swift */; };
 		052A16321B04F62C4A78FC99 /* RecognitionEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 775A3E31ED46212C7EF9C5F4 /* RecognitionEvent.swift */; };
 		063E89076BBF7ED9186ACF13 /* KuchibiError.swift in Sources */ = {isa = PBXBuildFile; fileRef = F210E248F410C33E8DD354BB /* KuchibiError.swift */; };
@@ -19,7 +20,9 @@
 		38D05F27F1E438EECA7E9594 /* SpeechRecognitionServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B334D7BD062516AB599119D2 /* SpeechRecognitionServiceTests.swift */; };
 		3D896B5A4244B1D4DCF1BFFC /* HotKey in Frameworks */ = {isa = PBXBuildFile; productRef = C51938C3B8E29F96DA379568 /* HotKey */; };
 		3F60CDB02BB89D6F2D42CEDD /* OutputManaging.swift in Sources */ = {isa = PBXBuildFile; fileRef = 438FE5EE29F95ABC7530E1DC /* OutputManaging.swift */; };
+		45E542E5E74D5814693904B6 /* AppSettingsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE4CB2755E46F8B48C02948F /* AppSettingsTests.swift */; };
 		4A08E8F56B25D0EF716AB777 /* MockOutputManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18F26478F8E01F0C16F321F2 /* MockOutputManager.swift */; };
+		5BEDB9C4D624B47357FF4EFC /* SettingsAccess in Frameworks */ = {isa = PBXBuildFile; productRef = 3A3BDC62E8812110D2FE49BF /* SettingsAccess */; };
 		5DC1D1F518BAB6216592076F /* ClipboardServicing.swift in Sources */ = {isa = PBXBuildFile; fileRef = E66CB5F565073A98DF48CC2F /* ClipboardServicing.swift */; };
 		5FEFC91E55EC69384E6CE020 /* HotKeyController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17091088C1A51563CE50547C /* HotKeyController.swift */; };
 		6B613ECC3D138813FE8565BE /* OutputManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA5FC1EF0A9139A547DCE9E1 /* OutputManager.swift */; };
@@ -34,6 +37,7 @@
 		9A97EAB982046264987BEAA2 /* MockClipboardService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B3061795806AC0CA836AAB7 /* MockClipboardService.swift */; };
 		A2C3BBB86FBA1CA25BBEE200 /* KuchibiApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = C32DA2D991DEFB3190AA572F /* KuchibiApp.swift */; };
 		A545B0010DBEB690DCB7E6E2 /* SessionManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1BBF3BF9F624BDACFFBEE6B7 /* SessionManager.swift */; };
+		B25A2B10C6906684172340BF /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6FA88E522113163387194FC /* SettingsView.swift */; };
 		B6B59DCFE1D7124F94B5EC3B /* FeedbackBarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 59F2C2477208487EC2512D63 /* FeedbackBarView.swift */; };
 		BAAD6B03864F546F3E3367ED /* MockNotificationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC030E08D9FB798B68FFADA4 /* MockNotificationService.swift */; };
 		C45FEACCB46A4EA1576DD6BF /* NotificationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 98D0E0C1DB5386C565834D9A /* NotificationService.swift */; };
@@ -78,12 +82,15 @@
 		AC030E08D9FB798B68FFADA4 /* MockNotificationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockNotificationService.swift; sourceTree = "<group>"; };
 		AF6B8FA94DE9C36C7FFA3F4E /* MoonshineAdapting.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoonshineAdapting.swift; sourceTree = "<group>"; };
 		B334D7BD062516AB599119D2 /* SpeechRecognitionServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpeechRecognitionServiceTests.swift; sourceTree = "<group>"; };
+		BE4CB2755E46F8B48C02948F /* AppSettingsTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppSettingsTests.swift; sourceTree = "<group>"; };
 		C114CB5F1012E3C584AB09F4 /* AudioCaptureService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioCaptureService.swift; sourceTree = "<group>"; };
+		C2567DD24F7F2384CAFF09A9 /* AppSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppSettings.swift; sourceTree = "<group>"; };
 		C32DA2D991DEFB3190AA572F /* KuchibiApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KuchibiApp.swift; sourceTree = "<group>"; };
 		C531F963B68CB7998DD9D1B9 /* OutputManagerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OutputManagerTests.swift; sourceTree = "<group>"; };
 		C60BE26F4FD2896422DC6AD2 /* Kuchibi.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Kuchibi.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		E63E378A918F838B82ACE3FF /* NotificationServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationServiceTests.swift; sourceTree = "<group>"; };
 		E66CB5F565073A98DF48CC2F /* ClipboardServicing.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClipboardServicing.swift; sourceTree = "<group>"; };
+		E6FA88E522113163387194FC /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		E8FF8890BCFF032E69155777 /* NotificationServicing.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationServicing.swift; sourceTree = "<group>"; };
 		F210E248F410C33E8DD354BB /* KuchibiError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KuchibiError.swift; sourceTree = "<group>"; };
 		F27A6934F52E8C5BC69591EA /* MockAudioCaptureService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockAudioCaptureService.swift; sourceTree = "<group>"; };
@@ -98,6 +105,7 @@
 			files = (
 				3D896B5A4244B1D4DCF1BFFC /* HotKey in Frameworks */,
 				94A26725752116D062AB00CB /* Moonshine in Frameworks */,
+				5BEDB9C4D624B47357FF4EFC /* SettingsAccess in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -108,6 +116,7 @@
 			isa = PBXGroup;
 			children = (
 				59F2C2477208487EC2512D63 /* FeedbackBarView.swift */,
+				E6FA88E522113163387194FC /* SettingsView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -115,6 +124,7 @@
 		1DFD8DD313CC3E4A020920FD /* Services */ = {
 			isa = PBXGroup;
 			children = (
+				C2567DD24F7F2384CAFF09A9 /* AppSettings.swift */,
 				C114CB5F1012E3C584AB09F4 /* AudioCaptureService.swift */,
 				02FBC7887C665F64BFF30939 /* ClipboardService.swift */,
 				17091088C1A51563CE50547C /* HotKeyController.swift */,
@@ -172,6 +182,7 @@
 		AA5264FD43458EAF46C5C962 /* Tests */ = {
 			isa = PBXGroup;
 			children = (
+				BE4CB2755E46F8B48C02948F /* AppSettingsTests.swift */,
 				42412DB8F6EC05A959ABE916 /* ModelsTests.swift */,
 				E63E378A918F838B82ACE3FF /* NotificationServiceTests.swift */,
 				C531F963B68CB7998DD9D1B9 /* OutputManagerTests.swift */,
@@ -227,6 +238,7 @@
 			packageProductDependencies = (
 				C51938C3B8E29F96DA379568 /* HotKey */,
 				15F30F0D08FB173F3E97476C /* Moonshine */,
+				3A3BDC62E8812110D2FE49BF /* SettingsAccess */,
 			);
 			productName = Kuchibi;
 			productReference = C60BE26F4FD2896422DC6AD2 /* Kuchibi.app */;
@@ -272,6 +284,7 @@
 			packageReferences = (
 				BEB727BF0A9FD067B3D4C160 /* XCRemoteSwiftPackageReference "HotKey" */,
 				B315BC6C97CFE8EB105863D0 /* XCRemoteSwiftPackageReference "moonshine-swift" */,
+				4D183F5E172D1CE1DCCC3B33 /* XCRemoteSwiftPackageReference "SettingsAccess" */,
 			);
 			preferredProjectObjectVersion = 77;
 			projectDirPath = "";
@@ -288,6 +301,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				014B4FEF231C4ECC8AB67954 /* AppSettings.swift in Sources */,
 				7B9604777D16087D296030AF /* AudioCaptureService.swift in Sources */,
 				7CC8122E6EDBD0BD5C5596DD /* AudioCapturing.swift in Sources */,
 				8A25A25F336AA98A1BF41B6E /* ClipboardService.swift in Sources */,
@@ -307,6 +321,7 @@
 				052A16321B04F62C4A78FC99 /* RecognitionEvent.swift in Sources */,
 				A545B0010DBEB690DCB7E6E2 /* SessionManager.swift in Sources */,
 				11FE8E3B330EE2ACEAAF09E2 /* SessionState.swift in Sources */,
+				B25A2B10C6906684172340BF /* SettingsView.swift in Sources */,
 				E95FEACC830651D7DF4009BC /* SpeechRecognitionService.swift in Sources */,
 				D9C5F978AD02FB264AE19A31 /* SpeechRecognizing.swift in Sources */,
 			);
@@ -316,6 +331,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				45E542E5E74D5814693904B6 /* AppSettingsTests.swift in Sources */,
 				9A1361D1428C7264FAD5D65E /* MockAudioCaptureService.swift in Sources */,
 				9A97EAB982046264987BEAA2 /* MockClipboardService.swift in Sources */,
 				84ECFF1B5FC59931BAD35345 /* MockMoonshineAdapter.swift in Sources */,
@@ -557,6 +573,14 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
+		4D183F5E172D1CE1DCCC3B33 /* XCRemoteSwiftPackageReference "SettingsAccess" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/orchetect/SettingsAccess";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 2.1.0;
+			};
+		};
 		B315BC6C97CFE8EB105863D0 /* XCRemoteSwiftPackageReference "moonshine-swift" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/moonshine-ai/moonshine-swift";
@@ -580,6 +604,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = B315BC6C97CFE8EB105863D0 /* XCRemoteSwiftPackageReference "moonshine-swift" */;
 			productName = Moonshine;
+		};
+		3A3BDC62E8812110D2FE49BF /* SettingsAccess */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 4D183F5E172D1CE1DCCC3B33 /* XCRemoteSwiftPackageReference "SettingsAccess" */;
+			productName = SettingsAccess;
 		};
 		C51938C3B8E29F96DA379568 /* HotKey */ = {
 			isa = XCSwiftPackageProductDependency;

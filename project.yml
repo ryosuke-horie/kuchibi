@@ -13,6 +13,9 @@ packages:
   MoonshineSwift:
     url: https://github.com/moonshine-ai/moonshine-swift
     from: "0.0.49"
+  SettingsAccess:
+    url: https://github.com/orchetect/SettingsAccess
+    from: "2.1.0"
 
 targets:
   Kuchibi:
@@ -24,6 +27,7 @@ targets:
       - package: HotKey
       - package: MoonshineSwift
         product: Moonshine
+      - package: SettingsAccess
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.kuchibi.app

@@ -73,11 +73,11 @@ struct SessionManagerTests {
         #expect(mockOutput.outputCalls.first?.mode == .clipboard)
     }
 
-    @Test("outputModeのデフォルトはclipboard")
+    @Test("AppSettingsのoutputModeがデフォルトでclipboard")
+    @MainActor
     func defaultOutputMode() async {
-        let sm = await createSessionManager()
-        let mode = await sm.outputMode
-        #expect(mode == .clipboard)
+        let settings = AppSettings(defaults: UserDefaults(suiteName: "test.sessionmanager")!)
+        #expect(settings.outputMode == .clipboard)
     }
 
     @Test("toggleSessionでセッションの開始・停止が切り替わる")
@@ -213,12 +213,14 @@ struct SessionManagerTests {
 
     // MARK: - Helper
 
+    @MainActor
     private func createSessionManager(
         audioService: AudioCapturing? = nil,
         outputManager: OutputManaging? = nil,
         speechService: SpeechRecognizing? = nil,
-        notificationService: NotificationServicing? = nil
-    ) async -> SessionManagerImpl {
+        notificationService: NotificationServicing? = nil,
+        appSettings: AppSettings? = nil
+    ) -> SessionManagerImpl {
         let audio = audioService ?? MockAudioCaptureService()
         let asr: SpeechRecognizing
         if let s = speechService {
@@ -230,11 +232,13 @@ struct SessionManagerTests {
         }
         let output = outputManager ?? MockOutputManager()
         let notification = notificationService ?? MockNotificationService()
-        return await SessionManagerImpl(
+        let settings = appSettings ?? AppSettings(defaults: UserDefaults(suiteName: "test.sessionmanager.\(UUID().uuidString)")!)
+        return SessionManagerImpl(
             audioService: audio,
             speechService: asr,
             outputManager: output,
-            notificationService: notification
-        )
+            notificationService: notification,
+            appSettings: settings)
+
     }
 }

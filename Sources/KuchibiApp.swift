@@ -1,14 +1,18 @@
 import os
-import ServiceManagement
+import SettingsAccess
 import SwiftUI
 
 @main
 struct KuchibiApp: App {
+    @StateObject private var appSettings = AppSettings()
     @StateObject private var sessionManager: SessionManagerImpl
     private let hotKeyController: HotKeyControllerImpl
     private let feedbackBarController: FeedbackBarWindowController
 
     init() {
+        let settings = AppSettings()
+        _appSettings = StateObject(wrappedValue: settings)
+
         // サービス構築
         let audioService = AudioCaptureServiceImpl()
         let moonshineAdapter = MoonshineAdapterImpl()
@@ -21,7 +25,8 @@ struct KuchibiApp: App {
             audioService: audioService,
             speechService: speechService,
             outputManager: outputManager,
-            notificationService: notificationService
+            notificationService: notificationService,
+            appSettings: settings
         )
         _sessionManager = StateObject(wrappedValue: sm)
 
@@ -50,6 +55,10 @@ struct KuchibiApp: App {
         MenuBarExtra("Kuchibi", systemImage: menuBarIcon) {
             MenuBarView(sessionManager: sessionManager)
         }
+
+        Settings {
+            SettingsView(appSettings: appSettings)
+        }
     }
 
     private var menuBarIcon: String {
@@ -62,10 +71,7 @@ struct KuchibiApp: App {
 }
 
 struct MenuBarView: View {
-    private static let logger = Logger(subsystem: "com.kuchibi.app", category: "MenuBarView")
-
     @ObservedObject var sessionManager: SessionManagerImpl
-    @State private var launchAtLogin = false
 
     var body: some View {
         VStack {
@@ -74,17 +80,11 @@ struct MenuBarView: View {
 
             Divider()
 
-            Picker("出力モード", selection: $sessionManager.outputMode) {
-                Text("クリップボード").tag(OutputMode.clipboard)
-                Text("直接入力").tag(OutputMode.directInput)
-            }
-
-            Divider()
-
-            Toggle("ログイン時に起動", isOn: $launchAtLogin)
-                .onChange(of: launchAtLogin) { _, newValue in
-                    setLaunchAtLogin(newValue)
-                }
+            SettingsLink(
+                label: { Text("設定...") },
+                preAction: { NSApp.activate(ignoringOtherApps: true) },
+                postAction: { }
+            )
 
             Divider()
 
@@ -100,19 +100,6 @@ struct MenuBarView: View {
         case .idle: "待機中"
         case .recording: "録音中..."
         case .processing: "認識処理中..."
-        }
-    }
-
-    private func setLaunchAtLogin(_ enabled: Bool) {
-        do {
-            if enabled {
-                try SMAppService.mainApp.register()
-            } else {
-                try SMAppService.mainApp.unregister()
-            }
-        } catch {
-            Self.logger.error("ログイン時起動の設定に失敗: \(error.localizedDescription)")
-            launchAtLogin = !enabled
         }
     }
 }

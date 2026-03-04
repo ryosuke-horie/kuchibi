@@ -5,19 +5,16 @@ import os
 @MainActor
 final class SessionManagerImpl: ObservableObject {
     private static let logger = Logger(subsystem: "com.kuchibi.app", category: "SessionManager")
-    private static let silenceTimeoutSeconds: TimeInterval = 30
 
     @Published private(set) var state: SessionState = .idle
     @Published private(set) var partialText: String = ""
     @Published private(set) var audioLevel: Float = 0.0
-    @Published var outputMode: OutputMode = .clipboard {
-        didSet { UserDefaults.standard.set(outputMode.rawValue, forKey: "outputMode") }
-    }
 
     private let audioService: AudioCapturing
     private let speechService: SpeechRecognizing
     private let outputManager: OutputManaging
     private let notificationService: NotificationServicing
+    private let appSettings: AppSettings
 
     private var recordingTask: Task<Void, Never>?
     private var timeoutTask: Task<Void, Never>?
@@ -26,18 +23,14 @@ final class SessionManagerImpl: ObservableObject {
         audioService: AudioCapturing,
         speechService: SpeechRecognizing,
         outputManager: OutputManaging,
-        notificationService: NotificationServicing
+        notificationService: NotificationServicing,
+        appSettings: AppSettings
     ) {
         self.audioService = audioService
         self.speechService = speechService
         self.outputManager = outputManager
         self.notificationService = notificationService
-
-        // UserDefaultsから出力モードを復元
-        if let saved = UserDefaults.standard.string(forKey: "outputMode"),
-           let mode = OutputMode(rawValue: saved) {
-            self.outputMode = mode
-        }
+        self.appSettings = appSettings
     }
 
     func startSession() {
@@ -122,7 +115,7 @@ final class SessionManagerImpl: ObservableObject {
             audioLevel = audioService.currentAudioLevel
             startSilenceTimeout()
         case .lineCompleted(let final_):
-            let mode = outputMode
+            let mode = appSettings.outputMode
             await outputManager.output(text: final_, mode: mode)
             partialText = ""
             startSilenceTimeout()
@@ -143,8 +136,9 @@ final class SessionManagerImpl: ObservableObject {
 
     private func startSilenceTimeout() {
         timeoutTask?.cancel()
+        let timeout = appSettings.silenceTimeout
         timeoutTask = Task {
-            try? await Task.sleep(for: .seconds(Self.silenceTimeoutSeconds))
+            try? await Task.sleep(for: .seconds(timeout))
             guard !Task.isCancelled, state == .recording else { return }
             Self.logger.info("無音タイムアウト")
             audioService.stopCapture()
