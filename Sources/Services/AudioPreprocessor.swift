@@ -21,8 +21,8 @@ final class AudioPreprocessorImpl: AudioPreprocessing {
     ) -> AsyncStream<AVAudioPCMBuffer> {
         AsyncStream { continuation in
             Task {
-                var converter: AVAudioConverter?
                 var needsResampling: Bool?
+                var resamplingRatio: Double = 1.0
 
                 for await buffer in stream {
                     // リサンプリング判定（初回のみ）
@@ -32,13 +32,8 @@ final class AudioPreprocessorImpl: AudioPreprocessing {
                             && inputFormat.channelCount == Self.targetChannelCount
                         needsResampling = !skip
                         if !skip {
-                            converter = AVAudioConverter(from: inputFormat, to: Self.targetFormat)
-                            if converter == nil {
-                                Self.logger.warning("AVAudioConverter の初期化に失敗。リサンプリングをスキップ")
-                                needsResampling = false
-                            } else {
-                                Self.logger.info("リサンプリング有効: \(inputFormat.sampleRate)Hz → \(Self.targetSampleRate)Hz")
-                            }
+                            resamplingRatio = Self.targetSampleRate / inputFormat.sampleRate
+                            Self.logger.info("リサンプリング有効: \(inputFormat.sampleRate)Hz → \(Self.targetSampleRate)Hz (ratio=\(resamplingRatio))")
                         } else {
                             Self.logger.info("入力が16kHzモノラルのためリサンプリングをスキップ")
                         }
@@ -46,8 +41,8 @@ final class AudioPreprocessorImpl: AudioPreprocessing {
 
                     // リサンプリング
                     let processedBuffer: AVAudioPCMBuffer
-                    if needsResampling == true, let converter {
-                        guard let resampled = resample(buffer: buffer, converter: converter) else {
+                    if needsResampling == true {
+                        guard let resampled = resample(buffer: buffer, ratio: resamplingRatio) else {
                             continue
                         }
                         processedBuffer = resampled
@@ -73,33 +68,50 @@ final class AudioPreprocessorImpl: AudioPreprocessing {
 
     // MARK: - Private
 
-    private func resample(buffer: AVAudioPCMBuffer, converter: AVAudioConverter) -> AVAudioPCMBuffer? {
-        let ratio = Self.targetSampleRate / buffer.format.sampleRate
-        let outputFrameCount = AVAudioFrameCount(Double(buffer.frameLength) * ratio)
+    /// 線形補間によるリサンプリング
+    private func resample(buffer: AVAudioPCMBuffer, ratio: Double) -> AVAudioPCMBuffer? {
+        guard let channelData = buffer.floatChannelData else {
+            Self.logger.error("リサンプリング失敗: floatChannelData が nil")
+            return nil
+        }
+
+        let inputFrames = Int(buffer.frameLength)
+        let outputFrames = Int(Double(inputFrames) * ratio)
+        guard outputFrames > 0 else { return nil }
+
         guard let outputBuffer = AVAudioPCMBuffer(
             pcmFormat: Self.targetFormat,
-            frameCapacity: outputFrameCount
+            frameCapacity: AVAudioFrameCount(outputFrames)
         ) else {
             Self.logger.error("出力バッファの作成に失敗")
             return nil
         }
 
-        var inputConsumed = false
-        let status = converter.convert(to: outputBuffer, error: nil) { _, outStatus in
-            if inputConsumed {
-                outStatus.pointee = .noDataNow
-                return nil
-            }
-            inputConsumed = true
-            outStatus.pointee = .haveData
-            return buffer
-        }
-
-        guard status != .error else {
-            Self.logger.error("リサンプリングに失敗")
+        guard let outputChannelData = outputBuffer.floatChannelData else {
+            Self.logger.error("出力バッファの floatChannelData が nil")
             return nil
         }
 
+        let inputSamples = channelData[0]
+        let outputSamples = outputChannelData[0]
+        let step = 1.0 / ratio  // 入力のステップ幅（例: 48kHz→16kHz では 3.0）
+
+        for i in 0..<outputFrames {
+            let srcPos = Double(i) * step
+            let srcIndex = Int(srcPos)
+            let fraction = Float(srcPos - Double(srcIndex))
+
+            if srcIndex + 1 < inputFrames {
+                // 線形補間
+                outputSamples[i] = inputSamples[srcIndex] * (1.0 - fraction) + inputSamples[srcIndex + 1] * fraction
+            } else if srcIndex < inputFrames {
+                outputSamples[i] = inputSamples[srcIndex]
+            } else {
+                outputSamples[i] = 0.0
+            }
+        }
+
+        outputBuffer.frameLength = AVAudioFrameCount(outputFrames)
         return outputBuffer
     }
 
