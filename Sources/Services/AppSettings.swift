@@ -15,6 +15,7 @@ final class AppSettings: ObservableObject {
     static let defaultVadEnabled: Bool = true
     static let defaultVadThreshold: Float = 0.01
     static let defaultTextPostprocessingEnabled: Bool = true
+    static let defaultMonitoringEnabled: Bool = true
 
     // MARK: - UserDefaults Keys
 
@@ -28,6 +29,7 @@ final class AppSettings: ObservableObject {
         static let vadEnabled = "setting.vadEnabled"
         static let vadThreshold = "setting.vadThreshold"
         static let textPostprocessingEnabled = "setting.textPostprocessingEnabled"
+        static let monitoringEnabled = "setting.monitoringEnabled"
     }
 
     // MARK: - Published Properties
@@ -111,6 +113,13 @@ final class AppSettings: ObservableObject {
         }
     }
 
+    @Published var monitoringEnabled: Bool {
+        didSet {
+            guard !isResetting else { return }
+            defaults.set(monitoringEnabled, forKey: Keys.monitoringEnabled)
+        }
+    }
+
     // MARK: - Private
 
     private let defaults: UserDefaults
@@ -169,6 +178,12 @@ final class AppSettings: ObservableObject {
         } else {
             self.textPostprocessingEnabled = Self.defaultTextPostprocessingEnabled
         }
+
+        if defaults.object(forKey: Keys.monitoringEnabled) != nil {
+            self.monitoringEnabled = defaults.bool(forKey: Keys.monitoringEnabled)
+        } else {
+            self.monitoringEnabled = Self.defaultMonitoringEnabled
+        }
     }
 
     // MARK: - Reset
@@ -186,6 +201,7 @@ final class AppSettings: ObservableObject {
         defaults.removeObject(forKey: Keys.vadEnabled)
         defaults.removeObject(forKey: Keys.vadThreshold)
         defaults.removeObject(forKey: Keys.textPostprocessingEnabled)
+        defaults.removeObject(forKey: Keys.monitoringEnabled)
 
         outputMode = Self.defaultOutputMode
         silenceTimeout = Self.defaultSilenceTimeout
@@ -196,5 +212,6 @@ final class AppSettings: ObservableObject {
         vadEnabled = Self.defaultVadEnabled
         vadThreshold = Self.defaultVadThreshold
         textPostprocessingEnabled = Self.defaultTextPostprocessingEnabled
+        monitoringEnabled = Self.defaultMonitoringEnabled
     }
 }

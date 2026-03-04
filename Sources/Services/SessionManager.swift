@@ -17,6 +17,7 @@ final class SessionManagerImpl: ObservableObject {
     private let appSettings: AppSettings
     private let preprocessor: AudioPreprocessing
     private let textPostprocessor: TextPostprocessing
+    private let monitoring: SessionMonitoring
 
     private var recordingTask: Task<Void, Never>?
     private var timeoutTask: Task<Void, Never>?
@@ -28,7 +29,8 @@ final class SessionManagerImpl: ObservableObject {
         notificationService: NotificationServicing,
         appSettings: AppSettings,
         preprocessor: AudioPreprocessing = AudioPreprocessorImpl(),
-        textPostprocessor: TextPostprocessing = TextPostprocessorImpl()
+        textPostprocessor: TextPostprocessing = TextPostprocessorImpl(),
+        monitoring: SessionMonitoring = SessionMonitoringServiceImpl()
     ) {
         self.audioService = audioService
         self.speechService = speechService
@@ -37,6 +39,7 @@ final class SessionManagerImpl: ObservableObject {
         self.appSettings = appSettings
         self.preprocessor = preprocessor
         self.textPostprocessor = textPostprocessor
+        self.monitoring = monitoring
     }
 
     func startSession() {
@@ -71,6 +74,9 @@ final class SessionManagerImpl: ObservableObject {
 
         state = .recording
         partialText = ""
+        if appSettings.monitoringEnabled {
+            monitoring.sessionStarted()
+        }
         Self.logger.info("セッションを開始")
 
         let processedStream = preprocessor.process(
@@ -128,6 +134,9 @@ final class SessionManagerImpl: ObservableObject {
             audioLevel = audioService.currentAudioLevel
             startSilenceTimeout()
         case .lineCompleted(let final_):
+            if appSettings.monitoringEnabled {
+                monitoring.textCompleted(text: final_)
+            }
             let outputText = appSettings.textPostprocessingEnabled
                 ? textPostprocessor.process(final_)
                 : final_
@@ -138,9 +147,16 @@ final class SessionManagerImpl: ObservableObject {
         }
     }
 
-    private func finishSession() {
+    private func finishSession(error: KuchibiError? = nil) {
         if audioService.isCapturing {
             audioService.stopCapture()
+        }
+        if appSettings.monitoringEnabled {
+            if let error {
+                monitoring.sessionFailed(error: error)
+            } else {
+                monitoring.sessionEnded()
+            }
         }
         state = .idle
         audioLevel = 0.0
@@ -159,7 +175,7 @@ final class SessionManagerImpl: ObservableObject {
             Self.logger.info("無音タイムアウト")
             audioService.stopCapture()
             await notificationService.sendErrorNotification(error: .silenceTimeout)
-            finishSession()
+            finishSession(error: .silenceTimeout)
         }
     }
 }

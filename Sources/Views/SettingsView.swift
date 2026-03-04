@@ -97,6 +97,10 @@ private struct RecognitionSettingsTab: View {
                 Toggle("テキスト後処理", isOn: $appSettings.textPostprocessingEnabled)
             }
 
+            Section("モニタリング") {
+                Toggle("セッションモニタリング", isOn: $appSettings.monitoringEnabled)
+            }
+
             Divider()
 
             HStack {

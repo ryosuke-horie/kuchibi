@@ -53,6 +53,10 @@
 		E14B97AA9E10BA2B27CBF008 /* SessionManagerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4DF746512D0786CC00E872E5 /* SessionManagerTests.swift */; };
 		E90EEEEDA9C89B97C45DEFDE /* AudioPreprocessor.swift in Sources */ = {isa = PBXBuildFile; fileRef = D7E70850E8617B23FFBC6D25 /* AudioPreprocessor.swift */; };
 		E95FEACC830651D7DF4009BC /* SpeechRecognitionService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20667E795903E13BE376BFB3 /* SpeechRecognitionService.swift */; };
+		B2C3D4E5F6A7B8C9D0E1F2A3 /* SessionMonitoring.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F6A7B8C9D0E1F2 /* SessionMonitoring.swift */; };
+		D4E5F6A7B8C9D0E1F2A3B4C5 /* SessionMonitoringService.swift in Sources */ = {isa = PBXBuildFile; fileRef = C3D4E5F6A7B8C9D0E1F2A3B4 /* SessionMonitoringService.swift */; };
+		F6A7B8C9D0E1F2A3B4C5D6E7 /* SessionMonitoringServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E5F6A7B8C9D0E1F2A3B4C5D6 /* SessionMonitoringServiceTests.swift */; };
+		A7B8C9D0E1F2A3B4C5D6E7F8 /* MockSessionMonitoringService.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8C9D0E1F2A3B4C5D6E7F8A9 /* MockSessionMonitoringService.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -74,6 +78,7 @@
 		1BBF3BF9F624BDACFFBEE6B7 /* SessionManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionManager.swift; sourceTree = "<group>"; };
 		1C5ED9C89542CB717C30A981 /* MockTextPostprocessor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockTextPostprocessor.swift; sourceTree = "<group>"; };
 		1E578D16AEE9FBE092B0038A /* MockAudioPreprocessor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockAudioPreprocessor.swift; sourceTree = "<group>"; };
+		B8C9D0E1F2A3B4C5D6E7F8A9 /* MockSessionMonitoringService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockSessionMonitoringService.swift; sourceTree = "<group>"; };
 		20667E795903E13BE376BFB3 /* SpeechRecognitionService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpeechRecognitionService.swift; sourceTree = "<group>"; };
 		354653C713A6898397AA7813 /* AudioPreprocessorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioPreprocessorTests.swift; sourceTree = "<group>"; };
 		3B8E11116B0287E092ADCD9A /* HotKeyControlling.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HotKeyControlling.swift; sourceTree = "<group>"; };
@@ -112,6 +117,9 @@
 		F27A6934F52E8C5BC69591EA /* MockAudioCaptureService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockAudioCaptureService.swift; sourceTree = "<group>"; };
 		F6B7BEA988E0B1018B66C656 /* SessionState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionState.swift; sourceTree = "<group>"; };
 		F6CAF48EF818CFA8942FA4D3 /* KuchibiTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = KuchibiTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		A1B2C3D4E5F6A7B8C9D0E1F2 /* SessionMonitoring.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionMonitoring.swift; sourceTree = "<group>"; };
+		C3D4E5F6A7B8C9D0E1F2A3B4 /* SessionMonitoringService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionMonitoringService.swift; sourceTree = "<group>"; };
+		E5F6A7B8C9D0E1F2A3B4C5D6 /* SessionMonitoringServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionMonitoringServiceTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -149,6 +157,7 @@
 				98D0E0C1DB5386C565834D9A /* NotificationService.swift */,
 				AA5FC1EF0A9139A547DCE9E1 /* OutputManager.swift */,
 				1BBF3BF9F624BDACFFBEE6B7 /* SessionManager.swift */,
+				C3D4E5F6A7B8C9D0E1F2A3B4 /* SessionMonitoringService.swift */,
 				20667E795903E13BE376BFB3 /* SpeechRecognitionService.swift */,
 				73138B86E0637C5A5354239B /* TextPostprocessor.swift */,
 				BE095DFF5F74059A492E2554 /* Protocols */,
@@ -206,6 +215,7 @@
 				E63E378A918F838B82ACE3FF /* NotificationServiceTests.swift */,
 				C531F963B68CB7998DD9D1B9 /* OutputManagerTests.swift */,
 				4DF746512D0786CC00E872E5 /* SessionManagerTests.swift */,
+				E5F6A7B8C9D0E1F2A3B4C5D6 /* SessionMonitoringServiceTests.swift */,
 				B334D7BD062516AB599119D2 /* SpeechRecognitionServiceTests.swift */,
 				59B9735BE3B50AE3B84CBFD5 /* TextPostprocessorTests.swift */,
 				C295405FCBB38D0A9B70EF68 /* Mocks */,
@@ -223,6 +233,7 @@
 				AF6B8FA94DE9C36C7FFA3F4E /* MoonshineAdapting.swift */,
 				E8FF8890BCFF032E69155777 /* NotificationServicing.swift */,
 				438FE5EE29F95ABC7530E1DC /* OutputManaging.swift */,
+				A1B2C3D4E5F6A7B8C9D0E1F2 /* SessionMonitoring.swift */,
 				5DEE9711076CD9BCFC277B74 /* SpeechRecognizing.swift */,
 				E3EC3E47D72739ECF113A59C /* TextPostprocessing.swift */,
 			);
@@ -238,6 +249,7 @@
 				46755D2BEBFC333AA9C5C8CC /* MockMoonshineAdapter.swift */,
 				AC030E08D9FB798B68FFADA4 /* MockNotificationService.swift */,
 				18F26478F8E01F0C16F321F2 /* MockOutputManager.swift */,
+				B8C9D0E1F2A3B4C5D6E7F8A9 /* MockSessionMonitoringService.swift */,
 				0950301454AEB49BA6A24954 /* MockSpeechRecognitionService.swift */,
 				1C5ED9C89542CB717C30A981 /* MockTextPostprocessor.swift */,
 			);
@@ -346,6 +358,8 @@
 				0B40562C1E761FAA2AD4CCAE /* OutputMode.swift in Sources */,
 				052A16321B04F62C4A78FC99 /* RecognitionEvent.swift in Sources */,
 				A545B0010DBEB690DCB7E6E2 /* SessionManager.swift in Sources */,
+				B2C3D4E5F6A7B8C9D0E1F2A3 /* SessionMonitoring.swift in Sources */,
+				D4E5F6A7B8C9D0E1F2A3B4C5 /* SessionMonitoringService.swift in Sources */,
 				11FE8E3B330EE2ACEAAF09E2 /* SessionState.swift in Sources */,
 				B25A2B10C6906684172340BF /* SettingsView.swift in Sources */,
 				E95FEACC830651D7DF4009BC /* SpeechRecognitionService.swift in Sources */,
@@ -368,11 +382,13 @@
 				BAAD6B03864F546F3E3367ED /* MockNotificationService.swift in Sources */,
 				4A08E8F56B25D0EF716AB777 /* MockOutputManager.swift in Sources */,
 				03B762943B04FBA12F3D7CA4 /* MockSpeechRecognitionService.swift in Sources */,
+				A7B8C9D0E1F2A3B4C5D6E7F8 /* MockSessionMonitoringService.swift in Sources */,
 				780CB8A2F76DD326232748E4 /* MockTextPostprocessor.swift in Sources */,
 				723DB1904E5938F1E2B87FFD /* ModelsTests.swift in Sources */,
 				90335A7F92C4230B3F1323F1 /* NotificationServiceTests.swift in Sources */,
 				141BB489588E01D5C1BFDFDE /* OutputManagerTests.swift in Sources */,
 				E14B97AA9E10BA2B27CBF008 /* SessionManagerTests.swift in Sources */,
+				F6A7B8C9D0E1F2A3B4C5D6E7 /* SessionMonitoringServiceTests.swift in Sources */,
 				38D05F27F1E438EECA7E9594 /* SpeechRecognitionServiceTests.swift in Sources */,
 				20A34326CF4EAED63E7B300B /* TextPostprocessorTests.swift in Sources */,
 			);

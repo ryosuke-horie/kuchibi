@@ -211,6 +211,93 @@ struct SessionManagerTests {
         #expect(level == 0.0)
     }
 
+    // MARK: - モニタリング統合テスト
+
+    @Test("モニタリング有効時にセッション開始・完了が通知される")
+    @MainActor
+    func monitoringEnabledNotifiesStartAndEnd() async throws {
+        let mockMonitoring = MockSessionMonitoringService()
+        let mockASR = MockSpeechRecognitionService()
+        mockASR.isModelLoaded = true
+        mockASR.eventsToEmit = [
+            RecognitionEvent(kind: .lineCompleted(final: "テスト"))
+        ]
+        let settings = AppSettings(defaults: UserDefaults(suiteName: "test.monitoring.\(UUID().uuidString)")!)
+        settings.monitoringEnabled = true
+
+        let sm = createSessionManager(
+            speechService: mockASR,
+            appSettings: settings,
+            monitoring: mockMonitoring
+        )
+
+        await sm.startSession()
+        await sm.stopSession()
+        try await Task.sleep(for: .milliseconds(200))
+
+        #expect(mockMonitoring.sessionStartedCalls == 1)
+        #expect(mockMonitoring.textCompletedCalls == ["テスト"])
+        #expect(mockMonitoring.sessionEndedCalls == 1)
+    }
+
+    @Test("モニタリング無効時にはモニタリングメソッドが呼ばれない")
+    @MainActor
+    func monitoringDisabledSkipsNotification() async throws {
+        let mockMonitoring = MockSessionMonitoringService()
+        let mockASR = MockSpeechRecognitionService()
+        mockASR.isModelLoaded = true
+        mockASR.eventsToEmit = [
+            RecognitionEvent(kind: .lineCompleted(final: "テスト"))
+        ]
+        let settings = AppSettings(defaults: UserDefaults(suiteName: "test.monitoring.\(UUID().uuidString)")!)
+        settings.monitoringEnabled = false
+
+        let sm = createSessionManager(
+            speechService: mockASR,
+            appSettings: settings,
+            monitoring: mockMonitoring
+        )
+
+        await sm.startSession()
+        await sm.stopSession()
+        try await Task.sleep(for: .milliseconds(200))
+
+        #expect(mockMonitoring.sessionStartedCalls == 0)
+        #expect(mockMonitoring.textCompletedCalls.isEmpty)
+        #expect(mockMonitoring.sessionEndedCalls == 0)
+    }
+
+    @Test("無音タイムアウト時にsessionFailedが呼ばれる")
+    @MainActor
+    func monitoringNotifiedOnSilenceTimeout() async throws {
+        let mockMonitoring = MockSessionMonitoringService()
+        let settings = AppSettings(defaults: UserDefaults(suiteName: "test.monitoring.\(UUID().uuidString)")!)
+        settings.monitoringEnabled = true
+        settings.silenceTimeout = 0.1
+
+        let mockASR = MockSpeechRecognitionService()
+        mockASR.isModelLoaded = true
+        mockASR.holdStream = true
+
+        let sm = createSessionManager(
+            speechService: mockASR,
+            appSettings: settings,
+            monitoring: mockMonitoring
+        )
+
+        await sm.startSession()
+        try await Task.sleep(for: .milliseconds(300))
+
+        #expect(mockMonitoring.sessionStartedCalls == 1)
+        #expect(mockMonitoring.sessionFailedCalls.count == 1)
+        if case .silenceTimeout = mockMonitoring.sessionFailedCalls.first {} else {
+            Issue.record("silenceTimeoutを期待")
+        }
+
+        mockASR.finishStream()
+        try await Task.sleep(for: .milliseconds(50))
+    }
+
     // MARK: - Helper
 
     @MainActor
@@ -219,7 +306,8 @@ struct SessionManagerTests {
         outputManager: OutputManaging? = nil,
         speechService: SpeechRecognizing? = nil,
         notificationService: NotificationServicing? = nil,
-        appSettings: AppSettings? = nil
+        appSettings: AppSettings? = nil,
+        monitoring: SessionMonitoring? = nil
     ) -> SessionManagerImpl {
         let audio = audioService ?? MockAudioCaptureService()
         let asr: SpeechRecognizing
@@ -238,7 +326,9 @@ struct SessionManagerTests {
             speechService: asr,
             outputManager: output,
             notificationService: notification,
-            appSettings: settings)
+            appSettings: settings,
+            monitoring: monitoring ?? MockSessionMonitoringService()
+        )
 
     }
 }

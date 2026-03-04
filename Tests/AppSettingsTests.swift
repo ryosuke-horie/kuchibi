@@ -256,4 +256,49 @@ struct AppSettingsTests {
 
         #expect(settings.textPostprocessingEnabled == AppSettings.defaultTextPostprocessingEnabled)
     }
+
+    // MARK: - モニタリング設定テスト
+
+    @Test("モニタリング設定のデフォルト値で初期化される")
+    @MainActor
+    func monitoringInitWithDefaults() {
+        let defaults = createCleanDefaults()
+        let settings = AppSettings(defaults: defaults)
+
+        #expect(settings.monitoringEnabled == AppSettings.defaultMonitoringEnabled)
+    }
+
+    @Test("モニタリング設定がUserDefaultsに永続化される")
+    @MainActor
+    func monitoringPersistsToUserDefaults() {
+        let defaults = createCleanDefaults()
+        let settings = AppSettings(defaults: defaults)
+
+        settings.monitoringEnabled = false
+
+        #expect(defaults.bool(forKey: "setting.monitoringEnabled") == false)
+    }
+
+    @Test("モニタリング設定がinitで復元される")
+    @MainActor
+    func monitoringRestoresFromUserDefaults() {
+        let defaults = createCleanDefaults()
+        defaults.set(false, forKey: "setting.monitoringEnabled")
+
+        let settings = AppSettings(defaults: defaults)
+
+        #expect(settings.monitoringEnabled == false)
+    }
+
+    @Test("resetToDefaultsでモニタリング設定もデフォルト値に戻る")
+    @MainActor
+    func monitoringResetToDefaults() {
+        let defaults = createCleanDefaults()
+        let settings = AppSettings(defaults: defaults)
+
+        settings.monitoringEnabled = false
+        settings.resetToDefaults()
+
+        #expect(settings.monitoringEnabled == AppSettings.defaultMonitoringEnabled)
+    }
 }
