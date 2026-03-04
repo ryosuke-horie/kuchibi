@@ -25,7 +25,7 @@ final class MoonshineAdapterImpl: MoonshineAdapting {
 
             transcriber = try Transcriber(
                 modelPath: modelPath,
-                modelArch: .tinyStreaming
+                modelArch: .tiny
             )
             Self.logger.info("Moonshineモデル '\(modelName)' を読み込み完了")
         } catch let error as KuchibiError {
