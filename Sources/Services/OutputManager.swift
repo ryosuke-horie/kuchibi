@@ -20,6 +20,9 @@ final class OutputManagerImpl: OutputManaging {
         case .directInput:
             await clipboardService.pasteToActiveApp(text: text)
             Self.logger.info("直接入力完了")
+        case .autoInput:
+            await clipboardService.typeText(text)
+            Self.logger.info("自動入力完了")
         }
     }
 }

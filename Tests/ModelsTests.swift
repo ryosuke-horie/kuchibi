@@ -33,22 +33,28 @@ struct OutputModeTests {
     func allCasesExist() {
         let clipboard = OutputMode.clipboard
         let directInput = OutputMode.directInput
+        let autoInput = OutputMode.autoInput
 
         #expect(clipboard != directInput)
+        #expect(clipboard != autoInput)
+        #expect(directInput != autoInput)
     }
 
     @Test("Equatableに準拠")
     func equatable() {
         #expect(OutputMode.clipboard == OutputMode.clipboard)
         #expect(OutputMode.directInput == OutputMode.directInput)
+        #expect(OutputMode.autoInput == OutputMode.autoInput)
     }
 
     @Test("rawValueによるUserDefaults永続化サポート")
     func rawValue() {
         #expect(OutputMode.clipboard.rawValue == "clipboard")
         #expect(OutputMode.directInput.rawValue == "directInput")
+        #expect(OutputMode.autoInput.rawValue == "autoInput")
         #expect(OutputMode(rawValue: "clipboard") == .clipboard)
         #expect(OutputMode(rawValue: "directInput") == .directInput)
+        #expect(OutputMode(rawValue: "autoInput") == .autoInput)
         #expect(OutputMode(rawValue: "invalid") == nil)
     }
 }

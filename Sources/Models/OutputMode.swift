@@ -2,4 +2,5 @@
 enum OutputMode: String, Equatable, Sendable {
     case clipboard
     case directInput
+    case autoInput
 }

@@ -6,7 +6,7 @@ import Foundation
 final class AppSettings: ObservableObject {
     // MARK: - Default Values
 
-    static let defaultOutputMode: OutputMode = .clipboard
+    static let defaultOutputMode: OutputMode = .autoInput
     static let defaultSilenceTimeout: TimeInterval = 30
     static let defaultModel: WhisperModel = .base
     static let defaultUpdateInterval: Double = 0.5
