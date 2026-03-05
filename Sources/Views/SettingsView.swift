@@ -26,6 +26,7 @@ private struct GeneralSettingsTab: View {
     var body: some View {
         Form {
             Picker("出力モード", selection: $appSettings.outputMode) {
+                Text("自動入力（推奨）").tag(OutputMode.autoInput)
                 Text("クリップボード").tag(OutputMode.clipboard)
                 Text("直接入力").tag(OutputMode.directInput)
             }

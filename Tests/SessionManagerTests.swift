@@ -70,14 +70,16 @@ struct SessionManagerTests {
         try await Task.sleep(for: .milliseconds(200))
         #expect(!mockOutput.outputCalls.isEmpty)
         #expect(mockOutput.outputCalls.first?.text == "認識結果")
-        #expect(mockOutput.outputCalls.first?.mode == .clipboard)
+        #expect(mockOutput.outputCalls.first?.mode == .autoInput)
     }
 
-    @Test("AppSettingsのoutputModeがデフォルトでclipboard")
+    @Test("AppSettingsのoutputModeがデフォルトでautoInput")
     @MainActor
     func defaultOutputMode() async {
-        let settings = AppSettings(defaults: UserDefaults(suiteName: "test.sessionmanager")!)
-        #expect(settings.outputMode == .clipboard)
+        let defaults = UserDefaults(suiteName: "test.sessionmanager")!
+        defaults.removePersistentDomain(forName: "test.sessionmanager")
+        let settings = AppSettings(defaults: defaults)
+        #expect(settings.outputMode == .autoInput)
     }
 
     @Test("toggleSessionでセッションの開始・停止が切り替わる")

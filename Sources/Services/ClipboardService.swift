@@ -44,6 +44,35 @@ final class ClipboardServiceImpl: ClipboardServicing {
         }
     }
 
+    func typeText(_ text: String) async {
+        guard !text.isEmpty else { return }
+
+        // 事前チェック: CGEvent 生成が可能か確認（アクセシビリティ権限等）
+        guard CGEvent(keyboardEventSource: nil, virtualKey: 0, keyDown: true) != nil else {
+            Self.logger.error("CGEvent生成失敗: アクセシビリティ権限を確認してください。フォールバックでペースト入力に切り替え")
+            await pasteToActiveApp(text: text)
+            return
+        }
+
+        for char in text {
+            let utf16 = Array(String(char).utf16)
+            guard let keyDown = CGEvent(keyboardEventSource: nil, virtualKey: 0, keyDown: true),
+                  let keyUp = CGEvent(keyboardEventSource: nil, virtualKey: 0, keyDown: false) else {
+                Self.logger.error("CGEvent生成が途中で失敗")
+                return
+            }
+
+            keyDown.keyboardSetUnicodeString(stringLength: utf16.count, unicodeString: utf16)
+            keyUp.keyboardSetUnicodeString(stringLength: utf16.count, unicodeString: utf16)
+
+            keyDown.post(tap: .cghidEventTap)
+            keyUp.post(tap: .cghidEventTap)
+
+            try? await Task.sleep(for: .milliseconds(2))
+        }
+        Self.logger.info("直接タイピング入力完了")
+    }
+
     @discardableResult
     private func sendPasteKeyEvent() -> Bool {
         // Cmd+V のキーコード: V = 0x09

@@ -26,6 +26,17 @@ struct AppSettingsTests {
         #expect(settings.bufferSize == AppSettings.defaultBufferSize)
     }
 
+    @Test("autoInputモードがUserDefaultsに永続化される")
+    @MainActor
+    func autoInputPersistsToUserDefaults() {
+        let defaults = createCleanDefaults()
+        let settings = AppSettings(defaults: defaults)
+
+        settings.outputMode = .autoInput
+
+        #expect(defaults.string(forKey: "setting.outputMode") == "autoInput")
+    }
+
     @Test("プロパティ変更がUserDefaultsに永続化される")
     @MainActor
     func persistsToUserDefaults() {
@@ -43,6 +54,16 @@ struct AppSettingsTests {
         #expect(defaults.string(forKey: "setting.modelName") == "small")
         #expect(defaults.double(forKey: "setting.updateInterval") == 1.0)
         #expect(defaults.integer(forKey: "setting.bufferSize") == 2048)
+    }
+
+    @Test("デフォルトの出力モードがautoInputである")
+    @MainActor
+    func defaultOutputModeIsAutoInput() {
+        #expect(AppSettings.defaultOutputMode == .autoInput)
+
+        let defaults = createCleanDefaults()
+        let settings = AppSettings(defaults: defaults)
+        #expect(settings.outputMode == .autoInput)
     }
 
     @Test("保存済みの値がinitで復元される")
@@ -64,6 +85,26 @@ struct AppSettingsTests {
         #expect(settings.model == .small)
         #expect(settings.updateInterval == 0.8)
         #expect(settings.bufferSize == 512)
+    }
+
+    @Test("既存の保存値clipboardが正しく復元される")
+    @MainActor
+    func restoresClipboardMode() {
+        let defaults = createCleanDefaults()
+        defaults.set("clipboard", forKey: "setting.outputMode")
+
+        let settings = AppSettings(defaults: defaults)
+        #expect(settings.outputMode == .clipboard)
+    }
+
+    @Test("既存の保存値autoInputが正しく復元される")
+    @MainActor
+    func restoresAutoInputMode() {
+        let defaults = createCleanDefaults()
+        defaults.set("autoInput", forKey: "setting.outputMode")
+
+        let settings = AppSettings(defaults: defaults)
+        #expect(settings.outputMode == .autoInput)
     }
 
     @Test("resetToDefaultsで全プロパティがデフォルト値に戻る")
