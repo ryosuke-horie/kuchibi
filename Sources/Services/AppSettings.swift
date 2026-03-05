@@ -8,7 +8,7 @@ final class AppSettings: ObservableObject {
 
     static let defaultOutputMode: OutputMode = .clipboard
     static let defaultSilenceTimeout: TimeInterval = 30
-    static let defaultModelName: String = "base"
+    static let defaultModel: WhisperModel = .base
     static let defaultUpdateInterval: Double = 0.5
     static let defaultBufferSize: Int = 1024
     static let defaultNoiseSuppressionEnabled: Bool = true
@@ -52,10 +52,10 @@ final class AppSettings: ObservableObject {
         }
     }
 
-    @Published var modelName: String {
+    @Published var model: WhisperModel {
         didSet {
             guard !isResetting else { return }
-            defaults.set(modelName, forKey: Keys.modelName)
+            defaults.set(model.rawValue, forKey: Keys.modelName)
         }
     }
 
@@ -141,10 +141,11 @@ final class AppSettings: ObservableObject {
         let savedTimeout = defaults.double(forKey: Keys.silenceTimeout)
         self.silenceTimeout = savedTimeout > 0 ? savedTimeout : Self.defaultSilenceTimeout
 
-        if let savedModel = defaults.string(forKey: Keys.modelName), !savedModel.isEmpty {
-            self.modelName = savedModel
+        if let saved = defaults.string(forKey: Keys.modelName),
+           let model = WhisperModel(rawValue: saved) {
+            self.model = model
         } else {
-            self.modelName = Self.defaultModelName
+            self.model = Self.defaultModel
         }
 
         let savedInterval = defaults.double(forKey: Keys.updateInterval)
@@ -205,7 +206,7 @@ final class AppSettings: ObservableObject {
 
         outputMode = Self.defaultOutputMode
         silenceTimeout = Self.defaultSilenceTimeout
-        modelName = Self.defaultModelName
+        model = Self.defaultModel
         updateInterval = Self.defaultUpdateInterval
         bufferSize = Self.defaultBufferSize
         noiseSuppressionEnabled = Self.defaultNoiseSuppressionEnabled

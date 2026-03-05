@@ -3,15 +3,17 @@ import AVFoundation
 
 final class MockSpeechRecognitionService: SpeechRecognizing {
     var isModelLoaded: Bool = false
+    var loadedModelName: String?
     var shouldThrowOnLoad: Bool = false
     var eventsToEmit: [RecognitionEvent] = []
     var holdStream: Bool = false
     private var streamContinuation: AsyncStream<RecognitionEvent>.Continuation?
 
-    func loadModel() async throws {
+    func loadModel(modelName: String) async throws {
         if shouldThrowOnLoad {
             throw KuchibiError.modelLoadFailed(underlying: NSError(domain: "mock", code: 1))
         }
+        loadedModelName = modelName
         isModelLoaded = true
     }
 

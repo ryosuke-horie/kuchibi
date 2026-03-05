@@ -58,10 +58,16 @@ private struct RecognitionSettingsTab: View {
 
     var body: some View {
         Form {
-            LabeledContent("モデル") {
-                Text(appSettings.modelName)
-                    .foregroundStyle(.secondary)
+            Picker("モデル", selection: $appSettings.model) {
+                ForEach(WhisperModel.allCases) { model in
+                    Text("\(model.displayName) — \(model.sizeDescription)")
+                        .tag(model)
+                }
             }
+
+            Text("モデル変更はアプリ再起動後に反映されます")
+                .font(.caption)
+                .foregroundStyle(.secondary)
 
             LabeledContent("無音タイムアウト") {
                 HStack {

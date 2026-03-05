@@ -11,9 +11,18 @@ struct SpeechRecognitionServiceTests {
         let service = SpeechRecognitionServiceImpl(adapter: mockAdapter)
 
         #expect(!service.isModelLoaded)
-        try await service.loadModel()
+        try await service.loadModel(modelName: "base")
         #expect(service.isModelLoaded)
         #expect(mockAdapter.isInitialized)
+    }
+
+    @Test("loadModelで指定されたモデル名がアダプターに渡される")
+    func loadModelPassesModelName() async throws {
+        let mockAdapter = MockSpeechRecognitionAdapter()
+        let service = SpeechRecognitionServiceImpl(adapter: mockAdapter)
+
+        try await service.loadModel(modelName: "large-v3")
+        #expect(mockAdapter.initializedModelName == "large-v3")
     }
 
     @Test("loadModel失敗時にエラーをスローする")
@@ -23,7 +32,7 @@ struct SpeechRecognitionServiceTests {
         let service = SpeechRecognitionServiceImpl(adapter: mockAdapter)
 
         do {
-            try await service.loadModel()
+            try await service.loadModel(modelName: "base")
             Issue.record("Expected error to be thrown")
         } catch {
             #expect(error is KuchibiError)
