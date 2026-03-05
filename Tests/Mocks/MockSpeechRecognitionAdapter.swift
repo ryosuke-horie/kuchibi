@@ -3,6 +3,7 @@ import AVFoundation
 
 final class MockSpeechRecognitionAdapter: SpeechRecognitionAdapting {
     var isInitialized = false
+    var initializedModelName: String?
     var shouldThrowOnInit = false
     var shouldThrowOnStartStream = false
     var startStreamCalled = false
@@ -14,6 +15,7 @@ final class MockSpeechRecognitionAdapter: SpeechRecognitionAdapting {
         if shouldThrowOnInit {
             throw KuchibiError.modelLoadFailed(underlying: NSError(domain: "mock", code: 1))
         }
+        initializedModelName = modelName
         isInitialized = true
     }
 

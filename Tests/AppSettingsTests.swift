@@ -21,7 +21,7 @@ struct AppSettingsTests {
 
         #expect(settings.outputMode == AppSettings.defaultOutputMode)
         #expect(settings.silenceTimeout == AppSettings.defaultSilenceTimeout)
-        #expect(settings.modelName == AppSettings.defaultModelName)
+        #expect(settings.model == AppSettings.defaultModel)
         #expect(settings.updateInterval == AppSettings.defaultUpdateInterval)
         #expect(settings.bufferSize == AppSettings.defaultBufferSize)
     }
@@ -34,7 +34,7 @@ struct AppSettingsTests {
 
         settings.outputMode = .directInput
         settings.silenceTimeout = 60
-        settings.modelName = "small"
+        settings.model = .small
         settings.updateInterval = 1.0
         settings.bufferSize = 2048
 
@@ -61,7 +61,7 @@ struct AppSettingsTests {
 
         #expect(settings.outputMode == .directInput)
         #expect(settings.silenceTimeout == 45.0)
-        #expect(settings.modelName == "small")
+        #expect(settings.model == .small)
         #expect(settings.updateInterval == 0.8)
         #expect(settings.bufferSize == 512)
     }
@@ -75,7 +75,7 @@ struct AppSettingsTests {
         // デフォルトから変更
         settings.outputMode = .directInput
         settings.silenceTimeout = 60
-        settings.modelName = "small"
+        settings.model = .small
         settings.updateInterval = 1.0
         settings.bufferSize = 2048
 
@@ -84,7 +84,7 @@ struct AppSettingsTests {
 
         #expect(settings.outputMode == AppSettings.defaultOutputMode)
         #expect(settings.silenceTimeout == AppSettings.defaultSilenceTimeout)
-        #expect(settings.modelName == AppSettings.defaultModelName)
+        #expect(settings.model == AppSettings.defaultModel)
         #expect(settings.updateInterval == AppSettings.defaultUpdateInterval)
         #expect(settings.bufferSize == AppSettings.defaultBufferSize)
     }
@@ -136,6 +136,28 @@ struct AppSettingsTests {
 
         settings.bufferSize = 0
         #expect(settings.bufferSize == AppSettings.defaultBufferSize)
+    }
+
+    @Test("無効なモデル名がUserDefaultsに保存されている場合デフォルトにフォールバックする")
+    @MainActor
+    func fallbacksOnInvalidModelName() {
+        let defaults = createCleanDefaults()
+        defaults.set("moonshine-small-ja", forKey: "setting.modelName")
+
+        let settings = AppSettings(defaults: defaults)
+
+        #expect(settings.model == AppSettings.defaultModel)
+    }
+
+    @Test("ハイフン付きモデル名が正しく復元される")
+    @MainActor
+    func restoresHyphenatedModelName() {
+        let defaults = createCleanDefaults()
+        defaults.set("large-v2", forKey: "setting.modelName")
+
+        let settings = AppSettings(defaults: defaults)
+
+        #expect(settings.model == .largeV2)
     }
 
     // MARK: - 前処理設定テスト

@@ -23,12 +23,14 @@
 		38D05F27F1E438EECA7E9594 /* SpeechRecognitionServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B334D7BD062516AB599119D2 /* SpeechRecognitionServiceTests.swift */; };
 		3D896B5A4244B1D4DCF1BFFC /* HotKey in Frameworks */ = {isa = PBXBuildFile; productRef = C51938C3B8E29F96DA379568 /* HotKey */; };
 		3F60CDB02BB89D6F2D42CEDD /* OutputManaging.swift in Sources */ = {isa = PBXBuildFile; fileRef = 438FE5EE29F95ABC7530E1DC /* OutputManaging.swift */; };
+		43C74C7D6753E45371D47173 /* WhisperModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6A94F3ABDD676828FA56913 /* WhisperModel.swift */; };
 		45E542E5E74D5814693904B6 /* AppSettingsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE4CB2755E46F8B48C02948F /* AppSettingsTests.swift */; };
 		4A08E8F56B25D0EF716AB777 /* MockOutputManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18F26478F8E01F0C16F321F2 /* MockOutputManager.swift */; };
 		4FD8F7E55BDC20972BB6F969 /* MockSessionMonitoringService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 622DC30131168B62E4329413 /* MockSessionMonitoringService.swift */; };
 		4FF9A1D4F54FEFFAD14763D7 /* SessionMonitoringServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 637E27FE3FD29E9185EDED16 /* SessionMonitoringServiceTests.swift */; };
 		5708E099C54A9FB745CD2EC1 /* SessionMonitoring.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73EC55D64C400DFB2B9E87F8 /* SessionMonitoring.swift */; };
 		5BEDB9C4D624B47357FF4EFC /* SettingsAccess in Frameworks */ = {isa = PBXBuildFile; productRef = 3A3BDC62E8812110D2FE49BF /* SettingsAccess */; };
+		5C526806294B2ECDC2492EFE /* WhisperModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D92FF9CC9A3BCB18F2B4E0D /* WhisperModelTests.swift */; };
 		5DC1D1F518BAB6216592076F /* ClipboardServicing.swift in Sources */ = {isa = PBXBuildFile; fileRef = E66CB5F565073A98DF48CC2F /* ClipboardServicing.swift */; };
 		5FEFC91E55EC69384E6CE020 /* HotKeyController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17091088C1A51563CE50547C /* HotKeyController.swift */; };
 		69EBC15318A7A3C85C2AE1BE /* AudioPreprocessorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 354653C713A6898397AA7813 /* AudioPreprocessorTests.swift */; };
@@ -90,6 +92,7 @@
 		56BCDB6049097A08A9854F4D /* SpeechRecognitionAdapting.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpeechRecognitionAdapting.swift; sourceTree = "<group>"; };
 		59B9735BE3B50AE3B84CBFD5 /* TextPostprocessorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextPostprocessorTests.swift; sourceTree = "<group>"; };
 		59F2C2477208487EC2512D63 /* FeedbackBarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeedbackBarView.swift; sourceTree = "<group>"; };
+		5D92FF9CC9A3BCB18F2B4E0D /* WhisperModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WhisperModelTests.swift; sourceTree = "<group>"; };
 		5DEE9711076CD9BCFC277B74 /* SpeechRecognizing.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpeechRecognizing.swift; sourceTree = "<group>"; };
 		622DC30131168B62E4329413 /* MockSessionMonitoringService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockSessionMonitoringService.swift; sourceTree = "<group>"; };
 		637E27FE3FD29E9185EDED16 /* SessionMonitoringServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionMonitoringServiceTests.swift; sourceTree = "<group>"; };
@@ -102,6 +105,7 @@
 		AA5FC1EF0A9139A547DCE9E1 /* OutputManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OutputManager.swift; sourceTree = "<group>"; };
 		AC030E08D9FB798B68FFADA4 /* MockNotificationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockNotificationService.swift; sourceTree = "<group>"; };
 		B334D7BD062516AB599119D2 /* SpeechRecognitionServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpeechRecognitionServiceTests.swift; sourceTree = "<group>"; };
+		B6A94F3ABDD676828FA56913 /* WhisperModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WhisperModel.swift; sourceTree = "<group>"; };
 		BE4CB2755E46F8B48C02948F /* AppSettingsTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppSettingsTests.swift; sourceTree = "<group>"; };
 		C114CB5F1012E3C584AB09F4 /* AudioCaptureService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioCaptureService.swift; sourceTree = "<group>"; };
 		C2567DD24F7F2384CAFF09A9 /* AppSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppSettings.swift; sourceTree = "<group>"; };
@@ -172,6 +176,7 @@
 				3D61FB5D132074721A6308B6 /* OutputMode.swift */,
 				775A3E31ED46212C7EF9C5F4 /* RecognitionEvent.swift */,
 				F6B7BEA988E0B1018B66C656 /* SessionState.swift */,
+				B6A94F3ABDD676828FA56913 /* WhisperModel.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -218,6 +223,7 @@
 				637E27FE3FD29E9185EDED16 /* SessionMonitoringServiceTests.swift */,
 				B334D7BD062516AB599119D2 /* SpeechRecognitionServiceTests.swift */,
 				59B9735BE3B50AE3B84CBFD5 /* TextPostprocessorTests.swift */,
+				5D92FF9CC9A3BCB18F2B4E0D /* WhisperModelTests.swift */,
 				C295405FCBB38D0A9B70EF68 /* Mocks */,
 			);
 			path = Tests;
@@ -366,6 +372,7 @@
 				7AE49779DA672DFD5251D9D2 /* TextPostprocessing.swift in Sources */,
 				C583092BF008DA651CDD6FC4 /* TextPostprocessor.swift in Sources */,
 				F89BFA8C4AB507E9C1388AA6 /* WhisperKitAdapter.swift in Sources */,
+				43C74C7D6753E45371D47173 /* WhisperModel.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -391,6 +398,7 @@
 				4FF9A1D4F54FEFFAD14763D7 /* SessionMonitoringServiceTests.swift in Sources */,
 				38D05F27F1E438EECA7E9594 /* SpeechRecognitionServiceTests.swift in Sources */,
 				20A34326CF4EAED63E7B300B /* TextPostprocessorTests.swift in Sources */,
+				5C526806294B2ECDC2492EFE /* WhisperModelTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

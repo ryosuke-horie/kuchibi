@@ -16,6 +16,15 @@ struct SpeechRecognitionServiceTests {
         #expect(mockAdapter.isInitialized)
     }
 
+    @Test("loadModelで指定されたモデル名がアダプターに渡される")
+    func loadModelPassesModelName() async throws {
+        let mockAdapter = MockSpeechRecognitionAdapter()
+        let service = SpeechRecognitionServiceImpl(adapter: mockAdapter)
+
+        try await service.loadModel(modelName: "large-v3")
+        #expect(mockAdapter.initializedModelName == "large-v3")
+    }
+
     @Test("loadModel失敗時にエラーをスローする")
     func loadModelFailure() async {
         let mockAdapter = MockSpeechRecognitionAdapter()

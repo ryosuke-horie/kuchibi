@@ -1,39 +1,5 @@
 import Foundation
 
-/// WhisperKit で利用可能なモデルサイズ
-enum WhisperModel: String, CaseIterable, Identifiable {
-    case tiny
-    case base
-    case small
-    case medium
-    case largeV2 = "large-v2"
-    case largeV3 = "large-v3"
-
-    var id: String { rawValue }
-
-    var displayName: String {
-        switch self {
-        case .tiny: "Tiny"
-        case .base: "Base"
-        case .small: "Small"
-        case .medium: "Medium"
-        case .largeV2: "Large v2"
-        case .largeV3: "Large v3"
-        }
-    }
-
-    var description: String {
-        switch self {
-        case .tiny: "最速・低精度"
-        case .base: "バランス型"
-        case .small: "高精度・やや遅い"
-        case .medium: "より高精度"
-        case .largeV2: "最高精度（メモリ大）"
-        case .largeV3: "最高精度（メモリ大）"
-        }
-    }
-}
-
 /// アプリケーション設定の一元管理
 /// 全設定値をUserDefaultsで永続化し、デフォルト値とリセット機能を提供する
 @MainActor
@@ -42,7 +8,7 @@ final class AppSettings: ObservableObject {
 
     static let defaultOutputMode: OutputMode = .clipboard
     static let defaultSilenceTimeout: TimeInterval = 30
-    static let defaultModelName: String = "base"
+    static let defaultModel: WhisperModel = .base
     static let defaultUpdateInterval: Double = 0.5
     static let defaultBufferSize: Int = 1024
     static let defaultNoiseSuppressionEnabled: Bool = true
@@ -86,10 +52,10 @@ final class AppSettings: ObservableObject {
         }
     }
 
-    @Published var modelName: String {
+    @Published var model: WhisperModel {
         didSet {
             guard !isResetting else { return }
-            defaults.set(modelName, forKey: Keys.modelName)
+            defaults.set(model.rawValue, forKey: Keys.modelName)
         }
     }
 
@@ -175,10 +141,11 @@ final class AppSettings: ObservableObject {
         let savedTimeout = defaults.double(forKey: Keys.silenceTimeout)
         self.silenceTimeout = savedTimeout > 0 ? savedTimeout : Self.defaultSilenceTimeout
 
-        if let savedModel = defaults.string(forKey: Keys.modelName), !savedModel.isEmpty {
-            self.modelName = savedModel
+        if let saved = defaults.string(forKey: Keys.modelName),
+           let model = WhisperModel(rawValue: saved) {
+            self.model = model
         } else {
-            self.modelName = Self.defaultModelName
+            self.model = Self.defaultModel
         }
 
         let savedInterval = defaults.double(forKey: Keys.updateInterval)
@@ -239,7 +206,7 @@ final class AppSettings: ObservableObject {
 
         outputMode = Self.defaultOutputMode
         silenceTimeout = Self.defaultSilenceTimeout
-        modelName = Self.defaultModelName
+        model = Self.defaultModel
         updateInterval = Self.defaultUpdateInterval
         bufferSize = Self.defaultBufferSize
         noiseSuppressionEnabled = Self.defaultNoiseSuppressionEnabled

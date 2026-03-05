@@ -58,10 +58,10 @@ private struct RecognitionSettingsTab: View {
 
     var body: some View {
         Form {
-            Picker("モデル", selection: $appSettings.modelName) {
+            Picker("モデル", selection: $appSettings.model) {
                 ForEach(WhisperModel.allCases) { model in
-                    Text("\(model.displayName) — \(model.description)")
-                        .tag(model.rawValue)
+                    Text("\(model.displayName) — \(model.sizeDescription)")
+                        .tag(model)
                 }
             }
 

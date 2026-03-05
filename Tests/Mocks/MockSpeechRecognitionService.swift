@@ -3,6 +3,7 @@ import AVFoundation
 
 final class MockSpeechRecognitionService: SpeechRecognizing {
     var isModelLoaded: Bool = false
+    var loadedModelName: String?
     var shouldThrowOnLoad: Bool = false
     var eventsToEmit: [RecognitionEvent] = []
     var holdStream: Bool = false
@@ -12,6 +13,7 @@ final class MockSpeechRecognitionService: SpeechRecognizing {
         if shouldThrowOnLoad {
             throw KuchibiError.modelLoadFailed(underlying: NSError(domain: "mock", code: 1))
         }
+        loadedModelName = modelName
         isModelLoaded = true
     }
 
