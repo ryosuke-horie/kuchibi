@@ -50,6 +50,17 @@ struct OutputManagerTests {
         #expect(mockClipboard.pastedTexts == ["フォールバック"])
     }
 
+    @Test("autoInputモードで空文字列は出力しない")
+    func emptyTextAutoInput() async {
+        let mockClipboard = MockClipboardService()
+        let manager = OutputManagerImpl(clipboardService: mockClipboard)
+
+        await manager.output(text: "", mode: .autoInput)
+
+        #expect(mockClipboard.typedTexts.isEmpty)
+        #expect(mockClipboard.pastedTexts.isEmpty)
+    }
+
     @Test("空文字列は出力しない")
     func emptyText() async {
         let mockClipboard = MockClipboardService()

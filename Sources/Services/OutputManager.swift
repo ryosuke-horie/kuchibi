@@ -22,7 +22,7 @@ final class OutputManagerImpl: OutputManaging {
             Self.logger.info("直接入力完了")
         case .autoInput:
             await clipboardService.typeText(text)
-            Self.logger.info("自動入力完了")
+            Self.logger.info("自動入力処理完了")
         }
     }
 }

@@ -26,6 +26,17 @@ struct AppSettingsTests {
         #expect(settings.bufferSize == AppSettings.defaultBufferSize)
     }
 
+    @Test("autoInputモードがUserDefaultsに永続化される")
+    @MainActor
+    func autoInputPersistsToUserDefaults() {
+        let defaults = createCleanDefaults()
+        let settings = AppSettings(defaults: defaults)
+
+        settings.outputMode = .autoInput
+
+        #expect(defaults.string(forKey: "setting.outputMode") == "autoInput")
+    }
+
     @Test("プロパティ変更がUserDefaultsに永続化される")
     @MainActor
     func persistsToUserDefaults() {
