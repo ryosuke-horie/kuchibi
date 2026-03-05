@@ -8,7 +8,7 @@ final class AppSettings: ObservableObject {
 
     static let defaultOutputMode: OutputMode = .clipboard
     static let defaultSilenceTimeout: TimeInterval = 30
-    static let defaultModelName: String = "moonshine-tiny-ja"
+    static let defaultModelName: String = "base"
     static let defaultUpdateInterval: Double = 0.5
     static let defaultBufferSize: Int = 1024
     static let defaultNoiseSuppressionEnabled: Bool = true

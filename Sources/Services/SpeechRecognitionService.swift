@@ -4,12 +4,12 @@ import os
 /// 音声ストリームからテキスト認識イベントを生成するサービス
 final class SpeechRecognitionServiceImpl: SpeechRecognizing {
     private static let logger = Logger(subsystem: "com.kuchibi.app", category: "SpeechRecognition")
-    private static let defaultModelName = "moonshine-tiny-ja"
+    private static let defaultModelName = "base"
 
-    private let adapter: MoonshineAdapting
+    private let adapter: SpeechRecognitionAdapting
     private(set) var isModelLoaded: Bool = false
 
-    init(adapter: MoonshineAdapting) {
+    init(adapter: SpeechRecognitionAdapting) {
         self.adapter = adapter
     }
 

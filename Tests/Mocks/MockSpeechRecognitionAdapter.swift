@@ -1,7 +1,7 @@
 import AVFoundation
 @testable import Kuchibi
 
-final class MockMoonshineAdapter: MoonshineAdapting {
+final class MockSpeechRecognitionAdapter: SpeechRecognitionAdapting {
     var isInitialized = false
     var shouldThrowOnInit = false
     var shouldThrowOnStartStream = false

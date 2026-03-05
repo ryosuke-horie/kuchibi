@@ -15,8 +15,8 @@ struct KuchibiApp: App {
 
         // サービス構築
         let audioService = AudioCaptureServiceImpl()
-        let moonshineAdapter = MoonshineAdapterImpl()
-        let speechService = SpeechRecognitionServiceImpl(adapter: moonshineAdapter)
+        let whisperAdapter = WhisperKitAdapter()
+        let speechService = SpeechRecognitionServiceImpl(adapter: whisperAdapter)
         let clipboardService = ClipboardServiceImpl()
         let outputManager = OutputManagerImpl(clipboardService: clipboardService)
         let notificationService = NotificationServiceImpl()

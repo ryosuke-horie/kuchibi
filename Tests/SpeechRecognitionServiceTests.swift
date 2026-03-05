@@ -5,9 +5,9 @@ import Testing
 
 @Suite("SpeechRecognitionService")
 struct SpeechRecognitionServiceTests {
-    @Test("loadModelでMoonshineAdapterが初期化される")
+    @Test("loadModelでアダプターが初期化される")
     func loadModel() async throws {
-        let mockAdapter = MockMoonshineAdapter()
+        let mockAdapter = MockSpeechRecognitionAdapter()
         let service = SpeechRecognitionServiceImpl(adapter: mockAdapter)
 
         #expect(!service.isModelLoaded)
@@ -18,7 +18,7 @@ struct SpeechRecognitionServiceTests {
 
     @Test("loadModel失敗時にエラーをスローする")
     func loadModelFailure() async {
-        let mockAdapter = MockMoonshineAdapter()
+        let mockAdapter = MockSpeechRecognitionAdapter()
         mockAdapter.shouldThrowOnInit = true
         let service = SpeechRecognitionServiceImpl(adapter: mockAdapter)
 
@@ -32,7 +32,7 @@ struct SpeechRecognitionServiceTests {
 
     @Test("processAudioStreamがRecognitionEventを発行する")
     func processAudioStream() async {
-        let mockAdapter = MockMoonshineAdapter()
+        let mockAdapter = MockSpeechRecognitionAdapter()
         mockAdapter.partialText = "途中"
         mockAdapter.finalText = "完了テキスト"
         let service = SpeechRecognitionServiceImpl(adapter: mockAdapter)
