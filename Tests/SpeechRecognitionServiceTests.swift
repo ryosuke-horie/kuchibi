@@ -11,7 +11,7 @@ struct SpeechRecognitionServiceTests {
         let service = SpeechRecognitionServiceImpl(adapter: mockAdapter)
 
         #expect(!service.isModelLoaded)
-        try await service.loadModel()
+        try await service.loadModel(modelName: "base")
         #expect(service.isModelLoaded)
         #expect(mockAdapter.isInitialized)
     }
@@ -23,7 +23,7 @@ struct SpeechRecognitionServiceTests {
         let service = SpeechRecognitionServiceImpl(adapter: mockAdapter)
 
         do {
-            try await service.loadModel()
+            try await service.loadModel(modelName: "base")
             Issue.record("Expected error to be thrown")
         } catch {
             #expect(error is KuchibiError)

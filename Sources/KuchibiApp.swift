@@ -44,7 +44,7 @@ struct KuchibiApp: App {
         // モデルの非同期読み込み
         Task {
             do {
-                try await speechService.loadModel()
+                try await speechService.loadModel(modelName: settings.modelName)
             } catch {
                 await notificationService.sendErrorNotification(error: error as? KuchibiError ?? .modelLoadFailed(underlying: error))
             }

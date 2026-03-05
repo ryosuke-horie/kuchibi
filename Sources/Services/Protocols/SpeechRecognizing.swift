@@ -4,6 +4,6 @@ import AVFoundation
 protocol SpeechRecognizing {
     var isModelLoaded: Bool { get }
 
-    func loadModel() async throws
+    func loadModel(modelName: String) async throws
     func processAudioStream(_ stream: AsyncStream<AVAudioPCMBuffer>) -> AsyncStream<RecognitionEvent>
 }

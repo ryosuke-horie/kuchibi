@@ -34,13 +34,13 @@ struct AppSettingsTests {
 
         settings.outputMode = .directInput
         settings.silenceTimeout = 60
-        settings.modelName = "moonshine-small-ja"
+        settings.modelName = "small"
         settings.updateInterval = 1.0
         settings.bufferSize = 2048
 
         #expect(defaults.string(forKey: "setting.outputMode") == "directInput")
         #expect(defaults.double(forKey: "setting.silenceTimeout") == 60)
-        #expect(defaults.string(forKey: "setting.modelName") == "moonshine-small-ja")
+        #expect(defaults.string(forKey: "setting.modelName") == "small")
         #expect(defaults.double(forKey: "setting.updateInterval") == 1.0)
         #expect(defaults.integer(forKey: "setting.bufferSize") == 2048)
     }
@@ -53,7 +53,7 @@ struct AppSettingsTests {
         // 値を事前に保存
         defaults.set("directInput", forKey: "setting.outputMode")
         defaults.set(45.0, forKey: "setting.silenceTimeout")
-        defaults.set("moonshine-small-ja", forKey: "setting.modelName")
+        defaults.set("small", forKey: "setting.modelName")
         defaults.set(0.8, forKey: "setting.updateInterval")
         defaults.set(512, forKey: "setting.bufferSize")
 
@@ -61,7 +61,7 @@ struct AppSettingsTests {
 
         #expect(settings.outputMode == .directInput)
         #expect(settings.silenceTimeout == 45.0)
-        #expect(settings.modelName == "moonshine-small-ja")
+        #expect(settings.modelName == "small")
         #expect(settings.updateInterval == 0.8)
         #expect(settings.bufferSize == 512)
     }
@@ -75,7 +75,7 @@ struct AppSettingsTests {
         // デフォルトから変更
         settings.outputMode = .directInput
         settings.silenceTimeout = 60
-        settings.modelName = "moonshine-small-ja"
+        settings.modelName = "small"
         settings.updateInterval = 1.0
         settings.bufferSize = 2048
 

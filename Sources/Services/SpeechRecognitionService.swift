@@ -4,8 +4,6 @@ import os
 /// 音声ストリームからテキスト認識イベントを生成するサービス
 final class SpeechRecognitionServiceImpl: SpeechRecognizing {
     private static let logger = Logger(subsystem: "com.kuchibi.app", category: "SpeechRecognition")
-    private static let defaultModelName = "base"
-
     private let adapter: SpeechRecognitionAdapting
     private(set) var isModelLoaded: Bool = false
 
@@ -13,8 +11,8 @@ final class SpeechRecognitionServiceImpl: SpeechRecognizing {
         self.adapter = adapter
     }
 
-    func loadModel() async throws {
-        try await adapter.initialize(modelName: Self.defaultModelName)
+    func loadModel(modelName: String) async throws {
+        try await adapter.initialize(modelName: modelName)
         isModelLoaded = true
         Self.logger.info("音声認識モデルを読み込み完了")
     }
