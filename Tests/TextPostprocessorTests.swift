@@ -83,4 +83,68 @@ struct TextPostprocessorTests {
         let expected = "音声認識ありがとう"
         #expect(processor.process(input) == expected)
     }
+
+    // MARK: - フィラー除去テスト
+
+    @Test("長音系フィラーが除去される")
+    func removesLongVowelFillers() {
+        #expect(processor.process("あー今日は天気がいい") == "今日は天気がいい")
+        #expect(processor.process("えー明日は雨です") == "明日は雨です")
+        #expect(processor.process("うーん難しい") == "難しい")
+        #expect(processor.process("んー考えます") == "考えます")
+    }
+
+    @Test("複合系フィラーが除去される")
+    func removesCompoundFillers() {
+        #expect(processor.process("えーと今日は") == "今日は")
+        #expect(processor.process("えっと明日は") == "明日は")
+    }
+
+    @Test("文中のフィラーが除去され前後が接続される")
+    func removesFillersMidSentence() {
+        #expect(processor.process("今日はえーと天気がいい") == "今日は天気がいい")
+        #expect(processor.process("私はあー元気です") == "私は元気です")
+    }
+
+    @Test("フィラーのみのテキストが空文字列を返す")
+    func returnsEmptyForFillerOnlyText() {
+        #expect(processor.process("あー") == "")
+        #expect(processor.process("えーと") == "")
+        #expect(processor.process("うーん") == "")
+    }
+
+    @Test("意味のある語の一部は誤除去されない")
+    func preservesMeaningfulWords() {
+        #expect(processor.process("あのね聞いて") == "あのね聞いて")
+        #expect(processor.process("まあまあだね") == "まあまあだね")
+        #expect(processor.process("そのとおり") == "そのとおり")
+    }
+
+    @Test("フィラーと既存ルールの複合処理")
+    func fillerWithExistingRules() {
+        let input = "  えーと 音声 認識 あー 結果  "
+        let expected = "音声認識結果"
+        #expect(processor.process(input) == expected)
+    }
+
+    @Test("句読点付きフィラーが除去される")
+    func removesPunctuatedFillers() {
+        #expect(processor.process("あ、今日は天気がいい") == "今日は天気がいい")
+        #expect(processor.process("ま、いいか") == "いいか")
+    }
+
+    @Test("なんかが独立フィラーとして除去される")
+    func removesNankaAsFiller() {
+        #expect(processor.process("なんか 面白い") == "面白い")
+    }
+
+    @Test("なんかが語の一部では保持される")
+    func preservesNankaInWord() {
+        #expect(processor.process("なんかい") == "なんかい")
+    }
+
+    @Test("複数の異なるフィラーが一つの文で除去される")
+    func removesMultipleFillerTypes() {
+        #expect(processor.process("えーと あの 今日は天気がいい") == "今日は天気がいい")
+    }
 }

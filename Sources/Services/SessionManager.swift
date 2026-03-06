@@ -1,3 +1,4 @@
+import AppKit
 import AVFoundation
 import os
 
@@ -20,7 +21,6 @@ final class SessionManagerImpl: ObservableObject {
     private let monitoring: SessionMonitoring
 
     private var recordingTask: Task<Void, Never>?
-    private var timeoutTask: Task<Void, Never>?
     private var accumulatedLines: [String] = []
 
     init(
@@ -74,6 +74,11 @@ final class SessionManagerImpl: ObservableObject {
         }
 
         state = .recording
+        if let sound = NSSound(named: NSSound.Name("Tink")) {
+            sound.play()
+        } else {
+            Self.logger.warning("セッション開始サウンド 'Tink' が見つかりません")
+        }
         partialText = ""
         accumulatedLines = []
         if appSettings.monitoringEnabled {
@@ -97,8 +102,6 @@ final class SessionManagerImpl: ObservableObject {
                 await finishSession()
             }
         }
-
-        startSilenceTimeout()
     }
 
     func stopSession() {
@@ -108,7 +111,6 @@ final class SessionManagerImpl: ObservableObject {
         }
 
         state = .processing
-        timeoutTask?.cancel()
         audioService.stopCapture()
         Self.logger.info("セッションを停止、認識処理中...")
     }
@@ -134,7 +136,6 @@ final class SessionManagerImpl: ObservableObject {
         case .textChanged(let partial):
             partialText = partial
             audioLevel = audioService.currentAudioLevel
-            startSilenceTimeout()
         case .lineCompleted(let final_):
             if appSettings.monitoringEnabled {
                 monitoring.textCompleted(text: final_)
@@ -144,7 +145,6 @@ final class SessionManagerImpl: ObservableObject {
                 : final_
             accumulatedLines.append(outputText)
             partialText = ""
-            startSilenceTimeout()
         }
     }
 
@@ -168,21 +168,6 @@ final class SessionManagerImpl: ObservableObject {
         state = .idle
         audioLevel = 0.0
         recordingTask = nil
-        timeoutTask?.cancel()
-        timeoutTask = nil
         Self.logger.info("セッションを完了")
-    }
-
-    private func startSilenceTimeout() {
-        timeoutTask?.cancel()
-        let timeout = appSettings.silenceTimeout
-        timeoutTask = Task {
-            try? await Task.sleep(for: .seconds(timeout))
-            guard !Task.isCancelled, state == .recording else { return }
-            Self.logger.info("無音タイムアウト")
-            audioService.stopCapture()
-            await notificationService.sendErrorNotification(error: .silenceTimeout)
-            await finishSession(error: .silenceTimeout)
-        }
     }
 }

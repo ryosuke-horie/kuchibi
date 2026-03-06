@@ -20,7 +20,6 @@ struct AppSettingsTests {
         let settings = AppSettings(defaults: defaults)
 
         #expect(settings.outputMode == AppSettings.defaultOutputMode)
-        #expect(settings.silenceTimeout == AppSettings.defaultSilenceTimeout)
         #expect(settings.model == AppSettings.defaultModel)
         #expect(settings.updateInterval == AppSettings.defaultUpdateInterval)
         #expect(settings.bufferSize == AppSettings.defaultBufferSize)
@@ -44,13 +43,11 @@ struct AppSettingsTests {
         let settings = AppSettings(defaults: defaults)
 
         settings.outputMode = .directInput
-        settings.silenceTimeout = 60
         settings.model = .small
         settings.updateInterval = 1.0
         settings.bufferSize = 2048
 
         #expect(defaults.string(forKey: "setting.outputMode") == "directInput")
-        #expect(defaults.double(forKey: "setting.silenceTimeout") == 60)
         #expect(defaults.string(forKey: "setting.modelName") == "small")
         #expect(defaults.double(forKey: "setting.updateInterval") == 1.0)
         #expect(defaults.integer(forKey: "setting.bufferSize") == 2048)
@@ -73,7 +70,6 @@ struct AppSettingsTests {
 
         // 値を事前に保存
         defaults.set("directInput", forKey: "setting.outputMode")
-        defaults.set(45.0, forKey: "setting.silenceTimeout")
         defaults.set("small", forKey: "setting.modelName")
         defaults.set(0.8, forKey: "setting.updateInterval")
         defaults.set(512, forKey: "setting.bufferSize")
@@ -81,7 +77,6 @@ struct AppSettingsTests {
         let settings = AppSettings(defaults: defaults)
 
         #expect(settings.outputMode == .directInput)
-        #expect(settings.silenceTimeout == 45.0)
         #expect(settings.model == .small)
         #expect(settings.updateInterval == 0.8)
         #expect(settings.bufferSize == 512)
@@ -115,7 +110,6 @@ struct AppSettingsTests {
 
         // デフォルトから変更
         settings.outputMode = .directInput
-        settings.silenceTimeout = 60
         settings.model = .small
         settings.updateInterval = 1.0
         settings.bufferSize = 2048
@@ -124,7 +118,6 @@ struct AppSettingsTests {
         settings.resetToDefaults()
 
         #expect(settings.outputMode == AppSettings.defaultOutputMode)
-        #expect(settings.silenceTimeout == AppSettings.defaultSilenceTimeout)
         #expect(settings.model == AppSettings.defaultModel)
         #expect(settings.updateInterval == AppSettings.defaultUpdateInterval)
         #expect(settings.bufferSize == AppSettings.defaultBufferSize)
@@ -137,26 +130,14 @@ struct AppSettingsTests {
         let settings = AppSettings(defaults: defaults)
 
         settings.outputMode = .directInput
-        settings.silenceTimeout = 60
 
         settings.resetToDefaults()
 
         // UserDefaultsからも削除されている
         #expect(defaults.object(forKey: "setting.outputMode") == nil)
-        #expect(defaults.object(forKey: "setting.silenceTimeout") == nil)
         #expect(defaults.object(forKey: "setting.modelName") == nil)
         #expect(defaults.object(forKey: "setting.updateInterval") == nil)
         #expect(defaults.object(forKey: "setting.bufferSize") == nil)
-    }
-
-    @Test("不正な負数のsilenceTimeoutは拒否される")
-    @MainActor
-    func rejectsNegativeSilenceTimeout() {
-        let defaults = createCleanDefaults()
-        let settings = AppSettings(defaults: defaults)
-
-        settings.silenceTimeout = -5
-        #expect(settings.silenceTimeout == AppSettings.defaultSilenceTimeout)
     }
 
     @Test("不正な負数のupdateIntervalは拒否される")

@@ -117,19 +117,9 @@ struct KuchibiErrorTests {
         }
     }
 
-    @Test("silenceTimeout")
-    func silenceTimeout() {
-        let error = KuchibiError.silenceTimeout
-        if case .silenceTimeout = error {
-            // OK
-        } else {
-            Issue.record("Expected silenceTimeout")
-        }
-    }
-
     @Test("Error プロトコルに準拠")
     func conformsToError() {
-        let error: any Error = KuchibiError.silenceTimeout
+        let error: any Error = KuchibiError.microphoneUnavailable
         #expect(error is KuchibiError)
     }
 }

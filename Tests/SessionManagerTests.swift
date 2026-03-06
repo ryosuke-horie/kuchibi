@@ -269,37 +269,6 @@ struct SessionManagerTests {
         #expect(mockMonitoring.sessionEndedCalls == 0)
     }
 
-    @Test("無音タイムアウト時にsessionFailedが呼ばれる")
-    @MainActor
-    func monitoringNotifiedOnSilenceTimeout() async throws {
-        let mockMonitoring = MockSessionMonitoringService()
-        let settings = AppSettings(defaults: UserDefaults(suiteName: "test.monitoring.\(UUID().uuidString)")!)
-        settings.monitoringEnabled = true
-        settings.silenceTimeout = 0.1
-
-        let mockASR = MockSpeechRecognitionService()
-        mockASR.isModelLoaded = true
-        mockASR.holdStream = true
-
-        let sm = createSessionManager(
-            speechService: mockASR,
-            appSettings: settings,
-            monitoring: mockMonitoring
-        )
-
-        await sm.startSession()
-        try await Task.sleep(for: .milliseconds(300))
-
-        #expect(mockMonitoring.sessionStartedCalls == 1)
-        #expect(mockMonitoring.sessionFailedCalls.count == 1)
-        if case .silenceTimeout = mockMonitoring.sessionFailedCalls.first {} else {
-            Issue.record("silenceTimeoutを期待")
-        }
-
-        mockASR.finishStream()
-        try await Task.sleep(for: .milliseconds(50))
-    }
-
     // MARK: - テキスト蓄積テスト
 
     @Test("lineCompleted発生時にOutputManagerが即座に呼ばれない")
@@ -417,41 +386,6 @@ struct SessionManagerTests {
 
         #expect(mockPostprocessor.processCalls.isEmpty)
         #expect(mockOutput.outputCalls.first?.text == "テスト 文")
-    }
-
-    @Test("無音タイムアウト時に蓄積テキストが出力される")
-    @MainActor
-    func accumulatedTextOutputOnSilenceTimeout() async throws {
-        let mockOutput = MockOutputManager()
-        let mockASR = MockSpeechRecognitionService()
-        mockASR.isModelLoaded = true
-        mockASR.holdStream = true
-        let settings = AppSettings(defaults: UserDefaults(suiteName: "test.accumulate.\(UUID().uuidString)")!)
-        settings.silenceTimeout = 0.3
-
-        let sm = createSessionManager(
-            outputManager: mockOutput,
-            speechService: mockASR,
-            appSettings: settings
-        )
-
-        await sm.startSession()
-
-        // ストリーム中にイベントを手動注入
-        mockASR.yieldEvent(RecognitionEvent(kind: .lineCompleted(final: "タイムアウト前テキスト")))
-        try await Task.sleep(for: .milliseconds(50))
-
-        // recording中はOutputManagerが呼ばれない
-        #expect(mockOutput.outputCalls.isEmpty)
-
-        // タイムアウトを待つ
-        try await Task.sleep(for: .milliseconds(400))
-
-        #expect(mockOutput.outputCalls.count == 1)
-        #expect(mockOutput.outputCalls.first?.text == "タイムアウト前テキスト")
-
-        mockASR.finishStream()
-        try await Task.sleep(for: .milliseconds(50))
     }
 
     @Test("セッション開始時にバッファが初期化される")

@@ -51,8 +51,6 @@ final class NotificationServiceImpl: NotificationServicing {
             return ("認識エラー", "音声認識中にエラーが発生しました: \(underlying.localizedDescription)")
         case .accessibilityPermissionDenied:
             return ("アクセシビリティ権限エラー", "システム設定 > プライバシーとセキュリティ > アクセシビリティ からアクセスを許可してください")
-        case .silenceTimeout:
-            return ("タイムアウト", "音声が検出されなかったため、セッションを終了しました")
         }
     }
 }

@@ -17,9 +17,5 @@ struct NotificationServiceTests {
         let (title2, body2) = service.notificationContent(for: .microphonePermissionDenied)
         #expect(title2.contains("マイク"))
         #expect(body2.contains("設定"))
-
-        // silenceTimeout
-        let (title3, _) = service.notificationContent(for: .silenceTimeout)
-        #expect(title3.contains("タイムアウト"))
     }
 }
