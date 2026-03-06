@@ -75,7 +75,7 @@ Architecture Integration:
 
 | Layer | Choice / Version | Role in Feature | Notes |
 |-------|------------------|-----------------|-------|
-| ASR Engine | WhisperKit v0.15+ | 音声認識処理 | SPM 依存として追加 |
+| ASR Engine | WhisperKit (from: "0.9.0") | 音声認識処理 | SPM 依存として追加 |
 | ASR Model | whisper-base (CoreML) | 日本語音声認識モデル | HuggingFace から自動ダウンロード |
 | Services | Swift (既存) | アダプター実装、サービス層 | 既存パターンの踏襲 |
 | Testing | Swift Testing (既存) | テストスイートの更新 | Mock のリネームと新規テスト |

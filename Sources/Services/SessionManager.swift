@@ -60,6 +60,34 @@ final class SessionManagerImpl: ObservableObject {
             return
         }
 
+        // マイク権限チェック
+        let authStatus = AVCaptureDevice.authorizationStatus(for: .audio)
+        switch authStatus {
+        case .denied, .restricted:
+            Self.logger.warning("マイク権限が拒否されています")
+            Task {
+                await notificationService.sendErrorNotification(error: .microphonePermissionDenied)
+            }
+            return
+        case .notDetermined:
+            Self.logger.info("マイク権限が未決定のため権限リクエストを行います")
+            Task {
+                let granted = await audioService.requestMicrophonePermission()
+                if granted {
+                    Self.logger.info("マイク権限が許可されました。セッションを開始します")
+                    startSession()
+                } else {
+                    Self.logger.warning("マイク権限が拒否されました")
+                    await notificationService.sendErrorNotification(error: .microphonePermissionDenied)
+                }
+            }
+            return
+        case .authorized:
+            break
+        @unknown default:
+            break
+        }
+
         let audioStream: AsyncStream<AVAudioPCMBuffer>
         do {
             audioStream = try audioService.startCapture(
@@ -155,7 +183,14 @@ final class SessionManagerImpl: ObservableObject {
         if !accumulatedLines.isEmpty {
             let joinedText = accumulatedLines.joined(separator: "\n")
             let mode = appSettings.outputMode
-            await outputManager.output(text: joinedText, mode: mode)
+            // directInput/autoInput モードではアクセシビリティ権限を事前確認
+            if (mode == .directInput || mode == .autoInput) && !AXIsProcessTrusted() {
+                Self.logger.warning("アクセシビリティ権限がないため、クリップボードにフォールバック")
+                await notificationService.sendErrorNotification(error: .accessibilityPermissionDenied)
+                await outputManager.output(text: joinedText, mode: .clipboard)
+            } else {
+                await outputManager.output(text: joinedText, mode: mode)
+            }
             accumulatedLines = []
         }
         if appSettings.monitoringEnabled {
@@ -163,6 +198,13 @@ final class SessionManagerImpl: ObservableObject {
                 monitoring.sessionFailed(error: error)
             } else {
                 monitoring.sessionEnded()
+            }
+        }
+        if appSettings.completionSoundEnabled {
+            if let sound = NSSound(named: NSSound.Name("Pop")) {
+                sound.play()
+            } else {
+                Self.logger.warning("完了サウンド 'Pop' が見つかりません")
             }
         }
         state = .idle

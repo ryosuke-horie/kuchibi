@@ -164,7 +164,7 @@ struct AppSettingsTests {
     @MainActor
     func fallbacksOnInvalidModelName() {
         let defaults = createCleanDefaults()
-        defaults.set("moonshine-small-ja", forKey: "setting.modelName")
+        defaults.set("invalid-model-name", forKey: "setting.modelName")
 
         let settings = AppSettings(defaults: defaults)
 

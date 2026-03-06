@@ -15,6 +15,7 @@ final class AppSettings: ObservableObject {
     static let defaultVadThreshold: Float = 0.01
     static let defaultTextPostprocessingEnabled: Bool = true
     static let defaultMonitoringEnabled: Bool = true
+    static let defaultCompletionSoundEnabled: Bool = true
 
     // MARK: - UserDefaults Keys
 
@@ -28,6 +29,7 @@ final class AppSettings: ObservableObject {
         static let vadThreshold = "setting.vadThreshold"
         static let textPostprocessingEnabled = "setting.textPostprocessingEnabled"
         static let monitoringEnabled = "setting.monitoringEnabled"
+        static let completionSoundEnabled = "setting.completionSoundEnabled"
     }
 
     // MARK: - Published Properties
@@ -107,6 +109,13 @@ final class AppSettings: ObservableObject {
         }
     }
 
+    @Published var completionSoundEnabled: Bool {
+        didSet {
+            guard !isResetting else { return }
+            defaults.set(completionSoundEnabled, forKey: Keys.completionSoundEnabled)
+        }
+    }
+
     // MARK: - Private
 
     private let defaults: UserDefaults
@@ -169,6 +178,12 @@ final class AppSettings: ObservableObject {
         } else {
             self.monitoringEnabled = Self.defaultMonitoringEnabled
         }
+
+        if defaults.object(forKey: Keys.completionSoundEnabled) != nil {
+            self.completionSoundEnabled = defaults.bool(forKey: Keys.completionSoundEnabled)
+        } else {
+            self.completionSoundEnabled = Self.defaultCompletionSoundEnabled
+        }
     }
 
     // MARK: - Reset
@@ -186,6 +201,7 @@ final class AppSettings: ObservableObject {
         defaults.removeObject(forKey: Keys.vadThreshold)
         defaults.removeObject(forKey: Keys.textPostprocessingEnabled)
         defaults.removeObject(forKey: Keys.monitoringEnabled)
+        defaults.removeObject(forKey: Keys.completionSoundEnabled)
 
         outputMode = Self.defaultOutputMode
         model = Self.defaultModel
@@ -196,5 +212,6 @@ final class AppSettings: ObservableObject {
         vadThreshold = Self.defaultVadThreshold
         textPostprocessingEnabled = Self.defaultTextPostprocessingEnabled
         monitoringEnabled = Self.defaultMonitoringEnabled
+        completionSoundEnabled = Self.defaultCompletionSoundEnabled
     }
 }

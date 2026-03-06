@@ -4,7 +4,7 @@
 
 kuchibi の音声キャプチャパイプラインに前処理レイヤーを追加し、マイク入力から認識エンジンに渡す音声品質を向上させる。現在は `AudioCaptureServiceImpl` が取得した生の AVAudioPCMBuffer をそのまま `SpeechRecognitionServiceImpl` に渡しているが、環境ノイズの影響を受けやすく、無音区間も含めてすべて認識エンジンに送信している。
 
-この設計では、macOS Voice Processing によるノイズ抑制、エネルギーベース VAD による無音区間フィルタリング、AVAudioConverter による 16kHz リサンプリングの3つの前処理を導入する。既存の AudioCapturing プロトコルを維持しつつ、新たな AudioPreprocessor コンポーネントをパイプラインに挿入する。
+この設計では、macOS Voice Processing によるノイズ抑制、エネルギーベース VAD による無音区間フィルタリング、線形補間による 16kHz リサンプリングの3つの前処理を導入する。既存の AudioCapturing プロトコルを維持しつつ、新たな AudioPreprocessor コンポーネントをパイプラインに挿入する。
 
 ### Goals
 
@@ -56,7 +56,7 @@ Architecture Integration:
 |-------|------------------|-----------------|-------|
 | Audio I/O | AVAudioEngine | マイク入力と Voice Processing | macOS 標準フレームワーク |
 | ノイズ抑制 | AVAudioIONode Voice Processing | ハードウェアレベルのノイズ抑制 | `setVoiceProcessingEnabled(_:)` |
-| リサンプリング | AVAudioConverter | サンプルレート変換 | コールバック形式の convert を使用 |
+| リサンプリング | 線形補間（カスタム実装）| サンプルレート変換 | AVAudioConverter のコールバック形式を回避した軽量実装 |
 | 設定管理 | AppSettings / UserDefaults | 前処理パラメータの永続化 | 既存の設定基盤を拡張 |
 
 ## System Flows
@@ -110,7 +110,7 @@ stateDiagram-v2
 | 2.3 | VAD オン・オフ設定 | AppSettings | - | - |
 | 2.4 | VAD 感度閾値の調整 | AppSettings | - | - |
 | 3.1 | 16kHz モノラルリサンプリング | AudioPreprocessor | AudioPreprocessing | 音声前処理パイプライン |
-| 3.2 | AVAudioConverter 使用 | AudioPreprocessor | AudioPreprocessing | - |
+| 3.2 | 線形補間リサンプリング使用 | AudioPreprocessor | AudioPreprocessing | AVAudioConverter よりシンプルな実装を採用 |
 | 3.3 | 16kHz モノラル時はスキップ | AudioPreprocessor | AudioPreprocessing | - |
 
 ## Components and Interfaces
@@ -134,14 +134,14 @@ stateDiagram-v2
 
 Responsibilities & Constraints:
 - `AsyncStream<AVAudioPCMBuffer>` を受け取り、前処理済みの `AsyncStream<AVAudioPCMBuffer>` を返す
-- AVAudioConverter による 16kHz モノラルへのリサンプリング
+- 線形補間による 16kHz モノラルへのリサンプリング
 - RMS エネルギーベースの VAD によるバッファフィルタリング
 - 入力フォーマットが既に 16kHz モノラルの場合はリサンプリングをスキップ
 
 Dependencies:
 - Inbound: SessionManager — 生の音声ストリームを受け取る (P0)
 - Outbound: SpeechRecognitionService — 前処理済みストリームを渡す (P0)
-- External: AVAudioConverter — サンプルレート変換 (P0)
+- External: なし（線形補間はカスタム実装）
 
 Contracts: Service [x]
 
@@ -159,12 +159,12 @@ protocol AudioPreprocessing {
 
 - Preconditions: 入力ストリームのバッファが有効な floatChannelData を持つ
 - Postconditions: 出力ストリームのバッファは 16kHz モノラル Float32 フォーマット。VAD 有効時は閾値以上のエネルギーを持つバッファのみ含む
-- Invariants: AVAudioConverter インスタンスは入力フォーマットが変わらない限り再利用する
+- Invariants: リサンプリング比率（ratio）は最初のバッファ受信時に一度計算し、セッション中は再利用する
 
 Implementation Notes:
 - Integration: SessionManager が `audioService.startCapture()` の結果を `preprocessor.process()` に渡し、その出力を `speechService.processAudioStream()` に渡す
 - Validation: 入力バッファの floatChannelData が nil の場合はスキップ
-- Risks: AVAudioConverter のコールバック形式の実装が複雑。`research.md` の知見に基づいて `.noDataNow` を正しく返す実装が必要
+- Risks: 線形補間は品質よりシンプルさを優先した設計。高品質なリサンプリングが必要になった場合は AVAudioConverter への移行を検討
 
 ### Audio I/O
 
@@ -290,7 +290,7 @@ vadThreshold: Float            // RMS エネルギー閾値（0.0-1.0）
 ### Error Categories and Responses
 
 - Voice Processing 有効化失敗: ログ出力し、ノイズ抑制なしで続行。ユーザーへの通知は不要（個人用アプリのため）
-- AVAudioConverter 初期化失敗: リサンプリングをスキップし、元のサンプルレートのまま認識エンジンに渡す（Moonshine は任意のサンプルレートを受け付ける）
+- リサンプリング失敗（出力バッファ作成不可等）: 該当バッファをスキップし、次のバッファを処理
 - バッファ変換失敗: 該当バッファをスキップし、次のバッファを処理
 
 ### Monitoring

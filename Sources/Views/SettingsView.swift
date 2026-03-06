@@ -92,6 +92,10 @@ private struct RecognitionSettingsTab: View {
                 Toggle("テキスト後処理", isOn: $appSettings.textPostprocessingEnabled)
             }
 
+            Section("フィードバック") {
+                Toggle("認識完了サウンド", isOn: $appSettings.completionSoundEnabled)
+            }
+
             Section("モニタリング") {
                 Toggle("セッションモニタリング", isOn: $appSettings.monitoringEnabled)
             }
