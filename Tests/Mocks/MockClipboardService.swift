@@ -3,7 +3,7 @@
 final class MockClipboardService: ClipboardServicing {
     var copiedTexts: [String] = []
     var pastedTexts: [String] = []
-    var lastRestoreClipboard: Bool = true
+    var lastRestoreClipboard: Bool? = nil
 
     func copyToClipboard(text: String) {
         copiedTexts.append(text)

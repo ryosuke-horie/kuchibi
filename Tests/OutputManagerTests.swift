@@ -49,6 +49,17 @@ struct OutputManagerTests {
         #expect(mockClipboard.pastedTexts.isEmpty)
     }
 
+    @Test("directInputモードで空文字列は出力しない")
+    func emptyTextDirectInput() async {
+        let mockClipboard = MockClipboardService()
+        let manager = OutputManagerImpl(clipboardService: mockClipboard)
+
+        await manager.output(text: "", mode: .directInput)
+
+        #expect(mockClipboard.pastedTexts.isEmpty)
+        #expect(mockClipboard.lastRestoreClipboard == nil)
+    }
+
     @Test("空文字列は出力しない")
     func emptyText() async {
         let mockClipboard = MockClipboardService()
