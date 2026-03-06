@@ -26,28 +26,16 @@ struct OutputManagerTests {
         #expect(mockClipboard.copiedTexts.isEmpty)
     }
 
-    @Test("autoInputモードでClipboardServiceのtypeTextが呼ばれる")
+    @Test("autoInputモードでpasteToActiveAppとcopyToClipboardが呼ばれる")
     func autoInputMode() async {
         let mockClipboard = MockClipboardService()
         let manager = OutputManagerImpl(clipboardService: mockClipboard)
 
         await manager.output(text: "自動入力テスト", mode: .autoInput)
 
-        #expect(mockClipboard.typedTexts == ["自動入力テスト"])
-        #expect(mockClipboard.copiedTexts.isEmpty)
-        #expect(mockClipboard.pastedTexts.isEmpty)
-    }
-
-    @Test("autoInputモードでtypeText失敗時にpasteToActiveAppにフォールバックする")
-    func autoInputFallback() async {
-        let mockClipboard = MockClipboardService()
-        mockClipboard.shouldFailTypeText = true
-        let manager = OutputManagerImpl(clipboardService: mockClipboard)
-
-        await manager.output(text: "フォールバック", mode: .autoInput)
-
+        #expect(mockClipboard.pastedTexts == ["自動入力テスト"])
+        #expect(mockClipboard.copiedTexts == ["自動入力テスト"])
         #expect(mockClipboard.typedTexts.isEmpty)
-        #expect(mockClipboard.pastedTexts == ["フォールバック"])
     }
 
     @Test("autoInputモードで空文字列は出力しない")

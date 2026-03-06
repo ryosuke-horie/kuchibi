@@ -34,7 +34,7 @@ final class ClipboardServiceImpl: ClipboardServicing {
 
         if pasteSucceeded {
             // 短い遅延後にクリップボード復元
-            try? await Task.sleep(for: .milliseconds(100))
+            try? await Task.sleep(for: .milliseconds(200))
 
             pasteboard.clearContents()
             for (type, data) in savedItems {
