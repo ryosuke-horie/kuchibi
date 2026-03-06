@@ -7,7 +7,6 @@ final class AppSettings: ObservableObject {
     // MARK: - Default Values
 
     static let defaultOutputMode: OutputMode = .autoInput
-    static let defaultSilenceTimeout: TimeInterval = 30
     static let defaultModel: WhisperModel = .base
     static let defaultUpdateInterval: Double = 0.5
     static let defaultBufferSize: Int = 1024
@@ -21,7 +20,6 @@ final class AppSettings: ObservableObject {
 
     private enum Keys {
         static let outputMode = "setting.outputMode"
-        static let silenceTimeout = "setting.silenceTimeout"
         static let modelName = "setting.modelName"
         static let updateInterval = "setting.updateInterval"
         static let bufferSize = "setting.bufferSize"
@@ -38,17 +36,6 @@ final class AppSettings: ObservableObject {
         didSet {
             guard !isResetting else { return }
             defaults.set(outputMode.rawValue, forKey: Keys.outputMode)
-        }
-    }
-
-    @Published var silenceTimeout: TimeInterval {
-        didSet {
-            guard !isResetting else { return }
-            guard silenceTimeout > 0 else {
-                silenceTimeout = Self.defaultSilenceTimeout
-                return
-            }
-            defaults.set(silenceTimeout, forKey: Keys.silenceTimeout)
         }
     }
 
@@ -138,9 +125,6 @@ final class AppSettings: ObservableObject {
             self.outputMode = Self.defaultOutputMode
         }
 
-        let savedTimeout = defaults.double(forKey: Keys.silenceTimeout)
-        self.silenceTimeout = savedTimeout > 0 ? savedTimeout : Self.defaultSilenceTimeout
-
         if let saved = defaults.string(forKey: Keys.modelName),
            let model = WhisperModel(rawValue: saved) {
             self.model = model
@@ -194,7 +178,6 @@ final class AppSettings: ObservableObject {
         defer { isResetting = false }
 
         defaults.removeObject(forKey: Keys.outputMode)
-        defaults.removeObject(forKey: Keys.silenceTimeout)
         defaults.removeObject(forKey: Keys.modelName)
         defaults.removeObject(forKey: Keys.updateInterval)
         defaults.removeObject(forKey: Keys.bufferSize)
@@ -205,7 +188,6 @@ final class AppSettings: ObservableObject {
         defaults.removeObject(forKey: Keys.monitoringEnabled)
 
         outputMode = Self.defaultOutputMode
-        silenceTimeout = Self.defaultSilenceTimeout
         model = Self.defaultModel
         updateInterval = Self.defaultUpdateInterval
         bufferSize = Self.defaultBufferSize

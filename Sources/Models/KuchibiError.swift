@@ -7,5 +7,4 @@ enum KuchibiError: Error {
     case microphoneUnavailable
     case recognitionFailed(underlying: Error)
     case accessibilityPermissionDenied
-    case silenceTimeout
 }

@@ -46,12 +46,12 @@ struct SessionMonitoringServiceTests {
     func sessionFailedRecordsError() {
         let service = SessionMonitoringServiceImpl()
         service.sessionStarted()
-        service.sessionFailed(error: .silenceTimeout)
+        service.sessionFailed(error: .microphoneUnavailable)
 
         let metrics = service.currentMetrics
         #expect(metrics!.error != nil)
-        if case .silenceTimeout = metrics!.error {} else {
-            Issue.record("silenceTimeout を期待")
+        if case .microphoneUnavailable = metrics!.error {} else {
+            Issue.record("microphoneUnavailable を期待")
         }
     }
 

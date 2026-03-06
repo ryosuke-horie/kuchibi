@@ -70,18 +70,6 @@ private struct RecognitionSettingsTab: View {
                 .font(.caption)
                 .foregroundStyle(.secondary)
 
-            LabeledContent("無音タイムアウト") {
-                HStack {
-                    TextField(
-                        "秒",
-                        value: $appSettings.silenceTimeout,
-                        format: .number
-                    )
-                    .frame(width: 60)
-                    Text("秒")
-                }
-            }
-
             Divider()
 
             Section("前処理") {
