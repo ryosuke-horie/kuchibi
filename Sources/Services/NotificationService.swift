@@ -50,7 +50,7 @@ final class NotificationServiceImpl: NotificationServicing {
         case .recognitionFailed(let underlying):
             return ("認識エラー", "音声認識中にエラーが発生しました: \(underlying.localizedDescription)")
         case .accessibilityPermissionDenied:
-            return ("アクセシビリティ権限エラー", "システム設定 > プライバシーとセキュリティ > アクセシビリティ からアクセスを許可してください")
+            return ("アクセシビリティ権限エラー", "テキストはクリップボードにコピーされました。システム設定 > プライバシーとセキュリティ > アクセシビリティ からアクセスを許可するか、クリップボードから貼り付けてください")
         }
     }
 }

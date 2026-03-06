@@ -345,4 +345,49 @@ struct AppSettingsTests {
 
         #expect(settings.monitoringEnabled == AppSettings.defaultMonitoringEnabled)
     }
+
+    // MARK: - 完了サウンド設定テスト
+
+    @Test("完了サウンド設定のデフォルト値で初期化される")
+    @MainActor
+    func completionSoundInitWithDefaults() {
+        let defaults = createCleanDefaults()
+        let settings = AppSettings(defaults: defaults)
+
+        #expect(settings.completionSoundEnabled == AppSettings.defaultCompletionSoundEnabled)
+    }
+
+    @Test("完了サウンド設定がUserDefaultsに永続化される")
+    @MainActor
+    func completionSoundPersistsToUserDefaults() {
+        let defaults = createCleanDefaults()
+        let settings = AppSettings(defaults: defaults)
+
+        settings.completionSoundEnabled = false
+
+        #expect(defaults.bool(forKey: "setting.completionSoundEnabled") == false)
+    }
+
+    @Test("完了サウンド設定がinitで復元される")
+    @MainActor
+    func completionSoundRestoresFromUserDefaults() {
+        let defaults = createCleanDefaults()
+        defaults.set(false, forKey: "setting.completionSoundEnabled")
+
+        let settings = AppSettings(defaults: defaults)
+
+        #expect(settings.completionSoundEnabled == false)
+    }
+
+    @Test("resetToDefaultsで完了サウンド設定もデフォルト値に戻る")
+    @MainActor
+    func completionSoundResetToDefaults() {
+        let defaults = createCleanDefaults()
+        let settings = AppSettings(defaults: defaults)
+
+        settings.completionSoundEnabled = false
+        settings.resetToDefaults()
+
+        #expect(settings.completionSoundEnabled == AppSettings.defaultCompletionSoundEnabled)
+    }
 }

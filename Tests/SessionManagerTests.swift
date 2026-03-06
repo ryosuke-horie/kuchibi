@@ -447,7 +447,9 @@ struct SessionManagerTests {
             notificationService: notification,
             appSettings: settings,
             textPostprocessor: textPostprocessor ?? MockTextPostprocessor(),
-            monitoring: monitoring ?? MockSessionMonitoringService()
+            monitoring: monitoring ?? MockSessionMonitoringService(),
+            micAuthorizationStatus: { .authorized },
+            accessibilityTrusted: { true }
         )
     }
 }

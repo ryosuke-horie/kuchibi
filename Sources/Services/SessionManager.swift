@@ -19,6 +19,8 @@ final class SessionManagerImpl: ObservableObject {
     private let preprocessor: AudioPreprocessing
     private let textPostprocessor: TextPostprocessing
     private let monitoring: SessionMonitoring
+    private let micAuthorizationStatus: () -> AVAuthorizationStatus
+    private let accessibilityTrusted: () -> Bool
 
     private var recordingTask: Task<Void, Never>?
     private var accumulatedLines: [String] = []
@@ -31,7 +33,9 @@ final class SessionManagerImpl: ObservableObject {
         appSettings: AppSettings,
         preprocessor: AudioPreprocessing = AudioPreprocessorImpl(),
         textPostprocessor: TextPostprocessing = TextPostprocessorImpl(),
-        monitoring: SessionMonitoring = SessionMonitoringServiceImpl()
+        monitoring: SessionMonitoring = SessionMonitoringServiceImpl(),
+        micAuthorizationStatus: @escaping () -> AVAuthorizationStatus = { AVCaptureDevice.authorizationStatus(for: .audio) },
+        accessibilityTrusted: @escaping () -> Bool = { AXIsProcessTrusted() }
     ) {
         self.audioService = audioService
         self.speechService = speechService
@@ -41,6 +45,8 @@ final class SessionManagerImpl: ObservableObject {
         self.preprocessor = preprocessor
         self.textPostprocessor = textPostprocessor
         self.monitoring = monitoring
+        self.micAuthorizationStatus = micAuthorizationStatus
+        self.accessibilityTrusted = accessibilityTrusted
     }
 
     func startSession() {
@@ -61,7 +67,7 @@ final class SessionManagerImpl: ObservableObject {
         }
 
         // マイク権限チェック
-        let authStatus = AVCaptureDevice.authorizationStatus(for: .audio)
+        let authStatus = micAuthorizationStatus()
         switch authStatus {
         case .denied, .restricted:
             Self.logger.warning("マイク権限が拒否されています")
@@ -71,8 +77,10 @@ final class SessionManagerImpl: ObservableObject {
             return
         case .notDetermined:
             Self.logger.info("マイク権限が未決定のため権限リクエストを行います")
+            state = .processing  // 二重呼び出し防止
             Task {
                 let granted = await audioService.requestMicrophonePermission()
+                state = .idle
                 if granted {
                     Self.logger.info("マイク権限が許可されました。セッションを開始します")
                     startSession()
@@ -85,7 +93,7 @@ final class SessionManagerImpl: ObservableObject {
         case .authorized:
             break
         @unknown default:
-            break
+            Self.logger.warning("未知のマイク権限ステータス (\(authStatus.rawValue))。処理を続行します")
         }
 
         let audioStream: AsyncStream<AVAudioPCMBuffer>
@@ -102,10 +110,12 @@ final class SessionManagerImpl: ObservableObject {
         }
 
         state = .recording
-        if let sound = NSSound(named: NSSound.Name("Tink")) {
-            sound.play()
-        } else {
-            Self.logger.warning("セッション開始サウンド 'Tink' が見つかりません")
+        if appSettings.completionSoundEnabled {
+            if let sound = NSSound(named: NSSound.Name("Tink")) {
+                sound.play()
+            } else {
+                Self.logger.warning("セッション開始サウンド 'Tink' が見つかりません")
+            }
         }
         partialText = ""
         accumulatedLines = []
@@ -184,7 +194,7 @@ final class SessionManagerImpl: ObservableObject {
             let joinedText = accumulatedLines.joined(separator: "\n")
             let mode = appSettings.outputMode
             // directInput/autoInput モードではアクセシビリティ権限を事前確認
-            if (mode == .directInput || mode == .autoInput) && !AXIsProcessTrusted() {
+            if (mode == .directInput || mode == .autoInput) && !accessibilityTrusted() {
                 Self.logger.warning("アクセシビリティ権限がないため、クリップボードにフォールバック")
                 await notificationService.sendErrorNotification(error: .accessibilityPermissionDenied)
                 await outputManager.output(text: joinedText, mode: .clipboard)
@@ -200,7 +210,7 @@ final class SessionManagerImpl: ObservableObject {
                 monitoring.sessionEnded()
             }
         }
-        if appSettings.completionSoundEnabled {
+        if error == nil && appSettings.completionSoundEnabled {
             if let sound = NSSound(named: NSSound.Name("Pop")) {
                 sound.play()
             } else {
