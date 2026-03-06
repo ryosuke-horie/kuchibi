@@ -126,4 +126,25 @@ struct TextPostprocessorTests {
         let expected = "音声認識結果"
         #expect(processor.process(input) == expected)
     }
+
+    @Test("句読点付きフィラーが除去される")
+    func removesPunctuatedFillers() {
+        #expect(processor.process("あ、今日は天気がいい") == "今日は天気がいい")
+        #expect(processor.process("ま、いいか") == "いいか")
+    }
+
+    @Test("なんかが独立フィラーとして除去される")
+    func removesNankaAsFiller() {
+        #expect(processor.process("なんか 面白い") == "面白い")
+    }
+
+    @Test("なんかが語の一部では保持される")
+    func preservesNankaInWord() {
+        #expect(processor.process("なんかい") == "なんかい")
+    }
+
+    @Test("複数の異なるフィラーが一つの文で除去される")
+    func removesMultipleFillerTypes() {
+        #expect(processor.process("えーと あの 今日は天気がいい") == "今日は天気がいい")
+    }
 }

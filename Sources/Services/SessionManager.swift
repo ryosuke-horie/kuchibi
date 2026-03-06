@@ -74,7 +74,11 @@ final class SessionManagerImpl: ObservableObject {
         }
 
         state = .recording
-        NSSound(named: NSSound.Name("Tink"))?.play()
+        if let sound = NSSound(named: NSSound.Name("Tink")) {
+            sound.play()
+        } else {
+            Self.logger.warning("セッション開始サウンド 'Tink' が見つかりません")
+        }
         partialText = ""
         accumulatedLines = []
         if appSettings.monitoringEnabled {
