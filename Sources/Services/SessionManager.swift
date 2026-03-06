@@ -1,3 +1,4 @@
+import AppKit
 import AVFoundation
 import os
 
@@ -73,6 +74,7 @@ final class SessionManagerImpl: ObservableObject {
         }
 
         state = .recording
+        NSSound(named: NSSound.Name("Tink"))?.play()
         partialText = ""
         accumulatedLines = []
         if appSettings.monitoringEnabled {
