@@ -69,8 +69,14 @@ final class SessionManagerImpl: ObservableObject {
         // マイク権限チェック
         let authStatus = micAuthorizationStatus()
         switch authStatus {
-        case .denied, .restricted:
+        case .denied:
             Self.logger.warning("マイク権限が拒否されています")
+            Task {
+                await notificationService.sendErrorNotification(error: .microphonePermissionDenied)
+            }
+            return
+        case .restricted:
+            Self.logger.warning("マイク権限が制限されています（管理者ポリシーによる制限）")
             Task {
                 await notificationService.sendErrorNotification(error: .microphonePermissionDenied)
             }
@@ -110,7 +116,7 @@ final class SessionManagerImpl: ObservableObject {
         }
 
         state = .recording
-        if appSettings.completionSoundEnabled {
+        if appSettings.sessionSoundEnabled {
             if let sound = NSSound(named: NSSound.Name("Tink")) {
                 sound.play()
             } else {
@@ -210,7 +216,7 @@ final class SessionManagerImpl: ObservableObject {
                 monitoring.sessionEnded()
             }
         }
-        if error == nil && appSettings.completionSoundEnabled {
+        if error == nil && appSettings.sessionSoundEnabled {
             if let sound = NSSound(named: NSSound.Name("Pop")) {
                 sound.play()
             } else {

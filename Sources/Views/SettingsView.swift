@@ -93,7 +93,7 @@ private struct RecognitionSettingsTab: View {
             }
 
             Section("フィードバック") {
-                Toggle("認識完了サウンド", isOn: $appSettings.completionSoundEnabled)
+                Toggle("セッションサウンド", isOn: $appSettings.sessionSoundEnabled)
             }
 
             Section("モニタリング") {
