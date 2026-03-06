@@ -13,6 +13,17 @@ struct TextPostprocessorImpl: TextPostprocessing {
         // 2. 連続スペースを1つに正規化
         result = result.replacing(/\s{2,}/, with: " ")
 
+        // 2.5. 日本語フィラー（言い淀み・つなぎ言葉）を除去
+        // 明確なフィラー（長音・促音を含む）は位置を問わず除去
+        result = result.replacing(
+            /(?:えーと|えっと|うーん|あー+|えー+|うー+|んー+|あ、|ま、)/
+        ) { _ in "" }
+        // 曖昧なフィラー（通常語と重複しうる）はスペースまたは文境界で囲まれた場合のみ除去
+        result = result.replacing(
+            /(?:^|\s)(?:まあ|なんか|あの|その)(?=\s|$)/
+        ) { _ in "" }
+        result = result.trimmingCharacters(in: .whitespaces)
+
         // 3. 日本語文字間のスペースを除去
         // 日本語文字: ひらがな、カタカナ、漢字、全角句読点・記号
         // 先読み(lookahead)により後続文字を消費せず、連続するスペースをすべて除去する
