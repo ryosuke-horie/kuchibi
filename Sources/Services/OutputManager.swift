@@ -18,11 +18,10 @@ final class OutputManagerImpl: OutputManaging {
             clipboardService.copyToClipboard(text: text)
             Self.logger.info("クリップボードにコピー完了")
         case .directInput:
-            await clipboardService.pasteToActiveApp(text: text)
+            await clipboardService.pasteToActiveApp(text: text, restoreClipboard: true)
             Self.logger.info("直接入力完了")
         case .autoInput:
-            await clipboardService.pasteToActiveApp(text: text)
-            clipboardService.copyToClipboard(text: text)
+            await clipboardService.pasteToActiveApp(text: text, restoreClipboard: false)
             Self.logger.info("自動入力処理完了")
         }
     }
