@@ -9,8 +9,11 @@ final class ClipboardServiceImpl: ClipboardServicing {
     func copyToClipboard(text: String) {
         let pasteboard = NSPasteboard.general
         pasteboard.clearContents()
-        pasteboard.setString(text, forType: .string)
-        Self.logger.info("テキストをクリップボードにコピー")
+        if pasteboard.setString(text, forType: .string) {
+            Self.logger.info("テキストをクリップボードにコピー")
+        } else {
+            Self.logger.error("クリップボードへのコピーに失敗")
+        }
     }
 
     func pasteToActiveApp(text: String) async {
@@ -47,6 +50,9 @@ final class ClipboardServiceImpl: ClipboardServicing {
     func typeText(_ text: String) async {
         guard !text.isEmpty else { return }
 
+        // 安全策: 先にクリップボードにコピーしておく（失敗時に手動ペースト可能）
+        copyToClipboard(text: text)
+
         // 事前チェック: CGEvent 生成が可能か確認（アクセシビリティ権限等）
         guard CGEvent(keyboardEventSource: nil, virtualKey: 0, keyDown: true) != nil else {
             Self.logger.error("CGEvent生成失敗: アクセシビリティ権限を確認してください。フォールバックでペースト入力に切り替え")
@@ -54,11 +60,14 @@ final class ClipboardServiceImpl: ClipboardServicing {
             return
         }
 
-        for char in text {
+        for (index, char) in text.enumerated() {
             let utf16 = Array(String(char).utf16)
             guard let keyDown = CGEvent(keyboardEventSource: nil, virtualKey: 0, keyDown: true),
                   let keyUp = CGEvent(keyboardEventSource: nil, virtualKey: 0, keyDown: false) else {
-                Self.logger.error("CGEvent生成が途中で失敗")
+                // 途中失敗時は pasteToActiveApp へのフォールバックを行わない
+                // 理由: 既にタイプ済みの文字があるため、ペーストするとテキストが重複する
+                // テキストはクリップボードに残してあるので手動ペーストで対応可能
+                Self.logger.error("CGEvent生成が途中で失敗（\(index)/\(text.count)文字目）。テキストはクリップボードに残しました")
                 return
             }
 
