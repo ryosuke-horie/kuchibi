@@ -165,6 +165,148 @@ struct SessionManagerTests {
         }
     }
 
+    @Test("マイク権限deniedではstartSessionがidleのまま通知が送られる")
+    func startSessionMicDenied() async throws {
+        let mockNotification = MockNotificationService()
+        let sm = await createSessionManager(
+            notificationService: mockNotification,
+            micAuthorizationStatus: { .denied }
+        )
+
+        await sm.startSession()
+        #expect(await sm.state == .idle)
+
+        try await Task.sleep(for: .milliseconds(50))
+        #expect(mockNotification.sentErrors.count == 1)
+        if case .microphonePermissionDenied = mockNotification.sentErrors.first {} else {
+            Issue.record("microphonePermissionDeniedを期待したが \(String(describing: mockNotification.sentErrors.first)) を受信")
+        }
+    }
+
+    @Test("マイク権限restrictedではstartSessionがidleのまま通知が送られる")
+    func startSessionMicRestricted() async throws {
+        let mockNotification = MockNotificationService()
+        let sm = await createSessionManager(
+            notificationService: mockNotification,
+            micAuthorizationStatus: { .restricted }
+        )
+
+        await sm.startSession()
+        #expect(await sm.state == .idle)
+
+        try await Task.sleep(for: .milliseconds(50))
+        #expect(mockNotification.sentErrors.count == 1)
+        if case .microphonePermissionDenied = mockNotification.sentErrors.first {} else {
+            Issue.record("microphonePermissionDeniedを期待したが \(String(describing: mockNotification.sentErrors.first)) を受信")
+        }
+    }
+
+    @Test("マイク権限notDetermined→許可でセッションが開始される")
+    func startSessionMicNotDeterminedGranted() async throws {
+        let mockAudio = MockAudioCaptureService()
+        mockAudio.micPermissionGranted = true
+        let sm = await createSessionManager(
+            audioService: mockAudio,
+            micAuthorizationStatus: { .authorized }
+        )
+
+        // まず notDetermined で起動してから authorized を返すシミュレーション
+        var callCount = 0
+        let smNotDetermined = await createSessionManager(
+            audioService: mockAudio,
+            micAuthorizationStatus: {
+                callCount += 1
+                return callCount == 1 ? .notDetermined : .authorized
+            }
+        )
+
+        await smNotDetermined.startSession()
+        try await Task.sleep(for: .milliseconds(100))
+        #expect(await smNotDetermined.state == .recording)
+    }
+
+    @Test("マイク権限notDetermined→拒否でidleのまま通知が送られる")
+    func startSessionMicNotDeterminedDenied() async throws {
+        let mockAudio = MockAudioCaptureService()
+        mockAudio.micPermissionGranted = false
+        let mockNotification = MockNotificationService()
+        let sm = await createSessionManager(
+            audioService: mockAudio,
+            notificationService: mockNotification,
+            micAuthorizationStatus: { .notDetermined }
+        )
+
+        await sm.startSession()
+        try await Task.sleep(for: .milliseconds(100))
+        #expect(await sm.state == .idle)
+        #expect(mockNotification.sentErrors.count == 1)
+        if case .microphonePermissionDenied = mockNotification.sentErrors.first {} else {
+            Issue.record("microphonePermissionDeniedを期待したが \(String(describing: mockNotification.sentErrors.first)) を受信")
+        }
+    }
+
+    @Test("アクセシビリティ権限なし時はクリップボードにフォールバックして通知される")
+    func accessibilityFallbackToClipboard() async throws {
+        let mockOutput = MockOutputManager()
+        let mockNotification = MockNotificationService()
+        let mockASR = MockSpeechRecognitionService()
+        mockASR.isModelLoaded = true
+        mockASR.eventsToEmit = [
+            RecognitionEvent(kind: .lineCompleted(final: "認識テキスト"))
+        ]
+        let defaults = UserDefaults(suiteName: "test.accessibility.\(UUID().uuidString)")!
+        let settings = await AppSettings(defaults: defaults)
+        await MainActor.run { settings.outputMode = .autoInput }
+
+        let sm = await createSessionManager(
+            outputManager: mockOutput,
+            speechService: mockASR,
+            notificationService: mockNotification,
+            appSettings: settings,
+            accessibilityTrusted: { false }
+        )
+
+        await sm.startSession()
+        await sm.stopSession()
+        try await Task.sleep(for: .milliseconds(200))
+
+        #expect(mockOutput.outputCalls.first?.mode == .clipboard)
+        #expect(mockOutput.outputCalls.first?.text == "認識テキスト")
+        #expect(mockNotification.sentErrors.count == 1)
+        if case .accessibilityPermissionDenied = mockNotification.sentErrors.first {} else {
+            Issue.record("accessibilityPermissionDeniedを期待したが \(String(describing: mockNotification.sentErrors.first)) を受信")
+        }
+    }
+
+    @Test("clipboardモード時はアクセシビリティ権限不要で通常出力される")
+    func clipboardModeSkipsAccessibilityCheck() async throws {
+        let mockOutput = MockOutputManager()
+        let mockNotification = MockNotificationService()
+        let mockASR = MockSpeechRecognitionService()
+        mockASR.isModelLoaded = true
+        mockASR.eventsToEmit = [
+            RecognitionEvent(kind: .lineCompleted(final: "クリップボードテキスト"))
+        ]
+        let defaults = UserDefaults(suiteName: "test.clipboard.\(UUID().uuidString)")!
+        let settings = await AppSettings(defaults: defaults)
+        await MainActor.run { settings.outputMode = .clipboard }
+
+        let sm = await createSessionManager(
+            outputManager: mockOutput,
+            speechService: mockASR,
+            notificationService: mockNotification,
+            appSettings: settings,
+            accessibilityTrusted: { false }
+        )
+
+        await sm.startSession()
+        await sm.stopSession()
+        try await Task.sleep(for: .milliseconds(200))
+
+        #expect(mockOutput.outputCalls.first?.mode == .clipboard)
+        #expect(mockNotification.sentErrors.isEmpty)
+    }
+
     @Test("processing状態でtoggleSessionは無視される")
     func toggleSessionDuringProcessing() async throws {
         let mockASR = MockSpeechRecognitionService()
@@ -426,7 +568,9 @@ struct SessionManagerTests {
         notificationService: NotificationServicing? = nil,
         appSettings: AppSettings? = nil,
         textPostprocessor: TextPostprocessing? = nil,
-        monitoring: SessionMonitoring? = nil
+        monitoring: SessionMonitoring? = nil,
+        micAuthorizationStatus: (() -> AVAuthorizationStatus)? = nil,
+        accessibilityTrusted: (() -> Bool)? = nil
     ) -> SessionManagerImpl {
         let audio = audioService ?? MockAudioCaptureService()
         let asr: SpeechRecognizing
@@ -448,8 +592,8 @@ struct SessionManagerTests {
             appSettings: settings,
             textPostprocessor: textPostprocessor ?? MockTextPostprocessor(),
             monitoring: monitoring ?? MockSessionMonitoringService(),
-            micAuthorizationStatus: { .authorized },
-            accessibilityTrusted: { true }
+            micAuthorizationStatus: micAuthorizationStatus ?? { .authorized },
+            accessibilityTrusted: accessibilityTrusted ?? { true }
         )
     }
 }

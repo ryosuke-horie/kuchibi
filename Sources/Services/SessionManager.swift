@@ -99,7 +99,11 @@ final class SessionManagerImpl: ObservableObject {
         case .authorized:
             break
         @unknown default:
-            Self.logger.warning("未知のマイク権限ステータス (\(authStatus.rawValue))。処理を続行します")
+            Self.logger.warning("未知のマイク権限ステータス (\(authStatus.rawValue))。安全のため処理を中断します")
+            Task {
+                await notificationService.sendErrorNotification(error: .microphonePermissionDenied)
+            }
+            return
         }
 
         let audioStream: AsyncStream<AVAudioPCMBuffer>

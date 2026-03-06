@@ -138,6 +138,7 @@ struct AppSettingsTests {
         #expect(defaults.object(forKey: "setting.modelName") == nil)
         #expect(defaults.object(forKey: "setting.updateInterval") == nil)
         #expect(defaults.object(forKey: "setting.bufferSize") == nil)
+        #expect(defaults.object(forKey: "setting.sessionSoundEnabled") == nil)
     }
 
     @Test("不正な負数のupdateIntervalは拒否される")
