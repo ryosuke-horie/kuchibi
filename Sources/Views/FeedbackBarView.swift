@@ -72,6 +72,8 @@ struct ProcessingWaveView: View {
             }
         }
         .onAppear { animating = true }
+        // View が .processing ブランチから除外されると同時に破棄されるためアニメーションは自然停止する。
+        // opacity 切り替え等で View を再利用するパターンに変更した際は、この false 設定が有効になる。
         .onDisappear { animating = false }
     }
 }
@@ -158,5 +160,6 @@ final class FeedbackBarWindowController {
         window = nil
     }
 
+    /// テスト用: ウィンドウが表示中かどうか
     var isVisible: Bool { window != nil }
 }

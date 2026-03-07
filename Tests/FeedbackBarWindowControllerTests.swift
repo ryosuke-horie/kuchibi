@@ -1,3 +1,4 @@
+import AppKit
 import AVFoundation
 import Foundation
 import Testing
@@ -18,6 +19,8 @@ struct FeedbackBarWindowControllerTests {
     @Test("recording状態でウィンドウが表示される")
     @MainActor
     func showsWindowInRecordingState() async throws {
+        try #require(NSScreen.main != nil, "このテストはディスプレイ（NSScreen.main）が必要です")
+
         let mockASR = makeHoldingASR()
         let sm = makeSessionManager(speechService: mockASR)
         let controller = FeedbackBarWindowController(sessionManager: sm)
@@ -34,6 +37,8 @@ struct FeedbackBarWindowControllerTests {
     @Test("processing状態でウィンドウが表示され続ける")
     @MainActor
     func keepsWindowInProcessingState() async throws {
+        try #require(NSScreen.main != nil, "このテストはディスプレイ（NSScreen.main）が必要です")
+
         let mockASR = makeHoldingASR()
         let sm = makeSessionManager(speechService: mockASR)
         let controller = FeedbackBarWindowController(sessionManager: sm)
@@ -55,6 +60,8 @@ struct FeedbackBarWindowControllerTests {
     @Test("idle遷移でウィンドウが非表示になる")
     @MainActor
     func hidesWindowWhenIdle() async throws {
+        try #require(NSScreen.main != nil, "このテストはディスプレイ（NSScreen.main）が必要です")
+
         let mockASR = makeHoldingASR()
         let sm = makeSessionManager(speechService: mockASR)
         let controller = FeedbackBarWindowController(sessionManager: sm)
@@ -75,6 +82,8 @@ struct FeedbackBarWindowControllerTests {
     @Test("recording→processing遷移でウィンドウが重複生成されない")
     @MainActor
     func idempotentShowDoesNotDuplicateWindow() async throws {
+        try #require(NSScreen.main != nil, "このテストはディスプレイ（NSScreen.main）が必要です")
+
         let mockASR = makeHoldingASR()
         let sm = makeSessionManager(speechService: mockASR)
         let controller = FeedbackBarWindowController(sessionManager: sm)
