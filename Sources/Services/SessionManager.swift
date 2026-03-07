@@ -6,6 +6,7 @@ import os
 private enum SystemSound {
     static let sessionStart: SystemSoundID = 1057  // Tink 相当
     static let sessionEnd: SystemSoundID = SystemSoundID(kSystemSoundID_UserPreferredAlert)
+    static let sessionCancel: SystemSoundID = 1073  // Basso 相当
 }
 
 /// 音声入力セッションのライフサイクル管理
@@ -163,6 +164,21 @@ final class SessionManagerImpl: ObservableObject {
         state = .processing
         audioService.stopCapture()
         Self.logger.info("セッションを停止、認識処理中...")
+    }
+
+    func cancelSession() {
+        guard state == .recording || state == .processing else { return }
+        Self.logger.info("セッションをキャンセルした")
+        recordingTask?.cancel()
+        recordingTask = nil
+        audioService.stopCapture()
+        accumulatedLines = []
+        partialText = ""
+        audioLevel = 0.0
+        state = .idle
+        if appSettings.sessionSoundEnabled {
+            AudioServicesPlaySystemSound(SystemSound.sessionCancel)
+        }
     }
 
     func toggleSession() {

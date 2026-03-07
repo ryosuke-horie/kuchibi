@@ -7,6 +7,7 @@ final class MockAudioCaptureService: AudioCapturing {
     var micPermissionGranted: Bool = true
     var shouldThrowOnStart: Bool = false
     private var continuation: AsyncStream<AVAudioPCMBuffer>.Continuation?
+    private(set) var stopCaptureCallCount: Int = 0
 
     var lastNoiseSuppressionEnabled: Bool?
 
@@ -22,6 +23,7 @@ final class MockAudioCaptureService: AudioCapturing {
     }
 
     func stopCapture() {
+        stopCaptureCallCount += 1
         isCapturing = false
         continuation?.finish()
         continuation = nil

@@ -7,6 +7,7 @@ struct KuchibiApp: App {
     @StateObject private var appSettings = AppSettings()
     @StateObject private var sessionManager: SessionManagerImpl
     private let hotKeyController: HotKeyControllerImpl
+    private let escapeKeyMonitor: EscapeKeyMonitorImpl
     private let feedbackBarController: FeedbackBarWindowController
 
     init() {
@@ -36,10 +37,19 @@ struct KuchibiApp: App {
             }
         })
 
+        escapeKeyMonitor = EscapeKeyMonitorImpl()
+
         feedbackBarController = FeedbackBarWindowController(sessionManager: sm)
 
         // ホットキー登録
         hotKeyController.register()
+
+        // ESCキー監視開始
+        escapeKeyMonitor.startMonitoring {
+            Task { @MainActor in
+                sm.cancelSession()
+            }
+        }
 
         // モデルの非同期読み込み
         Task {

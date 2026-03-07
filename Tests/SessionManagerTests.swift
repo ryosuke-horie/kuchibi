@@ -558,6 +558,120 @@ struct SessionManagerTests {
         #expect(mockOutput.outputCalls.last?.text == "2回目")
     }
 
+    // MARK: - cancelSession テスト
+
+    @Test("recording状態でcancelSessionを呼ぶとidleに遷移する")
+    func cancelSessionFromRecording() async {
+        let sm = await createSessionManager()
+        await sm.startSession()
+        #expect(await sm.state == .recording)
+
+        await sm.cancelSession()
+        #expect(await sm.state == .idle)
+    }
+
+    @Test("processing状態でcancelSessionを呼ぶとidleに遷移する")
+    func cancelSessionFromProcessing() async throws {
+        let mockASR = MockSpeechRecognitionService()
+        mockASR.isModelLoaded = true
+        mockASR.holdStream = true
+        let sm = await createSessionManager(speechService: mockASR)
+
+        await sm.startSession()
+        await sm.stopSession()
+        #expect(await sm.state == .processing)
+
+        await sm.cancelSession()
+        #expect(await sm.state == .idle)
+
+        mockASR.finishStream()
+    }
+
+    @Test("idle状態でcancelSessionを呼んでもOutputManagerが呼ばれない")
+    func cancelSessionFromIdleNoOutput() async {
+        let mockOutput = MockOutputManager()
+        let sm = await createSessionManager(outputManager: mockOutput)
+
+        await sm.cancelSession()
+        #expect(mockOutput.outputCalls.isEmpty)
+    }
+
+    @Test("cancelSession後にaccumulatedLinesが空になる")
+    func cancelSessionClearsAccumulatedLines() async throws {
+        let mockOutput = MockOutputManager()
+        let mockASR = MockSpeechRecognitionService()
+        mockASR.isModelLoaded = true
+        mockASR.holdStream = true
+        mockASR.eventsToEmit = [
+            RecognitionEvent(kind: .lineCompleted(final: "キャンセル対象テキスト"))
+        ]
+        let sm = await createSessionManager(outputManager: mockOutput, speechService: mockASR)
+
+        await sm.startSession()
+        try await Task.sleep(for: .milliseconds(100))
+        await sm.cancelSession()
+
+        // キャンセル後はOutputManagerが呼ばれない
+        try await Task.sleep(for: .milliseconds(100))
+        #expect(mockOutput.outputCalls.isEmpty)
+
+        mockASR.finishStream()
+    }
+
+    @Test("cancelSession後にpartialTextが空になる")
+    func cancelSessionClearsPartialText() async throws {
+        let mockASR = MockSpeechRecognitionService()
+        mockASR.isModelLoaded = true
+        mockASR.holdStream = true
+        mockASR.eventsToEmit = [
+            RecognitionEvent(kind: .textChanged(partial: "途中テキスト"))
+        ]
+        let sm = await createSessionManager(speechService: mockASR)
+
+        await sm.startSession()
+        try await Task.sleep(for: .milliseconds(100))
+        await sm.cancelSession()
+
+        let partial = await sm.partialText
+        #expect(partial == "")
+
+        mockASR.finishStream()
+    }
+
+    @Test("cancelSession後にaudioLevel が0.0にリセットされる")
+    func cancelSessionResetsAudioLevel() async throws {
+        let mockAudio = MockAudioCaptureService()
+        mockAudio.currentAudioLevel = 0.8
+        let mockASR = MockSpeechRecognitionService()
+        mockASR.isModelLoaded = true
+        mockASR.holdStream = true
+        mockASR.eventsToEmit = [
+            RecognitionEvent(kind: .textChanged(partial: "テスト"))
+        ]
+        let sm = await createSessionManager(audioService: mockAudio, speechService: mockASR)
+
+        await sm.startSession()
+        try await Task.sleep(for: .milliseconds(100))
+        await sm.cancelSession()
+
+        let level = await sm.audioLevel
+        #expect(level == 0.0)
+
+        mockASR.finishStream()
+    }
+
+    @Test("cancelSession後にstopCaptureが呼ばれる")
+    func cancelSessionCallsStopCapture() async throws {
+        let mockAudio = MockAudioCaptureService()
+        let sm = await createSessionManager(audioService: mockAudio)
+
+        await sm.startSession()
+        let countBeforeCancel = mockAudio.stopCaptureCallCount
+        await sm.cancelSession()
+
+        #expect(mockAudio.stopCaptureCallCount > countBeforeCancel)
+    }
+
     // MARK: - Helper
 
     @MainActor

@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		014B4FEF231C4ECC8AB67954 /* AppSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = C2567DD24F7F2384CAFF09A9 /* AppSettings.swift */; };
 		03B762943B04FBA12F3D7CA4 /* MockSpeechRecognitionService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0950301454AEB49BA6A24954 /* MockSpeechRecognitionService.swift */; };
+		049160B5A20797AA987C254E /* EscapeKeyMonitoring.swift in Sources */ = {isa = PBXBuildFile; fileRef = A6F0FB6B9CF216513A8BA139 /* EscapeKeyMonitoring.swift */; };
 		052A16321B04F62C4A78FC99 /* RecognitionEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 775A3E31ED46212C7EF9C5F4 /* RecognitionEvent.swift */; };
 		063E89076BBF7ED9186ACF13 /* KuchibiError.swift in Sources */ = {isa = PBXBuildFile; fileRef = F210E248F410C33E8DD354BB /* KuchibiError.swift */; };
 		07FA9937DBFA3DDE8787693A /* MockSpeechRecognitionAdapter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47983A578F918AFA52340AC4 /* MockSpeechRecognitionAdapter.swift */; };
@@ -19,6 +20,7 @@
 		20A34326CF4EAED63E7B300B /* TextPostprocessorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 59B9735BE3B50AE3B84CBFD5 /* TextPostprocessorTests.swift */; };
 		21E3191C5591D65D08DB2BA7 /* NotificationServicing.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8FF8890BCFF032E69155777 /* NotificationServicing.swift */; };
 		22C80ABB9E8DB2F7084CB805 /* MockAudioPreprocessor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1E578D16AEE9FBE092B0038A /* MockAudioPreprocessor.swift */; };
+		251A054F13C009419A5D2CA4 /* EscapeKeyCancelIntegrationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A5A61DEB75EC1C649EB1FF69 /* EscapeKeyCancelIntegrationTests.swift */; };
 		2B35717DA6411E881447A3E8 /* SessionMonitoringService.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFB235043E7580AFFA0E0FD9 /* SessionMonitoringService.swift */; };
 		38D05F27F1E438EECA7E9594 /* SpeechRecognitionServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B334D7BD062516AB599119D2 /* SpeechRecognitionServiceTests.swift */; };
 		3D896B5A4244B1D4DCF1BFFC /* HotKey in Frameworks */ = {isa = PBXBuildFile; productRef = C51938C3B8E29F96DA379568 /* HotKey */; };
@@ -37,6 +39,7 @@
 		6B613ECC3D138813FE8565BE /* OutputManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA5FC1EF0A9139A547DCE9E1 /* OutputManager.swift */; };
 		723DB1904E5938F1E2B87FFD /* ModelsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 42412DB8F6EC05A959ABE916 /* ModelsTests.swift */; };
 		780CB8A2F76DD326232748E4 /* MockTextPostprocessor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1C5ED9C89542CB717C30A981 /* MockTextPostprocessor.swift */; };
+		7A0C2A342BE0E488E3BEE230 /* MockEscapeKeyMonitor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 611512C204C9D6714B06BD33 /* MockEscapeKeyMonitor.swift */; };
 		7AE49779DA672DFD5251D9D2 /* TextPostprocessing.swift in Sources */ = {isa = PBXBuildFile; fileRef = E3EC3E47D72739ECF113A59C /* TextPostprocessing.swift */; };
 		7B9604777D16087D296030AF /* AudioCaptureService.swift in Sources */ = {isa = PBXBuildFile; fileRef = C114CB5F1012E3C584AB09F4 /* AudioCaptureService.swift */; };
 		7CC8122E6EDBD0BD5C5596DD /* AudioCapturing.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7A53A1440803CD3EA276D791 /* AudioCapturing.swift */; };
@@ -46,6 +49,7 @@
 		94A26725752116D062AB00CB /* WhisperKit in Frameworks */ = {isa = PBXBuildFile; productRef = 23C80BB8E405997E0DDCE7C4 /* WhisperKit */; };
 		9A1361D1428C7264FAD5D65E /* MockAudioCaptureService.swift in Sources */ = {isa = PBXBuildFile; fileRef = F27A6934F52E8C5BC69591EA /* MockAudioCaptureService.swift */; };
 		9A97EAB982046264987BEAA2 /* MockClipboardService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B3061795806AC0CA836AAB7 /* MockClipboardService.swift */; };
+		A25027BCDA52E9A234CCBA1D /* EscapeKeyMonitor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0AEAC1E923D2B0A6C98EF191 /* EscapeKeyMonitor.swift */; };
 		A2C3BBB86FBA1CA25BBEE200 /* KuchibiApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = C32DA2D991DEFB3190AA572F /* KuchibiApp.swift */; };
 		A545B0010DBEB690DCB7E6E2 /* SessionManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1BBF3BF9F624BDACFFBEE6B7 /* SessionManager.swift */; };
 		B25A2B10C6906684172340BF /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6FA88E522113163387194FC /* SettingsView.swift */; };
@@ -75,6 +79,7 @@
 /* Begin PBXFileReference section */
 		02FBC7887C665F64BFF30939 /* ClipboardService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClipboardService.swift; sourceTree = "<group>"; };
 		0950301454AEB49BA6A24954 /* MockSpeechRecognitionService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockSpeechRecognitionService.swift; sourceTree = "<group>"; };
+		0AEAC1E923D2B0A6C98EF191 /* EscapeKeyMonitor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EscapeKeyMonitor.swift; sourceTree = "<group>"; };
 		0EDBA40BCFA4E3D0A6A04437 /* FeedbackBarWindowControllerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeedbackBarWindowControllerTests.swift; sourceTree = "<group>"; };
 		17091088C1A51563CE50547C /* HotKeyController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HotKeyController.swift; sourceTree = "<group>"; };
 		18009A0EB4ACCBA03198413F /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
@@ -96,6 +101,7 @@
 		59F2C2477208487EC2512D63 /* FeedbackBarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeedbackBarView.swift; sourceTree = "<group>"; };
 		5D92FF9CC9A3BCB18F2B4E0D /* WhisperModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WhisperModelTests.swift; sourceTree = "<group>"; };
 		5DEE9711076CD9BCFC277B74 /* SpeechRecognizing.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpeechRecognizing.swift; sourceTree = "<group>"; };
+		611512C204C9D6714B06BD33 /* MockEscapeKeyMonitor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockEscapeKeyMonitor.swift; sourceTree = "<group>"; };
 		622DC30131168B62E4329413 /* MockSessionMonitoringService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockSessionMonitoringService.swift; sourceTree = "<group>"; };
 		637E27FE3FD29E9185EDED16 /* SessionMonitoringServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionMonitoringServiceTests.swift; sourceTree = "<group>"; };
 		73138B86E0637C5A5354239B /* TextPostprocessor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextPostprocessor.swift; sourceTree = "<group>"; };
@@ -104,6 +110,8 @@
 		7A53A1440803CD3EA276D791 /* AudioCapturing.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioCapturing.swift; sourceTree = "<group>"; };
 		8B3061795806AC0CA836AAB7 /* MockClipboardService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockClipboardService.swift; sourceTree = "<group>"; };
 		98D0E0C1DB5386C565834D9A /* NotificationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationService.swift; sourceTree = "<group>"; };
+		A5A61DEB75EC1C649EB1FF69 /* EscapeKeyCancelIntegrationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EscapeKeyCancelIntegrationTests.swift; sourceTree = "<group>"; };
+		A6F0FB6B9CF216513A8BA139 /* EscapeKeyMonitoring.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EscapeKeyMonitoring.swift; sourceTree = "<group>"; };
 		AA5FC1EF0A9139A547DCE9E1 /* OutputManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OutputManager.swift; sourceTree = "<group>"; };
 		AC030E08D9FB798B68FFADA4 /* MockNotificationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockNotificationService.swift; sourceTree = "<group>"; };
 		B334D7BD062516AB599119D2 /* SpeechRecognitionServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpeechRecognitionServiceTests.swift; sourceTree = "<group>"; };
@@ -158,6 +166,7 @@
 				C114CB5F1012E3C584AB09F4 /* AudioCaptureService.swift */,
 				D7E70850E8617B23FFBC6D25 /* AudioPreprocessor.swift */,
 				02FBC7887C665F64BFF30939 /* ClipboardService.swift */,
+				0AEAC1E923D2B0A6C98EF191 /* EscapeKeyMonitor.swift */,
 				17091088C1A51563CE50547C /* HotKeyController.swift */,
 				98D0E0C1DB5386C565834D9A /* NotificationService.swift */,
 				AA5FC1EF0A9139A547DCE9E1 /* OutputManager.swift */,
@@ -218,6 +227,7 @@
 			children = (
 				BE4CB2755E46F8B48C02948F /* AppSettingsTests.swift */,
 				354653C713A6898397AA7813 /* AudioPreprocessorTests.swift */,
+				A5A61DEB75EC1C649EB1FF69 /* EscapeKeyCancelIntegrationTests.swift */,
 				0EDBA40BCFA4E3D0A6A04437 /* FeedbackBarWindowControllerTests.swift */,
 				42412DB8F6EC05A959ABE916 /* ModelsTests.swift */,
 				E63E378A918F838B82ACE3FF /* NotificationServiceTests.swift */,
@@ -238,6 +248,7 @@
 				7A53A1440803CD3EA276D791 /* AudioCapturing.swift */,
 				DCC3C51E299A787C548A0EFE /* AudioPreprocessing.swift */,
 				E66CB5F565073A98DF48CC2F /* ClipboardServicing.swift */,
+				A6F0FB6B9CF216513A8BA139 /* EscapeKeyMonitoring.swift */,
 				3B8E11116B0287E092ADCD9A /* HotKeyControlling.swift */,
 				E8FF8890BCFF032E69155777 /* NotificationServicing.swift */,
 				438FE5EE29F95ABC7530E1DC /* OutputManaging.swift */,
@@ -255,6 +266,7 @@
 				F27A6934F52E8C5BC69591EA /* MockAudioCaptureService.swift */,
 				1E578D16AEE9FBE092B0038A /* MockAudioPreprocessor.swift */,
 				8B3061795806AC0CA836AAB7 /* MockClipboardService.swift */,
+				611512C204C9D6714B06BD33 /* MockEscapeKeyMonitor.swift */,
 				AC030E08D9FB798B68FFADA4 /* MockNotificationService.swift */,
 				18F26478F8E01F0C16F321F2 /* MockOutputManager.swift */,
 				622DC30131168B62E4329413 /* MockSessionMonitoringService.swift */,
@@ -353,6 +365,8 @@
 				E90EEEEDA9C89B97C45DEFDE /* AudioPreprocessor.swift in Sources */,
 				8A25A25F336AA98A1BF41B6E /* ClipboardService.swift in Sources */,
 				5DC1D1F518BAB6216592076F /* ClipboardServicing.swift in Sources */,
+				A25027BCDA52E9A234CCBA1D /* EscapeKeyMonitor.swift in Sources */,
+				049160B5A20797AA987C254E /* EscapeKeyMonitoring.swift in Sources */,
 				B6B59DCFE1D7124F94B5EC3B /* FeedbackBarView.swift in Sources */,
 				5FEFC91E55EC69384E6CE020 /* HotKeyController.swift in Sources */,
 				0D8FCFBAB02F67DF7EF606A6 /* HotKeyControlling.swift in Sources */,
@@ -385,10 +399,12 @@
 			files = (
 				45E542E5E74D5814693904B6 /* AppSettingsTests.swift in Sources */,
 				69EBC15318A7A3C85C2AE1BE /* AudioPreprocessorTests.swift in Sources */,
+				251A054F13C009419A5D2CA4 /* EscapeKeyCancelIntegrationTests.swift in Sources */,
 				F2DFFDFA5D01526E0FD5FF59 /* FeedbackBarWindowControllerTests.swift in Sources */,
 				9A1361D1428C7264FAD5D65E /* MockAudioCaptureService.swift in Sources */,
 				22C80ABB9E8DB2F7084CB805 /* MockAudioPreprocessor.swift in Sources */,
 				9A97EAB982046264987BEAA2 /* MockClipboardService.swift in Sources */,
+				7A0C2A342BE0E488E3BEE230 /* MockEscapeKeyMonitor.swift in Sources */,
 				BAAD6B03864F546F3E3367ED /* MockNotificationService.swift in Sources */,
 				4A08E8F56B25D0EF716AB777 /* MockOutputManager.swift in Sources */,
 				4FD8F7E55BDC20972BB6F969 /* MockSessionMonitoringService.swift in Sources */,
