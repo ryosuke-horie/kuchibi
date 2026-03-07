@@ -9,25 +9,35 @@ struct FeedbackBarView: View {
 
     var body: some View {
         HStack(spacing: 4) {
-            // 音量バー
-            HStack(spacing: 2) {
-                ForEach(0..<barCount, id: \.self) { index in
-                    AudioLevelBar(
-                        level: sessionManager.audioLevel,
-                        index: index,
-                        totalBars: barCount
-                    )
-                }
-            }
-            .frame(width: 60)
+            if sessionManager.state == .processing {
+                // 文字起こし中アニメーション
+                ProcessingWaveView()
+                    .frame(width: 60)
 
-            // 認識テキスト
-            if !sessionManager.partialText.isEmpty {
-                Text(sessionManager.partialText)
+                Text("文字起こし中...")
                     .font(.system(size: 12))
-                    .foregroundColor(.primary)
-                    .lineLimit(1)
-                    .truncationMode(.tail)
+                    .foregroundColor(.secondary)
+            } else {
+                // 音量バー
+                HStack(spacing: 2) {
+                    ForEach(0..<barCount, id: \.self) { index in
+                        AudioLevelBar(
+                            level: sessionManager.audioLevel,
+                            index: index,
+                            totalBars: barCount
+                        )
+                    }
+                }
+                .frame(width: 60)
+
+                // 認識テキスト
+                if !sessionManager.partialText.isEmpty {
+                    Text(sessionManager.partialText)
+                        .font(.system(size: 12))
+                        .foregroundColor(.primary)
+                        .lineLimit(1)
+                        .truncationMode(.tail)
+                }
             }
 
             Spacer()
@@ -36,6 +46,33 @@ struct FeedbackBarView: View {
         .padding(.vertical, 6)
         .frame(height: 36)
         .background(.ultraThinMaterial)
+    }
+}
+
+/// 文字起こし処理中を表すウェーブアニメーション
+struct ProcessingWaveView: View {
+    @State private var animating = false
+
+    private let barHeights: [(min: CGFloat, max: CGFloat)] = [
+        (4, 10), (4, 16), (4, 20), (4, 16), (4, 10)
+    ]
+
+    var body: some View {
+        HStack(spacing: 3) {
+            ForEach(0..<5, id: \.self) { index in
+                RoundedRectangle(cornerRadius: 1)
+                    .fill(Color.accentColor.opacity(0.6))
+                    .frame(width: 3, height: animating ? barHeights[index].max : barHeights[index].min)
+                    .animation(
+                        .easeInOut(duration: 0.45)
+                            .repeatForever(autoreverses: true)
+                            .delay(Double(index) * 0.09),
+                        value: animating
+                    )
+            }
+        }
+        .onAppear { animating = true }
+        .onDisappear { animating = false }
     }
 }
 
@@ -76,7 +113,7 @@ final class FeedbackBarWindowController {
         cancellable = sessionManager.$state
             .receive(on: RunLoop.main)
             .sink { [weak self] state in
-                if state == .recording {
+                if state == .recording || state == .processing {
                     self?.show()
                 } else {
                     self?.hide()
@@ -120,4 +157,6 @@ final class FeedbackBarWindowController {
         window?.orderOut(nil)
         window = nil
     }
+
+    var isVisible: Bool { window != nil }
 }

@@ -58,6 +58,7 @@
 		E14B97AA9E10BA2B27CBF008 /* SessionManagerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4DF746512D0786CC00E872E5 /* SessionManagerTests.swift */; };
 		E90EEEEDA9C89B97C45DEFDE /* AudioPreprocessor.swift in Sources */ = {isa = PBXBuildFile; fileRef = D7E70850E8617B23FFBC6D25 /* AudioPreprocessor.swift */; };
 		E95FEACC830651D7DF4009BC /* SpeechRecognitionService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20667E795903E13BE376BFB3 /* SpeechRecognitionService.swift */; };
+		F2DFFDFA5D01526E0FD5FF59 /* FeedbackBarWindowControllerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0EDBA40BCFA4E3D0A6A04437 /* FeedbackBarWindowControllerTests.swift */; };
 		F89BFA8C4AB507E9C1388AA6 /* WhisperKitAdapter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27506DF60E8AE1D221334763 /* WhisperKitAdapter.swift */; };
 /* End PBXBuildFile section */
 
@@ -74,6 +75,7 @@
 /* Begin PBXFileReference section */
 		02FBC7887C665F64BFF30939 /* ClipboardService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClipboardService.swift; sourceTree = "<group>"; };
 		0950301454AEB49BA6A24954 /* MockSpeechRecognitionService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockSpeechRecognitionService.swift; sourceTree = "<group>"; };
+		0EDBA40BCFA4E3D0A6A04437 /* FeedbackBarWindowControllerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeedbackBarWindowControllerTests.swift; sourceTree = "<group>"; };
 		17091088C1A51563CE50547C /* HotKeyController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HotKeyController.swift; sourceTree = "<group>"; };
 		18009A0EB4ACCBA03198413F /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		18F26478F8E01F0C16F321F2 /* MockOutputManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockOutputManager.swift; sourceTree = "<group>"; };
@@ -216,6 +218,7 @@
 			children = (
 				BE4CB2755E46F8B48C02948F /* AppSettingsTests.swift */,
 				354653C713A6898397AA7813 /* AudioPreprocessorTests.swift */,
+				0EDBA40BCFA4E3D0A6A04437 /* FeedbackBarWindowControllerTests.swift */,
 				42412DB8F6EC05A959ABE916 /* ModelsTests.swift */,
 				E63E378A918F838B82ACE3FF /* NotificationServiceTests.swift */,
 				C531F963B68CB7998DD9D1B9 /* OutputManagerTests.swift */,
@@ -382,6 +385,7 @@
 			files = (
 				45E542E5E74D5814693904B6 /* AppSettingsTests.swift in Sources */,
 				69EBC15318A7A3C85C2AE1BE /* AudioPreprocessorTests.swift in Sources */,
+				F2DFFDFA5D01526E0FD5FF59 /* FeedbackBarWindowControllerTests.swift in Sources */,
 				9A1361D1428C7264FAD5D65E /* MockAudioCaptureService.swift in Sources */,
 				22C80ABB9E8DB2F7084CB805 /* MockAudioPreprocessor.swift in Sources */,
 				9A97EAB982046264987BEAA2 /* MockClipboardService.swift in Sources */,
