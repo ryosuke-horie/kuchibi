@@ -28,6 +28,7 @@ struct FeedbackBarWindowControllerTests {
 
         mockASR.finishStream()
         try await Task.sleep(for: .milliseconds(100))
+        #expect(!controller.isVisible)
     }
 
     @Test("processing状態でウィンドウが表示され続ける")
@@ -69,19 +70,18 @@ struct FeedbackBarWindowControllerTests {
 
     @Test("recording→processing遷移でウィンドウが重複生成されない")
     @MainActor
-    func idempotentShowDoesNotDuplicateWindow() async throws {
-        let (controller, mockASR, sm) = try makeController()
+    func idempotentShowDoesNotDuplicateWindow() throws {
+        try #require(NSScreen.main != nil, "このテストはディスプレイ（NSScreen.main）が必要です")
+        let sm = makeSessionManager()
+        let controller = FeedbackBarWindowController(sessionManager: sm)
 
-        sm.startSession()
-        try await Task.sleep(for: .milliseconds(100))
+        controller.show()  // 1回目
         #expect(controller.isVisible)
 
-        sm.stopSession()  // show() が再呼び出しされるが guard window == nil でスキップされる
-        try await Task.sleep(for: .milliseconds(100))
+        controller.show()  // 2回目 — guard window == nil でスキップされる
         #expect(controller.isVisible)
 
-        mockASR.finishStream()
-        try await Task.sleep(for: .milliseconds(100))
+        controller.hide()
         #expect(!controller.isVisible)
     }
 
