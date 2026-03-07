@@ -6,13 +6,14 @@ struct FeedbackBarView: View {
     @ObservedObject var sessionManager: SessionManagerImpl
 
     private let barCount = 10
+    private let indicatorWidth: CGFloat = 60
 
     var body: some View {
         HStack(spacing: 4) {
             if sessionManager.state == .processing {
                 // 文字起こし中アニメーション
                 ProcessingWaveView()
-                    .frame(width: 60)
+                    .frame(width: indicatorWidth)
 
                 Text("文字起こし中...")
                     .font(.system(size: 12))
@@ -28,7 +29,7 @@ struct FeedbackBarView: View {
                         )
                     }
                 }
-                .frame(width: 60)
+                .frame(width: indicatorWidth)
 
                 // 認識テキスト
                 if !sessionManager.partialText.isEmpty {
