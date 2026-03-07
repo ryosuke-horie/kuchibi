@@ -167,7 +167,10 @@ final class SessionManagerImpl: ObservableObject {
     }
 
     func cancelSession() {
-        guard state == .recording || state == .processing else { return }
+        guard state == .recording || state == .processing else {
+            Self.logger.warning("cancelSessionが無視された: 現在の状態=\(String(describing: self.state))")
+            return
+        }
         Self.logger.info("セッションをキャンセルした")
         recordingTask?.cancel()
         recordingTask = nil

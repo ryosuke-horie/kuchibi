@@ -1,5 +1,5 @@
 /// ESC キーのグローバル監視プロトコル
-protocol EscapeKeyMonitoring {
+protocol EscapeKeyMonitoring: AnyObject {
     /// ESC キー監視を開始する
     /// - Parameter onEscape: ESC 検出時に呼び出されるコールバック（呼び出しスレッドは不定）
     func startMonitoring(onEscape: @escaping () -> Void)

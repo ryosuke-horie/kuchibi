@@ -63,7 +63,7 @@ struct EscapeKeyCancelIntegrationTests {
         mockASR.finishStream()
     }
 
-    @Test("キャンセル後にstartSessionが正常に動作する（状態復帰の検証）")
+    @Test("キャンセル後に同一インスタンスでstartSessionが正常に動作する（状態復帰の検証）")
     @MainActor
     func startSessionWorksAfterCancel() async throws {
         let mockASR = MockSpeechRecognitionService()
@@ -78,6 +78,7 @@ struct EscapeKeyCancelIntegrationTests {
             }
         }
 
+        // 1回目: 開始 → ESCキャンセル
         sm.startSession()
         try await Task.sleep(for: .milliseconds(50))
         #expect(sm.state == .recording)
@@ -89,16 +90,13 @@ struct EscapeKeyCancelIntegrationTests {
         mockASR.finishStream()
         try await Task.sleep(for: .milliseconds(50))
 
-        // キャンセル後に再度 startSession が正常に動作すること
-        let mockASR2 = MockSpeechRecognitionService()
-        mockASR2.isModelLoaded = true
-        mockASR2.holdStream = true
-        let sm2 = makeSessionManager(speechService: mockASR2)
+        // 2回目: 同一インスタンスで再起動できることを検証
+        mockASR.holdStream = true
+        sm.startSession()
+        try await Task.sleep(for: .milliseconds(50))
+        #expect(sm.state == .recording)
 
-        sm2.startSession()
-        #expect(sm2.state == .recording)
-
-        mockASR2.finishStream()
+        mockASR.finishStream()
         try await Task.sleep(for: .milliseconds(50))
     }
 

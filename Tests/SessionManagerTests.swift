@@ -660,7 +660,7 @@ struct SessionManagerTests {
         mockASR.finishStream()
     }
 
-    @Test("cancelSession後にstopCaptureが呼ばれる")
+    @Test("cancelSession後にstopCaptureが1回呼ばれる")
     func cancelSessionCallsStopCapture() async throws {
         let mockAudio = MockAudioCaptureService()
         let sm = await createSessionManager(audioService: mockAudio)
@@ -669,7 +669,7 @@ struct SessionManagerTests {
         let countBeforeCancel = mockAudio.stopCaptureCallCount
         await sm.cancelSession()
 
-        #expect(mockAudio.stopCaptureCallCount > countBeforeCancel)
+        #expect(mockAudio.stopCaptureCallCount == countBeforeCancel + 1)
     }
 
     // MARK: - Helper

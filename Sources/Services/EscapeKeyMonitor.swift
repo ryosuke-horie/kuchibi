@@ -27,4 +27,8 @@ final class EscapeKeyMonitorImpl: EscapeKeyMonitoring {
         }
         monitor = nil
     }
+
+    deinit {
+        stopMonitoring()
+    }
 }
