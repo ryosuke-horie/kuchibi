@@ -4,20 +4,33 @@ macOS で動作する個人用音声入力アプリ。ホットキー（Cmd+Shif
 
 ## セットアップ
 
-### 1. ビルド
+### 1. ビルドとインストール
 
-Xcode でビルドする。
+Makefile を使ってビルドからインストール・起動まで実行できる。
 
-### 2. /Applications へのインストール（自動入力に必要）
+初回（または再ビルド後）:
+
+```bash
+make build    # Xcode でビルド
+make run      # /Applications にインストールして起動
+```
+
+その他のコマンド:
+
+```bash
+make install  # /Applications にインストール（起動なし）
+make clean    # ビルドキャッシュを削除
+```
+
+> [!NOTE]
+> `make run` / `make install` を実行する前に `make build` が必要。ビルド前に実行するとエラーになる。
+
+### 2. /Applications へのインストール理由（自動入力に必要）
 
 自動入力（directInput / autoInput モード）には macOS のアクセシビリティ権限が必要。
 DerivedData のビルドでは権限が毎ビルドごとにリセットされるため、`/Applications` にインストールして使用すること。
 
-```bash
-cp -R ~/Library/Developer/Xcode/DerivedData/Kuchibi-*/Build/Products/Debug/Kuchibi.app /Applications/
-```
-
-再ビルド後はこのコマンドを再実行してインストールしなおす。
+再ビルド後は `make run` を再実行してインストールしなおす。
 
 ### 3. アクセシビリティ権限の付与
 

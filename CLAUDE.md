@@ -11,7 +11,7 @@
 
 ## AIモデル
 
-[moonshine](https://github.com/moonshine-ai/moonshine)を第一候補として起用。
+[WhisperKit](https://github.com/argmaxinc/WhisperKit) を使用。Whisper モデルサイズは tiny / base / small / medium / large-v2 / large-v3 から選択可能（デフォルト: base）。
 
 
 # AI-DLC and Spec-Driven Development
@@ -26,8 +26,8 @@ Kiro-style Spec Driven Development implementation on AI-DLC (AI Development Life
 
 ### Steering vs Specification
 
-**Steering** (`.kiro/steering/`) - Guide AI with project-wide rules and context
-**Specs** (`.kiro/specs/`) - Formalize development process for individual features
+Steering (`.kiro/steering/`) - Guide AI with project-wide rules and context
+Specs (`.kiro/specs/`) - Formalize development process for individual features
 
 ### Active Specifications
 - Check `.kiro/specs/` for active specifications
