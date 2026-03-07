@@ -49,6 +49,7 @@ struct KuchibiApp: App {
                 await notificationService.sendErrorNotification(error: error as? KuchibiError ?? .modelLoadFailed(underlying: error))
             }
         }
+
     }
 
     var body: some Scene {

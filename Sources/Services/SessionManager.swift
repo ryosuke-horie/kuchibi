@@ -1,6 +1,12 @@
 import AppKit
+import AudioToolbox
 import AVFoundation
 import os
+
+private enum SystemSound {
+    static let sessionStart: SystemSoundID = 1057  // Tink 相当
+    static let sessionEnd: SystemSoundID = SystemSoundID(kSystemSoundID_UserPreferredAlert)
+}
 
 /// 音声入力セッションのライフサイクル管理
 @MainActor
@@ -121,11 +127,7 @@ final class SessionManagerImpl: ObservableObject {
 
         state = .recording
         if appSettings.sessionSoundEnabled {
-            if let sound = NSSound(named: NSSound.Name("Tink")) {
-                sound.play()
-            } else {
-                Self.logger.warning("セッション開始サウンド 'Tink' が見つかりません")
-            }
+            AudioServicesPlaySystemSound(SystemSound.sessionStart)
         }
         partialText = ""
         accumulatedLines = []
@@ -203,14 +205,7 @@ final class SessionManagerImpl: ObservableObject {
         if !accumulatedLines.isEmpty {
             let joinedText = accumulatedLines.joined(separator: "\n")
             let mode = appSettings.outputMode
-            // directInput/autoInput モードではアクセシビリティ権限を事前確認
-            if (mode == .directInput || mode == .autoInput) && !accessibilityTrusted() {
-                Self.logger.warning("アクセシビリティ権限がないため、クリップボードにフォールバック")
-                await notificationService.sendErrorNotification(error: .accessibilityPermissionDenied)
-                await outputManager.output(text: joinedText, mode: .clipboard)
-            } else {
-                await outputManager.output(text: joinedText, mode: mode)
-            }
+            await outputManager.output(text: joinedText, mode: mode)
             accumulatedLines = []
         }
         if appSettings.monitoringEnabled {
@@ -221,11 +216,7 @@ final class SessionManagerImpl: ObservableObject {
             }
         }
         if error == nil && appSettings.sessionSoundEnabled {
-            if let sound = NSSound(named: NSSound.Name("Pop")) {
-                sound.play()
-            } else {
-                Self.logger.warning("完了サウンド 'Pop' が見つかりません")
-            }
+            AudioServicesPlaySystemSound(SystemSound.sessionEnd)
         }
         state = .idle
         audioLevel = 0.0
