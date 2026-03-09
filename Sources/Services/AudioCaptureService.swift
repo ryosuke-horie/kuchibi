@@ -5,17 +5,19 @@ import os
 final class AudioCaptureServiceImpl: AudioCapturing {
     private static let logger = Logger(subsystem: "com.kuchibi.app", category: "AudioCapture")
 
-    private let engine = AVAudioEngine()
+    private var engine: AVAudioEngine?
     private var continuation: AsyncStream<AVAudioPCMBuffer>.Continuation?
     private(set) var isCapturing: Bool = false
     private(set) var currentAudioLevel: Float = 0.0
 
     func startCapture(noiseSuppressionEnabled: Bool) throws -> AsyncStream<AVAudioPCMBuffer> {
+        let newEngine = AVAudioEngine()
+
         let stream = AsyncStream<AVAudioPCMBuffer> { continuation in
             self.continuation = continuation
         }
 
-        let inputNode = engine.inputNode
+        let inputNode = newEngine.inputNode
 
         // Voice Processing の設定（エンジン起動前にのみ可能）
         if noiseSuppressionEnabled {
@@ -36,12 +38,13 @@ final class AudioCaptureServiceImpl: AudioCapturing {
         }
 
         do {
-            try engine.start()
+            try newEngine.start()
+            engine = newEngine
             isCapturing = true
             Self.logger.info("音声キャプチャを開始")
         } catch {
             Self.logger.error("音声キャプチャの開始に失敗: \(error.localizedDescription)")
-            engine.inputNode.removeTap(onBus: 0)
+            newEngine.inputNode.removeTap(onBus: 0)
             continuation?.finish()
             throw KuchibiError.microphoneUnavailable
         }
@@ -50,13 +53,14 @@ final class AudioCaptureServiceImpl: AudioCapturing {
     }
 
     func stopCapture() {
-        engine.inputNode.removeTap(onBus: 0)
-        engine.stop()
+        engine?.inputNode.removeTap(onBus: 0)
+        engine?.stop()
+        engine = nil
         continuation?.finish()
         continuation = nil
         isCapturing = false
         currentAudioLevel = 0.0
-        Self.logger.info("音声キャプチャを停止")
+        Self.logger.info("音声キャプチャを停止、オーディオハードウェアを解放")
     }
 
     private func updateAudioLevel(from buffer: AVAudioPCMBuffer) {
