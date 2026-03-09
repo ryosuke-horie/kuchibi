@@ -22,6 +22,11 @@ final class ClipboardServiceImpl: ClipboardServicing {
     func pasteToActiveApp(text: String, restoreClipboard: Bool) async {
         let pasteboard = NSPasteboard.general
 
+        // ペースト先アプリをメインスレッドで事前取得（NSWorkspaceはMainActor隔離）
+        let targetApp: NSRunningApplication? = await MainActor.run {
+            NSWorkspace.shared.frontmostApplication
+        }
+
         // 元のクリップボード内容を退避（復元が必要な場合のみ、複数型を全て保存）
         let savedItems: [(NSPasteboard.PasteboardType, Data)] = restoreClipboard
             ? pasteboard.pasteboardItems?.flatMap { item in
@@ -39,8 +44,11 @@ final class ClipboardServiceImpl: ClipboardServicing {
             return
         }
 
-        // Cmd+V を送信（成否はイベント到達を保証しない）
-        let pasteSucceeded = sendPasteKeyEvent()
+        // Cmd+V をメインスレッドで送信
+        // CGEvent.post はメインスレッドから呼ぶことで確実に対象アプリへ届く
+        let pasteSucceeded = await MainActor.run {
+            sendPasteKeyEvent(to: targetApp)
+        }
 
         if pasteSucceeded {
             if restoreClipboard {
@@ -68,8 +76,14 @@ final class ClipboardServiceImpl: ClipboardServicing {
         }
     }
 
+    @MainActor
     @discardableResult
-    private func sendPasteKeyEvent() -> Bool {
+    private func sendPasteKeyEvent(to targetApp: NSRunningApplication?) -> Bool {
+        // ターゲットアプリをアクティブ化（すでにアクティブなら no-op）
+        if let app = targetApp {
+            app.activate(options: [])
+        }
+
         // Cmd+V のキーコード: V = 0x09
         // hidSystemState をソースにすることで OS がキーストロークを正規の入力として扱う
         let source = CGEventSource(stateID: .hidSystemState)
@@ -82,9 +96,13 @@ final class ClipboardServiceImpl: ClipboardServicing {
         keyDown.flags = .maskCommand
         keyUp.flags = .maskCommand
 
-        // cgAnnotatedSessionEventTap はフロントモストアプリに確実に届く
+        // cgAnnotatedSessionEventTap はフロントモストアプリへ届く
         keyDown.post(tap: .cgAnnotatedSessionEventTap)
         keyUp.post(tap: .cgAnnotatedSessionEventTap)
+
+        if let app = targetApp {
+            Self.logger.debug("Cmd+V を送信: target=\(app.localizedName ?? "unknown")")
+        }
         return true
     }
 }
