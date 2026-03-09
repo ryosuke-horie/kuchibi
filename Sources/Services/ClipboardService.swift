@@ -71,8 +71,10 @@ final class ClipboardServiceImpl: ClipboardServicing {
     @discardableResult
     private func sendPasteKeyEvent() -> Bool {
         // Cmd+V のキーコード: V = 0x09
-        guard let keyDown = CGEvent(keyboardEventSource: nil, virtualKey: 0x09, keyDown: true),
-              let keyUp = CGEvent(keyboardEventSource: nil, virtualKey: 0x09, keyDown: false) else {
+        // hidSystemState をソースにすることで OS がキーストロークを正規の入力として扱う
+        let source = CGEventSource(stateID: .hidSystemState)
+        guard let keyDown = CGEvent(keyboardEventSource: source, virtualKey: 0x09, keyDown: true),
+              let keyUp = CGEvent(keyboardEventSource: source, virtualKey: 0x09, keyDown: false) else {
             Self.logger.error("CGEventの作成に失敗: アクセシビリティ権限を確認してください")
             return false
         }
@@ -80,8 +82,9 @@ final class ClipboardServiceImpl: ClipboardServicing {
         keyDown.flags = .maskCommand
         keyUp.flags = .maskCommand
 
-        keyDown.post(tap: .cghidEventTap)
-        keyUp.post(tap: .cghidEventTap)
+        // cgAnnotatedSessionEventTap はフロントモストアプリに確実に届く
+        keyDown.post(tap: .cgAnnotatedSessionEventTap)
+        keyUp.post(tap: .cgAnnotatedSessionEventTap)
         return true
     }
 }
