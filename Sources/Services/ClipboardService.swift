@@ -22,7 +22,18 @@ final class ClipboardServiceImpl: ClipboardServicing {
     func pasteToActiveApp(text: String, restoreClipboard: Bool) async {
         let pasteboard = NSPasteboard.general
 
-        // 元のクリップボード内容を退避（復元が必要な場合のみ、複数型を全て保存）
+        // 1st try: AXUIElement 経由でフォーカス中の要素にテキストを直接挿入
+        let insertedViaAXUI = await MainActor.run { insertTextViaAXUI(text) }
+        if insertedViaAXUI {
+            Self.logger.info("AXUIElement経由でテキストを直接挿入")
+            if !restoreClipboard {
+                copyToClipboard(text: text)
+            }
+            return
+        }
+        Self.logger.debug("AXUIElement挿入失敗: クリップボード+Cmd+Vを試みる")
+
+        // 2nd try: クリップボード経由でCmd+V
         let savedItems: [(NSPasteboard.PasteboardType, Data)] = restoreClipboard
             ? pasteboard.pasteboardItems?.flatMap { item in
                 item.types.compactMap { type in
@@ -31,7 +42,6 @@ final class ClipboardServiceImpl: ClipboardServicing {
             } ?? []
             : []
 
-        // テキストをクリップボードに設定
         pasteboard.clearContents()
         guard pasteboard.setString(text, forType: .string) else {
             Self.logger.error("クリップボードへの書き込みに失敗: ペーストを中断")
@@ -39,28 +49,41 @@ final class ClipboardServiceImpl: ClipboardServicing {
             return
         }
 
-        // Cmd+V を送信（成否はイベント到達を保証しない）
-        let pasteSucceeded = sendPasteKeyEvent()
+        // AppleScript (System Events) 経由でCmd+V を送信（最も信頼性が高い）
+        // 初回実行時に Automation 権限ダイアログが表示される
+        let pasteSucceeded = sendPasteViaAppleScript()
 
         if pasteSucceeded {
             if restoreClipboard {
-                // 短い遅延後にクリップボード復元
                 try? await Task.sleep(for: Self.clipboardRestoreDelay)
                 pasteboard.clearContents()
                 restoreItems(savedItems, to: pasteboard)
             }
-            Self.logger.info("テキストをアクティブアプリに直接入力")
+            Self.logger.info("AppleScript経由でCmd+Vを送信")
         } else {
-            if restoreClipboard {
-                // ペースト失敗時も元の内容を復元する
-                pasteboard.clearContents()
-                restoreItems(savedItems, to: pasteboard)
-                Self.logger.warning("ペースト失敗: クリップボードを元の内容に復元しました")
+            // フォールバック: CGEvent
+            Self.logger.warning("AppleScript失敗: CGEventにフォールバック")
+            let cgSucceeded = await MainActor.run { sendPasteKeyEventViaCGEvent() }
+            if cgSucceeded {
+                if restoreClipboard {
+                    try? await Task.sleep(for: Self.clipboardRestoreDelay)
+                    pasteboard.clearContents()
+                    restoreItems(savedItems, to: pasteboard)
+                }
+                Self.logger.info("CGEvent経由でCmd+Vを送信")
             } else {
-                Self.logger.warning("ペースト失敗: テキストはクリップボードに残しました")
+                if restoreClipboard {
+                    pasteboard.clearContents()
+                    restoreItems(savedItems, to: pasteboard)
+                    Self.logger.warning("ペースト失敗: クリップボードを元の内容に復元しました")
+                } else {
+                    Self.logger.warning("ペースト失敗: テキストはクリップボードに残しました")
+                }
             }
         }
     }
+
+    // MARK: - Private
 
     private func restoreItems(_ items: [(NSPasteboard.PasteboardType, Data)], to pasteboard: NSPasteboard) {
         for (type, data) in items {
@@ -68,20 +91,65 @@ final class ClipboardServiceImpl: ClipboardServicing {
         }
     }
 
+    /// AXUIElement 経由でフォーカス中の要素へテキストを直接挿入
+    @MainActor
+    private func insertTextViaAXUI(_ text: String) -> Bool {
+        let systemWide = AXUIElementCreateSystemWide()
+        var focusedElement: AnyObject?
+        let copyResult = AXUIElementCopyAttributeValue(
+            systemWide,
+            kAXFocusedUIElementAttribute as CFString,
+            &focusedElement
+        )
+        guard copyResult == .success, let rawElement = focusedElement else {
+            Self.logger.debug("AXUIElement: フォーカス要素の取得に失敗 (\(copyResult.rawValue))")
+            return false
+        }
+        // swiftlint:disable:next force_cast
+        let element = rawElement as! AXUIElement
+        let setResult = AXUIElementSetAttributeValue(
+            element,
+            kAXSelectedTextAttribute as CFString,
+            text as CFTypeRef
+        )
+        if setResult == .success {
+            return true
+        }
+        Self.logger.debug("AXUIElement: kAXSelectedTextAttribute 書き込み失敗 (\(setResult.rawValue))")
+        return false
+    }
+
+    /// System Events (AppleScript) 経由で Cmd+V を送信
+    private func sendPasteViaAppleScript() -> Bool {
+        let source = """
+            tell application "System Events"
+                keystroke "v" using command down
+            end tell
+            """
+        let script = NSAppleScript(source: source)
+        var errorInfo: NSDictionary?
+        script?.executeAndReturnError(&errorInfo)
+        if let error = errorInfo {
+            Self.logger.warning("AppleScript実行エラー: \(error)")
+            return false
+        }
+        return true
+    }
+
+    /// CGEvent 経由で Cmd+V を送信（最終フォールバック）
+    @MainActor
     @discardableResult
-    private func sendPasteKeyEvent() -> Bool {
-        // Cmd+V のキーコード: V = 0x09
-        guard let keyDown = CGEvent(keyboardEventSource: nil, virtualKey: 0x09, keyDown: true),
-              let keyUp = CGEvent(keyboardEventSource: nil, virtualKey: 0x09, keyDown: false) else {
+    private func sendPasteKeyEventViaCGEvent() -> Bool {
+        let source = CGEventSource(stateID: .hidSystemState)
+        guard let keyDown = CGEvent(keyboardEventSource: source, virtualKey: 0x09, keyDown: true),
+              let keyUp = CGEvent(keyboardEventSource: source, virtualKey: 0x09, keyDown: false) else {
             Self.logger.error("CGEventの作成に失敗: アクセシビリティ権限を確認してください")
             return false
         }
-
         keyDown.flags = .maskCommand
         keyUp.flags = .maskCommand
-
-        keyDown.post(tap: .cghidEventTap)
-        keyUp.post(tap: .cghidEventTap)
+        keyDown.post(tap: .cgAnnotatedSessionEventTap)
+        keyUp.post(tap: .cgAnnotatedSessionEventTap)
         return true
     }
 }

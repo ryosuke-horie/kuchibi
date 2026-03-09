@@ -223,7 +223,15 @@ final class SessionManagerImpl: ObservableObject {
         }
         if !accumulatedLines.isEmpty {
             let joinedText = accumulatedLines.joined(separator: "\n")
-            let mode = appSettings.outputMode
+            let rawMode = appSettings.outputMode
+            let mode: OutputMode
+            if (rawMode == .directInput || rawMode == .autoInput) && !accessibilityTrusted() {
+                mode = .clipboard
+                await notificationService.sendErrorNotification(error: .accessibilityPermissionDenied)
+                Self.logger.warning("アクセシビリティ権限がないためクリップボードにフォールバック")
+            } else {
+                mode = rawMode
+            }
             await outputManager.output(text: joinedText, mode: mode)
             accumulatedLines = []
         }
