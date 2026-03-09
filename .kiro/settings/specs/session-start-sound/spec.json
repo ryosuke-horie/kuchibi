@@ -1,0 +1,22 @@
+{
+  "feature_name": "session-start-sound",
+  "created_at": "2026-03-06T10:40:00.000Z",
+  "updated_at": "2026-03-06T11:00:00.000Z",
+  "language": "ja",
+  "phase": "implementation",
+  "approvals": {
+    "requirements": {
+      "generated": true,
+      "approved": true
+    },
+    "design": {
+      "generated": true,
+      "approved": true
+    },
+    "tasks": {
+      "generated": true,
+      "approved": true
+    }
+  },
+  "ready_for_implementation": true
+}
