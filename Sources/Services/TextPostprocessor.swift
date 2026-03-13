@@ -38,8 +38,8 @@ struct TextPostprocessorImpl: TextPostprocessing {
             String(match.output.1)
         }
 
-        // 5. 文末に句点を付与（読点は操作しない）
-        let sentenceEndingMarkers: Set<Character> = ["。", "！", "!", "？", "?"]
+        // 5. 文末に句点を付与（読点・感嘆符・疑問符で終わる場合はスキップ）
+        let sentenceEndingMarkers: Set<Character> = ["。", "、", "！", "!", "？", "?"]
         if !result.isEmpty, let lastChar = result.last, !sentenceEndingMarkers.contains(lastChar) {
             result += "。"
         }

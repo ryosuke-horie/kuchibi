@@ -189,4 +189,19 @@ struct TextPostprocessorTests {
     func doesNotAppendPeriodToWhitespaceOnly() {
         #expect(processor.process("   ") == "")
     }
+
+    @Test("読点で終わるテキストには句点を付与しない")
+    func doesNotAppendPeriodAfterComma() {
+        #expect(processor.process("それでは、") == "それでは、")
+    }
+
+    @Test("句点付き繰り返しフレーズが除去されて句点が保持される")
+    func removesRepeatedPhrasesWithPeriod() {
+        #expect(processor.process("ありがとう。ありがとう。") == "ありがとう。")
+    }
+
+    @Test("句点のみになるフィラーテキストは句点のみ返す")
+    func fillerWithTrailingPeriodReturnsPeriodOnly() {
+        #expect(processor.process("うーん。") == "。")
+    }
 }
