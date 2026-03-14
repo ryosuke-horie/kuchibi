@@ -1,3 +1,4 @@
+import ApplicationServices
 import os
 import SettingsAccess
 import SwiftUI
@@ -48,6 +49,16 @@ struct KuchibiApp: App {
         escapeKeyMonitor.startMonitoring {
             Task { @MainActor in
                 sm.cancelSession()
+            }
+        }
+
+        // アクセシビリティ権限の確認・プロンプト
+        if settings.outputMode != .clipboard {
+            let options = [kAXTrustedCheckOptionPrompt.takeUnretainedValue(): true] as CFDictionary
+            let trusted = AXIsProcessTrustedWithOptions(options)
+            if !trusted {
+                Logger(subsystem: "com.kuchibi.app", category: "App")
+                    .warning("アクセシビリティ権限が未付与: システム設定で許可が必要です")
             }
         }
 

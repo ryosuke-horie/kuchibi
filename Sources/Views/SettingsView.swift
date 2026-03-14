@@ -22,6 +22,7 @@ struct SettingsView: View {
 private struct GeneralSettingsTab: View {
     @ObservedObject var appSettings: AppSettings
     @Binding var launchAtLogin: Bool
+    @State private var diagResult: String?
 
     var body: some View {
         Form {
@@ -35,6 +36,20 @@ private struct GeneralSettingsTab: View {
                 .onChange(of: launchAtLogin) { _, newValue in
                     setLaunchAtLogin(newValue)
                 }
+
+            Divider()
+
+            Section("入力診断") {
+                Button("診断を実行") {
+                    Task {
+                        let service = ClipboardServiceImpl()
+                        diagResult = await service.runDiagnostics()
+                    }
+                }
+                Text("結果は ~/Desktop/kuchibi-diag.txt に保存されます")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            }
         }
         .padding()
     }
