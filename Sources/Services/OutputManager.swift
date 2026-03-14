@@ -21,7 +21,7 @@ final class OutputManagerImpl: OutputManaging {
             await clipboardService.pasteToActiveApp(text: text, restoreClipboard: true)
             Self.logger.info("直接入力完了")
         case .autoInput:
-            await clipboardService.pasteToActiveApp(text: text, restoreClipboard: false)
+            await clipboardService.typeText(text)
             Self.logger.info("自動入力処理完了")
         }
     }

@@ -83,12 +83,116 @@ final class ClipboardServiceImpl: ClipboardServicing {
         }
     }
 
+    // 1文字ずつキーイベント送信する際の間隔
+    private static let typeCharDelay: Duration = .milliseconds(5)
+
+    func typeText(_ text: String) async {
+        let success = await MainActor.run { sendTextViaCGEventUnicode(text) }
+        if success {
+            Self.logger.info("CGEvent Unicode経由でテキストを直接入力")
+            return
+        }
+        Self.logger.warning("CGEvent Unicode入力失敗: クリップボード+ペーストにフォールバック")
+        await pasteToActiveApp(text: text, restoreClipboard: true)
+    }
+
+    func runDiagnostics() async -> String {
+        var report = "=== Kuchibi 入力診断レポート ===\n"
+        report += "日時: \(Date())\n\n"
+
+        let trusted = AXIsProcessTrusted()
+        report += "[権限] AXIsProcessTrusted: \(trusted)\n\n"
+
+        // AXUIElement テスト
+        let axResult = await MainActor.run { () -> String in
+            let systemWide = AXUIElementCreateSystemWide()
+            var focusedElement: AnyObject?
+            let copyResult = AXUIElementCopyAttributeValue(
+                systemWide, kAXFocusedUIElementAttribute as CFString, &focusedElement
+            )
+            if copyResult != .success {
+                return "フォーカス要素取得失敗 (error: \(copyResult.rawValue))"
+            }
+            guard let element = focusedElement else { return "フォーカス要素がnil" }
+            // swiftlint:disable:next force_cast
+            let axElement = element as! AXUIElement
+            var role: AnyObject?
+            AXUIElementCopyAttributeValue(axElement, kAXRoleAttribute as CFString, &role)
+            return "フォーカス要素取得成功 (role: \(role as? String ?? "不明"))"
+        }
+        report += "[AXUIElement] \(axResult)\n"
+
+        // CGEvent 生成テスト
+        let cgResult = await MainActor.run { () -> String in
+            let source = CGEventSource(stateID: .combinedSessionState)
+            if source == nil { return "CGEventSource生成失敗" }
+            guard let event = CGEvent(keyboardEventSource: source, virtualKey: 0, keyDown: true) else {
+                return "CGEvent生成失敗"
+            }
+            _ = event
+            return "CGEvent生成成功"
+        }
+        report += "[CGEvent] \(cgResult)\n"
+
+        // AppleScript テスト（実行はしない）
+        let scriptTest = NSAppleScript(source: "return \"ok\"")
+        var errorInfo: NSDictionary?
+        let scriptResult = scriptTest?.executeAndReturnError(&errorInfo)
+        if let error = errorInfo {
+            report += "[AppleScript] 実行エラー: \(error)\n"
+        } else {
+            report += "[AppleScript] 基本実行: OK (result: \(scriptResult?.stringValue ?? "nil"))\n"
+        }
+
+        // System Events アクセステスト
+        let seScript = NSAppleScript(source: """
+            tell application "System Events"
+                return name of first process whose frontmost is true
+            end tell
+        """)
+        var seError: NSDictionary?
+        let seResult = seScript?.executeAndReturnError(&seError)
+        if let error = seError {
+            report += "[System Events] アクセス失敗: \(error)\n"
+        } else {
+            report += "[System Events] アクセス成功 (frontmost: \(seResult?.stringValue ?? "不明"))\n"
+        }
+
+        report += "\n=== 診断完了 ===\n"
+
+        // ファイルに保存
+        let path = NSHomeDirectory() + "/Desktop/kuchibi-diag.txt"
+        try? report.write(toFile: path, atomically: true, encoding: .utf8)
+        Self.logger.info("診断レポートを保存: \(path)")
+
+        return report
+    }
+
     // MARK: - Private
 
     private func restoreItems(_ items: [(NSPasteboard.PasteboardType, Data)], to pasteboard: NSPasteboard) {
         for (type, data) in items {
             pasteboard.setData(data, forType: type)
         }
+    }
+
+    /// CGEvent + keyboardSetUnicodeString 経由で Unicode テキストを直接入力
+    @MainActor
+    private func sendTextViaCGEventUnicode(_ text: String) -> Bool {
+        let source = CGEventSource(stateID: .combinedSessionState)
+        for scalar in text.unicodeScalars {
+            let utf16 = Array(String(scalar).utf16)
+            guard let keyDown = CGEvent(keyboardEventSource: source, virtualKey: 0, keyDown: true),
+                  let keyUp = CGEvent(keyboardEventSource: source, virtualKey: 0, keyDown: false) else {
+                Self.logger.error("CGEvent Unicode: イベント生成に失敗")
+                return false
+            }
+            keyDown.keyboardSetUnicodeString(stringLength: utf16.count, unicodeString: utf16)
+            keyUp.keyboardSetUnicodeString(stringLength: utf16.count, unicodeString: utf16)
+            keyDown.post(tap: .cgSessionEventTap)
+            keyUp.post(tap: .cgSessionEventTap)
+        }
+        return true
     }
 
     /// AXUIElement 経由でフォーカス中の要素へテキストを直接挿入
@@ -140,7 +244,7 @@ final class ClipboardServiceImpl: ClipboardServicing {
     @MainActor
     @discardableResult
     private func sendPasteKeyEventViaCGEvent() -> Bool {
-        let source = CGEventSource(stateID: .hidSystemState)
+        let source = CGEventSource(stateID: .combinedSessionState)
         guard let keyDown = CGEvent(keyboardEventSource: source, virtualKey: 0x09, keyDown: true),
               let keyUp = CGEvent(keyboardEventSource: source, virtualKey: 0x09, keyDown: false) else {
             Self.logger.error("CGEventの作成に失敗: アクセシビリティ権限を確認してください")
@@ -148,8 +252,8 @@ final class ClipboardServiceImpl: ClipboardServicing {
         }
         keyDown.flags = .maskCommand
         keyUp.flags = .maskCommand
-        keyDown.post(tap: .cgAnnotatedSessionEventTap)
-        keyUp.post(tap: .cgAnnotatedSessionEventTap)
+        keyDown.post(tap: .cgSessionEventTap)
+        keyUp.post(tap: .cgSessionEventTap)
         return true
     }
 }
