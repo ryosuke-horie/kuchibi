@@ -23,7 +23,6 @@ final class AudioPreprocessorImpl: AudioPreprocessing {
             Task {
                 var needsResampling: Bool?
                 var resamplingRatio: Double = 1.0
-
                 for await buffer in stream {
                     // リサンプリング判定（初回のみ）
                     if needsResampling == nil {

@@ -30,6 +30,7 @@ final class SessionManagerImpl: ObservableObject {
     private let accessibilityTrusted: () -> Bool
 
     private var recordingTask: Task<Void, Never>?
+    private var audioLevelTask: Task<Void, Never>?
     private var accumulatedLines: [String] = []
 
     init(
@@ -137,6 +138,14 @@ final class SessionManagerImpl: ObservableObject {
         }
         Self.logger.info("セッションを開始")
 
+        // オーディオレベルを定期的にUIへ反映（認識イベントに依存しない）
+        audioLevelTask = Task {
+            while !Task.isCancelled {
+                audioLevel = audioService.currentAudioLevel
+                try? await Task.sleep(for: .milliseconds(50))
+            }
+        }
+
         let processedStream = preprocessor.process(
             audioStream,
             vadEnabled: appSettings.vadEnabled,
@@ -162,6 +171,8 @@ final class SessionManagerImpl: ObservableObject {
         }
 
         state = .processing
+        audioLevelTask?.cancel()
+        audioLevelTask = nil
         audioService.stopCapture()
         Self.logger.info("セッションを停止、認識処理中...")
     }
@@ -174,6 +185,8 @@ final class SessionManagerImpl: ObservableObject {
         Self.logger.info("セッションをキャンセルした")
         recordingTask?.cancel()
         recordingTask = nil
+        audioLevelTask?.cancel()
+        audioLevelTask = nil
         audioService.stopCapture()
         accumulatedLines = []
         partialText = ""
@@ -200,11 +213,9 @@ final class SessionManagerImpl: ObservableObject {
     private func handleRecognitionEvent(_ event: RecognitionEvent) async {
         switch event.kind {
         case .lineStarted:
-            audioLevel = audioService.currentAudioLevel
             Self.logger.debug("行の認識を開始")
         case .textChanged(let partial):
             partialText = partial
-            audioLevel = audioService.currentAudioLevel
         case .lineCompleted(let final_):
             if appSettings.monitoringEnabled {
                 monitoring.textCompleted(text: final_)
@@ -218,6 +229,8 @@ final class SessionManagerImpl: ObservableObject {
     }
 
     private func finishSession(error: KuchibiError? = nil) async {
+        audioLevelTask?.cancel()
+        audioLevelTask = nil
         if audioService.isCapturing {
             audioService.stopCapture()
         }

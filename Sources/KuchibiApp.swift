@@ -3,17 +3,19 @@ import os
 import SettingsAccess
 import SwiftUI
 
-@main
-struct KuchibiApp: App {
-    @StateObject private var appSettings = AppSettings()
-    @StateObject private var sessionManager: SessionManagerImpl
+/// アプリ全体のコントローラーを保持するコーディネーター
+/// SwiftUI の App struct 再生成に影響されないよう @StateObject で管理する
+@MainActor
+final class AppCoordinator: ObservableObject {
+    let sessionManager: SessionManagerImpl
+    let appSettings: AppSettings
     private let hotKeyController: HotKeyControllerImpl
     private let escapeKeyMonitor: EscapeKeyMonitorImpl
     private let feedbackBarController: FeedbackBarWindowController
 
     init() {
         let settings = AppSettings()
-        _appSettings = StateObject(wrappedValue: settings)
+        self.appSettings = settings
 
         // サービス構築
         let audioService = AudioCaptureServiceImpl()
@@ -30,7 +32,7 @@ struct KuchibiApp: App {
             notificationService: notificationService,
             appSettings: settings
         )
-        _sessionManager = StateObject(wrappedValue: sm)
+        self.sessionManager = sm
 
         hotKeyController = HotKeyControllerImpl(onToggle: {
             Task { @MainActor in
@@ -70,21 +72,25 @@ struct KuchibiApp: App {
                 await notificationService.sendErrorNotification(error: error as? KuchibiError ?? .modelLoadFailed(underlying: error))
             }
         }
-
     }
+}
+
+@main
+struct KuchibiApp: App {
+    @StateObject private var coordinator = AppCoordinator()
 
     var body: some Scene {
         MenuBarExtra("Kuchibi", systemImage: menuBarIcon) {
-            MenuBarView(sessionManager: sessionManager)
+            MenuBarView(sessionManager: coordinator.sessionManager)
         }
 
         Settings {
-            SettingsView(appSettings: appSettings)
+            SettingsView(appSettings: coordinator.appSettings)
         }
     }
 
     private var menuBarIcon: String {
-        switch sessionManager.state {
+        switch coordinator.sessionManager.state {
         case .idle: "mic"
         case .recording: "mic.fill"
         case .processing: "mic.badge.ellipsis"
