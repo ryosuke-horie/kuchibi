@@ -45,7 +45,6 @@
 		7AE49779DA672DFD5251D9D2 /* TextPostprocessing.swift in Sources */ = {isa = PBXBuildFile; fileRef = E3EC3E47D72739ECF113A59C /* TextPostprocessing.swift */; };
 		7B9604777D16087D296030AF /* AudioCaptureService.swift in Sources */ = {isa = PBXBuildFile; fileRef = C114CB5F1012E3C584AB09F4 /* AudioCaptureService.swift */; };
 		7CC8122E6EDBD0BD5C5596DD /* AudioCapturing.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7A53A1440803CD3EA276D791 /* AudioCapturing.swift */; };
-		86E366A69884B8B307D749A9 /* kuchibi-app-icon.png in Resources */ = {isa = PBXBuildFile; fileRef = 4D1370196DBFA80CE90BF272 /* kuchibi-app-icon.png */; };
 		8A25A25F336AA98A1BF41B6E /* ClipboardService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 02FBC7887C665F64BFF30939 /* ClipboardService.swift */; };
 		90335A7F92C4230B3F1323F1 /* NotificationServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E63E378A918F838B82ACE3FF /* NotificationServiceTests.swift */; };
 		92E26B0CB7C93D07E3755726 /* AudioPreprocessing.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCC3C51E299A787C548A0EFE /* AudioPreprocessing.swift */; };
@@ -98,7 +97,6 @@
 		42412DB8F6EC05A959ABE916 /* ModelsTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModelsTests.swift; sourceTree = "<group>"; };
 		438FE5EE29F95ABC7530E1DC /* OutputManaging.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OutputManaging.swift; sourceTree = "<group>"; };
 		47983A578F918AFA52340AC4 /* MockSpeechRecognitionAdapter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockSpeechRecognitionAdapter.swift; sourceTree = "<group>"; };
-		4D1370196DBFA80CE90BF272 /* kuchibi-app-icon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "kuchibi-app-icon.png"; sourceTree = "<group>"; };
 		4DF746512D0786CC00E872E5 /* SessionManagerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionManagerTests.swift; sourceTree = "<group>"; };
 		56BCDB6049097A08A9854F4D /* SpeechRecognitionAdapting.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpeechRecognitionAdapting.swift; sourceTree = "<group>"; };
 		59B9735BE3B50AE3B84CBFD5 /* TextPostprocessorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextPostprocessorTests.swift; sourceTree = "<group>"; };
@@ -190,7 +188,6 @@
 			isa = PBXGroup;
 			children = (
 				FF8FE46E01854FFBF430CB31 /* Assets.xcassets */,
-				4D1370196DBFA80CE90BF272 /* kuchibi-app-icon.png */,
 			);
 			path = Resources;
 			sourceTree = "<group>";
@@ -377,7 +374,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				16D4611CF276F56CEE8E9DFB /* Assets.xcassets in Resources */,
-				86E366A69884B8B307D749A9 /* kuchibi-app-icon.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
