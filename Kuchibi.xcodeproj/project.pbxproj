@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		014B4FEF231C4ECC8AB67954 /* AppSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = C2567DD24F7F2384CAFF09A9 /* AppSettings.swift */; };
+		023CF6E9EF289FFEE6E773EC /* AudioCaptureServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9BB53C0854E518758D07FF2F /* AudioCaptureServiceTests.swift */; };
 		03B762943B04FBA12F3D7CA4 /* MockSpeechRecognitionService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0950301454AEB49BA6A24954 /* MockSpeechRecognitionService.swift */; };
 		049160B5A20797AA987C254E /* EscapeKeyMonitoring.swift in Sources */ = {isa = PBXBuildFile; fileRef = A6F0FB6B9CF216513A8BA139 /* EscapeKeyMonitoring.swift */; };
 		052A16321B04F62C4A78FC99 /* RecognitionEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 775A3E31ED46212C7EF9C5F4 /* RecognitionEvent.swift */; };
@@ -17,6 +18,7 @@
 		0D8FCFBAB02F67DF7EF606A6 /* HotKeyControlling.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3B8E11116B0287E092ADCD9A /* HotKeyControlling.swift */; };
 		11FE8E3B330EE2ACEAAF09E2 /* SessionState.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6B7BEA988E0B1018B66C656 /* SessionState.swift */; };
 		141BB489588E01D5C1BFDFDE /* OutputManagerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C531F963B68CB7998DD9D1B9 /* OutputManagerTests.swift */; };
+		16D4611CF276F56CEE8E9DFB /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = FF8FE46E01854FFBF430CB31 /* Assets.xcassets */; };
 		20A34326CF4EAED63E7B300B /* TextPostprocessorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 59B9735BE3B50AE3B84CBFD5 /* TextPostprocessorTests.swift */; };
 		21E3191C5591D65D08DB2BA7 /* NotificationServicing.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8FF8890BCFF032E69155777 /* NotificationServicing.swift */; };
 		22C80ABB9E8DB2F7084CB805 /* MockAudioPreprocessor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1E578D16AEE9FBE092B0038A /* MockAudioPreprocessor.swift */; };
@@ -36,7 +38,6 @@
 		5DC1D1F518BAB6216592076F /* ClipboardServicing.swift in Sources */ = {isa = PBXBuildFile; fileRef = E66CB5F565073A98DF48CC2F /* ClipboardServicing.swift */; };
 		5FEFC91E55EC69384E6CE020 /* HotKeyController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17091088C1A51563CE50547C /* HotKeyController.swift */; };
 		69EBC15318A7A3C85C2AE1BE /* AudioPreprocessorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 354653C713A6898397AA7813 /* AudioPreprocessorTests.swift */; };
-		AC1F2B3C4D5E6F7A8B9C0D1E /* AudioCaptureServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC2F3A4B5C6D7E8F9A0B1C2D /* AudioCaptureServiceTests.swift */; };
 		6B613ECC3D138813FE8565BE /* OutputManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA5FC1EF0A9139A547DCE9E1 /* OutputManager.swift */; };
 		723DB1904E5938F1E2B87FFD /* ModelsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 42412DB8F6EC05A959ABE916 /* ModelsTests.swift */; };
 		780CB8A2F76DD326232748E4 /* MockTextPostprocessor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1C5ED9C89542CB717C30A981 /* MockTextPostprocessor.swift */; };
@@ -44,6 +45,7 @@
 		7AE49779DA672DFD5251D9D2 /* TextPostprocessing.swift in Sources */ = {isa = PBXBuildFile; fileRef = E3EC3E47D72739ECF113A59C /* TextPostprocessing.swift */; };
 		7B9604777D16087D296030AF /* AudioCaptureService.swift in Sources */ = {isa = PBXBuildFile; fileRef = C114CB5F1012E3C584AB09F4 /* AudioCaptureService.swift */; };
 		7CC8122E6EDBD0BD5C5596DD /* AudioCapturing.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7A53A1440803CD3EA276D791 /* AudioCapturing.swift */; };
+		86E366A69884B8B307D749A9 /* kuchibi-app-icon.png in Resources */ = {isa = PBXBuildFile; fileRef = 4D1370196DBFA80CE90BF272 /* kuchibi-app-icon.png */; };
 		8A25A25F336AA98A1BF41B6E /* ClipboardService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 02FBC7887C665F64BFF30939 /* ClipboardService.swift */; };
 		90335A7F92C4230B3F1323F1 /* NotificationServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E63E378A918F838B82ACE3FF /* NotificationServiceTests.swift */; };
 		92E26B0CB7C93D07E3755726 /* AudioPreprocessing.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCC3C51E299A787C548A0EFE /* AudioPreprocessing.swift */; };
@@ -91,12 +93,12 @@
 		20667E795903E13BE376BFB3 /* SpeechRecognitionService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpeechRecognitionService.swift; sourceTree = "<group>"; };
 		27506DF60E8AE1D221334763 /* WhisperKitAdapter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WhisperKitAdapter.swift; sourceTree = "<group>"; };
 		354653C713A6898397AA7813 /* AudioPreprocessorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioPreprocessorTests.swift; sourceTree = "<group>"; };
-		BC2F3A4B5C6D7E8F9A0B1C2D /* AudioCaptureServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioCaptureServiceTests.swift; sourceTree = "<group>"; };
 		3B8E11116B0287E092ADCD9A /* HotKeyControlling.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HotKeyControlling.swift; sourceTree = "<group>"; };
 		3D61FB5D132074721A6308B6 /* OutputMode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OutputMode.swift; sourceTree = "<group>"; };
 		42412DB8F6EC05A959ABE916 /* ModelsTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModelsTests.swift; sourceTree = "<group>"; };
 		438FE5EE29F95ABC7530E1DC /* OutputManaging.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OutputManaging.swift; sourceTree = "<group>"; };
 		47983A578F918AFA52340AC4 /* MockSpeechRecognitionAdapter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockSpeechRecognitionAdapter.swift; sourceTree = "<group>"; };
+		4D1370196DBFA80CE90BF272 /* kuchibi-app-icon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "kuchibi-app-icon.png"; sourceTree = "<group>"; };
 		4DF746512D0786CC00E872E5 /* SessionManagerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionManagerTests.swift; sourceTree = "<group>"; };
 		56BCDB6049097A08A9854F4D /* SpeechRecognitionAdapting.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpeechRecognitionAdapting.swift; sourceTree = "<group>"; };
 		59B9735BE3B50AE3B84CBFD5 /* TextPostprocessorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextPostprocessorTests.swift; sourceTree = "<group>"; };
@@ -112,6 +114,7 @@
 		7A53A1440803CD3EA276D791 /* AudioCapturing.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioCapturing.swift; sourceTree = "<group>"; };
 		8B3061795806AC0CA836AAB7 /* MockClipboardService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockClipboardService.swift; sourceTree = "<group>"; };
 		98D0E0C1DB5386C565834D9A /* NotificationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationService.swift; sourceTree = "<group>"; };
+		9BB53C0854E518758D07FF2F /* AudioCaptureServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioCaptureServiceTests.swift; sourceTree = "<group>"; };
 		A5A61DEB75EC1C649EB1FF69 /* EscapeKeyCancelIntegrationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EscapeKeyCancelIntegrationTests.swift; sourceTree = "<group>"; };
 		A6F0FB6B9CF216513A8BA139 /* EscapeKeyMonitoring.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EscapeKeyMonitoring.swift; sourceTree = "<group>"; };
 		AA5FC1EF0A9139A547DCE9E1 /* OutputManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OutputManager.swift; sourceTree = "<group>"; };
@@ -135,6 +138,7 @@
 		F27A6934F52E8C5BC69591EA /* MockAudioCaptureService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockAudioCaptureService.swift; sourceTree = "<group>"; };
 		F6B7BEA988E0B1018B66C656 /* SessionState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionState.swift; sourceTree = "<group>"; };
 		F6CAF48EF818CFA8942FA4D3 /* KuchibiTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = KuchibiTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		FF8FE46E01854FFBF430CB31 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		FFB235043E7580AFFA0E0FD9 /* SessionMonitoringService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionMonitoringService.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -182,6 +186,15 @@
 			path = Services;
 			sourceTree = "<group>";
 		};
+		4AF0D99FBFDCD83D4F3C842F /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				FF8FE46E01854FFBF430CB31 /* Assets.xcassets */,
+				4D1370196DBFA80CE90BF272 /* kuchibi-app-icon.png */,
+			);
+			path = Resources;
+			sourceTree = "<group>";
+		};
 		6B5EB7526EBAF30BD60CF7A7 /* Models */ = {
 			isa = PBXGroup;
 			children = (
@@ -209,6 +222,7 @@
 				18009A0EB4ACCBA03198413F /* Info.plist */,
 				C32DA2D991DEFB3190AA572F /* KuchibiApp.swift */,
 				6B5EB7526EBAF30BD60CF7A7 /* Models */,
+				4AF0D99FBFDCD83D4F3C842F /* Resources */,
 				1DFD8DD313CC3E4A020920FD /* Services */,
 				148AAA59FCA0DEA8B51F64C8 /* Views */,
 			);
@@ -228,8 +242,8 @@
 			isa = PBXGroup;
 			children = (
 				BE4CB2755E46F8B48C02948F /* AppSettingsTests.swift */,
+				9BB53C0854E518758D07FF2F /* AudioCaptureServiceTests.swift */,
 				354653C713A6898397AA7813 /* AudioPreprocessorTests.swift */,
-				BC2F3A4B5C6D7E8F9A0B1C2D /* AudioCaptureServiceTests.swift */,
 				A5A61DEB75EC1C649EB1FF69 /* EscapeKeyCancelIntegrationTests.swift */,
 				0EDBA40BCFA4E3D0A6A04437 /* FeedbackBarWindowControllerTests.swift */,
 				42412DB8F6EC05A959ABE916 /* ModelsTests.swift */,
@@ -288,6 +302,7 @@
 			buildConfigurationList = 82D10357708499FF2EC5D4D6 /* Build configuration list for PBXNativeTarget "Kuchibi" */;
 			buildPhases = (
 				882DC4C4B0F6F2FD33C3ABFE /* Sources */,
+				E6A01D3D0DD646C23A1442BC /* Resources */,
 				A83575D7F074560A4041037E /* Frameworks */,
 			);
 			buildRules = (
@@ -356,6 +371,18 @@
 		};
 /* End PBXProject section */
 
+/* Begin PBXResourcesBuildPhase section */
+		E6A01D3D0DD646C23A1442BC /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				16D4611CF276F56CEE8E9DFB /* Assets.xcassets in Resources */,
+				86E366A69884B8B307D749A9 /* kuchibi-app-icon.png in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
 /* Begin PBXSourcesBuildPhase section */
 		882DC4C4B0F6F2FD33C3ABFE /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
@@ -401,8 +428,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				45E542E5E74D5814693904B6 /* AppSettingsTests.swift in Sources */,
+				023CF6E9EF289FFEE6E773EC /* AudioCaptureServiceTests.swift in Sources */,
 				69EBC15318A7A3C85C2AE1BE /* AudioPreprocessorTests.swift in Sources */,
-				AC1F2B3C4D5E6F7A8B9C0D1E /* AudioCaptureServiceTests.swift in Sources */,
 				251A054F13C009419A5D2CA4 /* EscapeKeyCancelIntegrationTests.swift in Sources */,
 				F2DFFDFA5D01526E0FD5FF59 /* FeedbackBarWindowControllerTests.swift in Sources */,
 				9A1361D1428C7264FAD5D65E /* MockAudioCaptureService.swift in Sources */,
