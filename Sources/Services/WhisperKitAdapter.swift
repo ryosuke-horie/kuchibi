@@ -7,12 +7,23 @@ final class WhisperKitAdapter: SpeechRecognitionAdapting {
     private static let logger = Logger(subsystem: "com.kuchibi.app", category: "WhisperKitAdapter")
 
     private var whisperKit: WhisperKit?
+    private var currentLanguage: String = "ja"
     private let state = OSAllocatedUnfairLock(initialState: AdapterState())
     private var recognitionTask: Task<Void, Never>?
     private var onTextChanged: ((String) -> Void)?
     private var onLineCompleted: ((String) -> Void)?
 
-    func initialize(modelName: String) async throws {
+    func initialize(engine: SpeechEngine, language: String) async throws {
+        // WhisperKitAdapter は `.whisperKit` 系のみ受理する。
+        // 他エンジンは `KuchibiError.engineMismatch` を返すべきだが、当該ケースは Task 1.5 で追加される。
+        // 1.5 完了までの暫定措置として、異常呼び出しを preconditionFailure で明示的に停止させる。
+        guard case .whisperKit(let model) = engine else {
+            preconditionFailure("WhisperKitAdapter expected .whisperKit engine, got \(engine.modelIdentifier)")
+        }
+
+        let modelName = model.rawValue
+        currentLanguage = language
+
         do {
             let config = WhisperKitConfig(
                 model: modelName,
@@ -23,7 +34,7 @@ final class WhisperKitAdapter: SpeechRecognitionAdapting {
                 download: true
             )
             whisperKit = try await WhisperKit(config)
-            Self.logger.info("WhisperKitモデル '\(modelName)' を読み込み完了")
+            Self.logger.info("WhisperKitモデル '\(modelName)' を言語 '\(language)' で読み込み完了")
         } catch {
             Self.logger.error("WhisperKitモデルの読み込みに失敗: \(error.localizedDescription)")
             throw KuchibiError.modelLoadFailed(underlying: error)
@@ -89,7 +100,7 @@ final class WhisperKitAdapter: SpeechRecognitionAdapting {
         }
 
         do {
-            let options = DecodingOptions(language: "ja")
+            let options = DecodingOptions(language: currentLanguage)
             let results = try await whisperKit.transcribe(
                 audioArray: currentState.audioBuffer,
                 decodeOptions: options
@@ -123,7 +134,7 @@ final class WhisperKitAdapter: SpeechRecognitionAdapting {
         let currentBuffer = state.withLock { $0.audioBuffer }
 
         do {
-            let options = DecodingOptions(language: "ja")
+            let options = DecodingOptions(language: currentLanguage)
             let results = try await whisperKit.transcribe(
                 audioArray: currentBuffer,
                 decodeOptions: options

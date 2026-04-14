@@ -11,7 +11,7 @@
   - _Requirements: 1.1, 1.2, 1.3_
   - _Boundary: Models_
 
-- [ ] 1.2 SpeechRecognitionAdapting を新シグネチャへ更新し補助プロトコルを追加
+- [x] 1.2 SpeechRecognitionAdapting を新シグネチャへ更新し補助プロトコルを追加
   - `SpeechRecognitionAdapting.initialize` を `(engine: SpeechEngine, language: String) async throws` に変更
   - `ModelAvailabilityChecking` / `LaunchPathValidating` / `PermissionStateObserving` の 3 プロトコルを新規作成
   - プロトコルに準拠する既存コードがビルドエラーになることを確認した上でコンパイル可能な最小スタブをアダプター側に残す
