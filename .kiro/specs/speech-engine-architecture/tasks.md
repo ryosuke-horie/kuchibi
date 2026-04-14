@@ -94,7 +94,7 @@
   - _Boundary: WhisperKitAdapter_
   - _Depends: 1.3, 1.5_
 
-- [ ] 4.2 (P) WhisperCppAdapter の基本ラッパーを実装
+- [x] 4.2 (P) WhisperCppAdapter の基本ラッパーを実装
   - `whisper_init_from_file` でコンテキストを初期化し `OpaquePointer` として保持する
   - `ModelAvailabilityChecker.modelPath(for:)` からパスを解決し、未配置なら `KuchibiError.modelFileMissing` を throw
   - `finalize` で `whisper_free` を呼んでリークを起こさないことを Swift Testing の deinit 検証で確認する
@@ -104,7 +104,7 @@
   - _Boundary: WhisperCppAdapter_
   - _Depends: 1.3, 1.4, 1.5, 3.1_
 
-- [ ] 4.3 WhisperCppAdapter に擬似ストリーミングを実装
+- [x] 4.3 WhisperCppAdapter に擬似ストリーミングを実装
   - 受信した 16kHz mono Float32 バッファを内部リングバッファへ蓄積する
   - 30 秒窓に到達した時点、または一定時間（例: 1 秒）新規バッファ追加が無い時点で `whisper_full` を同期実行する
   - 確定テキストは `onLineCompleted` コールバックで通知し、内部バッファをクリアする（stream 終了時は `finalize` が同じ処理を呼ぶ）
