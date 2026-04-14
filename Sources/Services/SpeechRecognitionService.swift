@@ -1,20 +1,49 @@
 import AVFoundation
+import Combine
 import os
 
 /// 音声ストリームからテキスト認識イベントを生成するサービス
-final class SpeechRecognitionServiceImpl: SpeechRecognizing {
+///
+/// Task 1.3 時点では hot-swap の最小スタブ実装。
+/// - `loadInitialEngine`: adapter.initialize() をそのまま呼ぶ
+/// - `switchEngine`: adapter.finalize() 後に adapter.initialize() を直列で呼ぶだけ
+///   （旧 adapter finalize 待ち・rollback・SessionState 前提違反チェックは Task 5.1/5.2/5.3 で実装）
+@MainActor
+final class SpeechRecognitionServiceImpl: ObservableObject, SpeechRecognizing {
     private static let logger = Logger(subsystem: "com.kuchibi.app", category: "SpeechRecognition")
-    private let adapter: SpeechRecognitionAdapting
-    private(set) var isModelLoaded: Bool = false
 
-    init(adapter: SpeechRecognitionAdapting) {
+    @Published private(set) var currentEngine: SpeechEngine
+    @Published private(set) var isModelLoaded: Bool = false
+    @Published private(set) var isSwitching: Bool = false
+    @Published private(set) var lastSwitchError: String? = nil
+
+    private var adapter: SpeechRecognitionAdapting
+
+    init(adapter: SpeechRecognitionAdapting, initialEngine: SpeechEngine) {
         self.adapter = adapter
+        self.currentEngine = initialEngine
     }
 
-    func loadModel(modelName: String) async throws {
-        try await adapter.initialize(modelName: modelName)
+    func loadInitialEngine(_ engine: SpeechEngine, language: String) async throws {
+        try await adapter.initialize(engine: engine, language: language)
+        currentEngine = engine
         isModelLoaded = true
-        Self.logger.info("音声認識モデルを読み込み完了")
+        Self.logger.info("音声認識モデル '\(engine.modelIdentifier)' を言語 '\(language)' で読み込み完了")
+    }
+
+    func switchEngine(to engine: SpeechEngine, language: String) async throws {
+        // Task 1.3 の最小スタブ: 単純に旧 adapter を finalize してから同一 adapter を再 initialize する。
+        // 本格的な hot-swap（新 adapter 生成、rollback、前提違反チェック）は Task 5.1/5.2/5.3 で実装。
+        isSwitching = true
+        defer { isSwitching = false }
+
+        _ = await adapter.finalize()
+        isModelLoaded = false
+
+        try await adapter.initialize(engine: engine, language: language)
+        currentEngine = engine
+        isModelLoaded = true
+        Self.logger.info("エンジンを '\(engine.modelIdentifier)' に切替（最小スタブ）")
     }
 
     func processAudioStream(_ stream: AsyncStream<AVAudioPCMBuffer>) -> AsyncStream<RecognitionEvent> {

@@ -19,7 +19,7 @@
   - _Boundary: Services/Protocols_
   - _Depends: 1.1_
 
-- [ ] 1.3 SpeechRecognizing プロトコルを hot-swap 対応へ拡張
+- [x] 1.3 SpeechRecognizing プロトコルを hot-swap 対応へ拡張
   - `currentEngine: SpeechEngine` / `isSwitching: Bool` / `lastSwitchError: String?` を Published として宣言
   - `loadInitialEngine(_:language:)` と `switchEngine(to:language:)` を async throws メソッドとして追加
   - 既存 `loadModel(modelName:)` を削除し、呼び出し側のコンパイルを失敗させて全参照を洗い出す

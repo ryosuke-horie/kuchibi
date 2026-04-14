@@ -5,46 +5,81 @@ import Testing
 
 @Suite("SpeechRecognitionService")
 struct SpeechRecognitionServiceTests {
-    @Test("loadModelでアダプターが初期化される")
-    func loadModel() async throws {
+    @Test("loadInitialEngineでアダプターが初期化される")
+    @MainActor
+    func loadInitialEngine() async throws {
         let mockAdapter = MockSpeechRecognitionAdapter()
-        let service = SpeechRecognitionServiceImpl(adapter: mockAdapter)
+        let service = SpeechRecognitionServiceImpl(
+            adapter: mockAdapter,
+            initialEngine: .whisperKit(.base)
+        )
 
         #expect(!service.isModelLoaded)
-        try await service.loadModel(modelName: "base")
+        try await service.loadInitialEngine(.whisperKit(.base), language: "ja")
         #expect(service.isModelLoaded)
         #expect(mockAdapter.isInitialized)
+        #expect(service.currentEngine == .whisperKit(.base))
     }
 
-    @Test("loadModelで指定されたモデル名がアダプターに渡される")
-    func loadModelPassesModelName() async throws {
+    @Test("loadInitialEngineで指定されたエンジンと言語がアダプターに渡される")
+    @MainActor
+    func loadInitialEnginePassesArguments() async throws {
         let mockAdapter = MockSpeechRecognitionAdapter()
-        let service = SpeechRecognitionServiceImpl(adapter: mockAdapter)
+        let service = SpeechRecognitionServiceImpl(
+            adapter: mockAdapter,
+            initialEngine: .whisperKit(.base)
+        )
 
-        try await service.loadModel(modelName: "large-v3")
-        #expect(mockAdapter.initializedModelName == "large-v3")
+        try await service.loadInitialEngine(.whisperKit(.largeV3Turbo), language: "en")
+        #expect(mockAdapter.initializedEngine == .whisperKit(.largeV3Turbo))
+        #expect(mockAdapter.initializedLanguage == "en")
     }
 
-    @Test("loadModel失敗時にエラーをスローする")
-    func loadModelFailure() async {
+    @Test("loadInitialEngine失敗時にエラーをスローする")
+    @MainActor
+    func loadInitialEngineFailure() async {
         let mockAdapter = MockSpeechRecognitionAdapter()
         mockAdapter.shouldThrowOnInit = true
-        let service = SpeechRecognitionServiceImpl(adapter: mockAdapter)
+        let service = SpeechRecognitionServiceImpl(
+            adapter: mockAdapter,
+            initialEngine: .whisperKit(.base)
+        )
 
         do {
-            try await service.loadModel(modelName: "base")
+            try await service.loadInitialEngine(.whisperKit(.base), language: "ja")
             Issue.record("Expected error to be thrown")
         } catch {
             #expect(error is KuchibiError)
         }
     }
 
+    @Test("switchEngineでcurrentEngineが更新される（最小スタブ）")
+    @MainActor
+    func switchEngineUpdatesCurrentEngine() async throws {
+        let mockAdapter = MockSpeechRecognitionAdapter()
+        let service = SpeechRecognitionServiceImpl(
+            adapter: mockAdapter,
+            initialEngine: .whisperKit(.base)
+        )
+
+        try await service.loadInitialEngine(.whisperKit(.base), language: "ja")
+        try await service.switchEngine(to: .whisperKit(.small), language: "ja")
+
+        #expect(service.currentEngine == .whisperKit(.small))
+        #expect(service.isModelLoaded)
+        #expect(!service.isSwitching)
+    }
+
     @Test("processAudioStreamがRecognitionEventを発行する")
+    @MainActor
     func processAudioStream() async {
         let mockAdapter = MockSpeechRecognitionAdapter()
         mockAdapter.partialText = "途中"
         mockAdapter.finalText = "完了テキスト"
-        let service = SpeechRecognitionServiceImpl(adapter: mockAdapter)
+        let service = SpeechRecognitionServiceImpl(
+            adapter: mockAdapter,
+            initialEngine: .whisperKit(.base)
+        )
 
         // ストリームを作成してすぐ終了
         let audioStream = AsyncStream<AVAudioPCMBuffer> { continuation in

@@ -20,7 +20,13 @@ final class AppCoordinator: ObservableObject {
         // サービス構築
         let audioService = AudioCaptureServiceImpl()
         let whisperAdapter = WhisperKitAdapter()
-        let speechService = SpeechRecognitionServiceImpl(adapter: whisperAdapter)
+        // Task 2.1 で `settings.speechEngine` を参照するよう差し替える。
+        // 本 task（1.3）ではビルドを通すため WhisperKit .base をハードコードする。
+        let initialEngine: SpeechEngine = .whisperKit(.base)
+        let speechService = SpeechRecognitionServiceImpl(
+            adapter: whisperAdapter,
+            initialEngine: initialEngine
+        )
         let clipboardService = ClipboardServiceImpl()
         let outputManager = OutputManagerImpl(clipboardService: clipboardService)
         let notificationService = NotificationServiceImpl()
@@ -65,9 +71,10 @@ final class AppCoordinator: ObservableObject {
         }
 
         // モデルの非同期読み込み
+        // Task 2.1 で `settings.speechEngine` を参照するよう差し替える予定。
         Task {
             do {
-                try await speechService.loadModel(modelName: settings.model.rawValue)
+                try await speechService.loadInitialEngine(initialEngine, language: "ja")
             } catch {
                 await notificationService.sendErrorNotification(error: error as? KuchibiError ?? .modelLoadFailed(underlying: error))
             }
