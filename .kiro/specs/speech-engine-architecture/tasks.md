@@ -84,7 +84,7 @@
   - _Depends: 1.2_
 
 - [ ] 4. 中核: Adapter 実装
-- [ ] 4.1 (P) WhisperKitAdapter を新プロトコルへ移行
+- [x] 4.1 (P) WhisperKitAdapter を新プロトコルへ移行
   - `initialize(engine:language:)` で engine が `.whisperKit(let model)` 以外なら `KuchibiError.engineMismatch` を throw
   - `largeV3Turbo` モデル名 `"openai_whisper-large-v3-v20240930_turbo"` を受理する
   - `language` 引数を `DecodingOptions(language:)` に渡し、ハードコード `"ja"` を撤廃する

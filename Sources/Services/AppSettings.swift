@@ -7,9 +7,8 @@ final class AppSettings: ObservableObject {
     // MARK: - Default Values
 
     static let defaultOutputMode: OutputMode = .autoInput
-    static let defaultModel: WhisperModel = .base
     /// 音声認識エンジンのデフォルト値。
-    /// WhisperKit Large v3 Turbo を採用（旧 `defaultModel` の medium 相当からのアップグレード）。
+    /// WhisperKit Large v3 Turbo を採用。
     static let defaultSpeechEngine: SpeechEngine = .whisperKit(.largeV3Turbo)
     static let defaultUpdateInterval: Double = 0.5
     static let defaultBufferSize: Int = 1024
@@ -24,6 +23,9 @@ final class AppSettings: ObservableObject {
 
     private enum Keys {
         static let outputMode = "setting.outputMode"
+        /// 旧キー（Task 4.1 で `model` プロパティは削除済み）。
+        /// `setting.speechEngine` への migration（init 内）と
+        /// `resetToDefaults` での旧キー除去のためにキー名のみ残している。
         static let modelName = "setting.modelName"
         static let speechEngine = "setting.speechEngine"
         static let updateInterval = "setting.updateInterval"
@@ -45,16 +47,8 @@ final class AppSettings: ObservableObject {
         }
     }
 
-    @Published var model: WhisperModel {
-        didSet {
-            guard !isResetting else { return }
-            defaults.set(model.rawValue, forKey: Keys.modelName)
-        }
-    }
-
     /// 音声認識エンジン設定（エンジン種別 + モデル）。
     /// JSON 文字列として `setting.speechEngine` に永続化される。
-    /// 旧 `model` プロパティとは独立に存在し、Task 4.1 で `model` を完全削除する予定。
     @Published var speechEngine: SpeechEngine {
         didSet {
             guard !isResetting else { return }
@@ -148,13 +142,6 @@ final class AppSettings: ObservableObject {
             self.outputMode = Self.defaultOutputMode
         }
 
-        if let saved = defaults.string(forKey: Keys.modelName),
-           let model = WhisperModel(rawValue: saved) {
-            self.model = model
-        } else {
-            self.model = Self.defaultModel
-        }
-
         // speechEngine の復元 / migration:
         // 1) 新キー `setting.speechEngine` があればそれを採用
         // 2) 無く、旧キー `setting.modelName` が存在すれば WhisperKit + 対応モデルへ migration し、旧キーを削除
@@ -238,7 +225,6 @@ final class AppSettings: ObservableObject {
         defaults.removeObject(forKey: Keys.sessionSoundEnabled)
 
         outputMode = Self.defaultOutputMode
-        model = Self.defaultModel
         speechEngine = Self.defaultSpeechEngine
         updateInterval = Self.defaultUpdateInterval
         bufferSize = Self.defaultBufferSize

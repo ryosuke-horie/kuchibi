@@ -74,18 +74,8 @@ private struct RecognitionSettingsTab: View {
 
     var body: some View {
         Form {
-            Picker("モデル", selection: $appSettings.model) {
-                ForEach(WhisperModel.allCases) { model in
-                    Text("\(model.displayName) — \(model.sizeDescription)")
-                        .tag(model)
-                }
-            }
-
-            Text("モデル変更はアプリ再起動後に反映されます")
-                .font(.caption)
-                .foregroundStyle(.secondary)
-
-            Divider()
+            // モデル/エンジン Picker は Task 7.1 でエンジン + モデルの 2 段 Picker として再実装される。
+            // 旧 `appSettings.model` は Task 4.1 で削除済みのため、ここでは一時的に Picker を持たない。
 
             Section("前処理") {
                 Toggle("ノイズ抑制", isOn: $appSettings.noiseSuppressionEnabled)
