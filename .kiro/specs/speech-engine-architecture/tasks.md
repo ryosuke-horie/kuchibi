@@ -34,7 +34,7 @@
   - _Requirements: 2.1_
   - _Boundary: project.yml, Packages/WhisperCppKit/_
 
-- [ ] 1.5 KuchibiError に新規エラーケースを追加
+- [x] 1.5 KuchibiError に新規エラーケースを追加
   - `engineMismatch(expected: SpeechEngine, actual: SpeechEngine)` を追加
   - `modelFileMissing(path: String)` を追加
   - `sessionActiveDuringSwitch` を追加

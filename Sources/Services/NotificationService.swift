@@ -51,6 +51,12 @@ final class NotificationServiceImpl: NotificationServicing {
             return ("認識エラー", "音声認識中にエラーが発生しました: \(underlying.localizedDescription)")
         case .accessibilityPermissionDenied:
             return ("アクセシビリティ権限エラー", "テキストはクリップボードにコピーされました。システム設定 > プライバシーとセキュリティ > アクセシビリティ からアクセスを許可するか、クリップボードから貼り付けてください")
+        case .engineMismatch(let expected, let actual):
+            return ("エンジン不一致エラー", "想定外のエンジンが要求されました（期待: \(expected.engineDisplayName) / 受信: \(actual.engineDisplayName)）")
+        case .modelFileMissing(let path):
+            return ("モデルファイル未配置", "モデルファイルが見つかりません: \(path)")
+        case .sessionActiveDuringSwitch:
+            return ("エンジン切替エラー", "録音中または処理中のためエンジン切替を適用できません。停止後に再度お試しください")
         }
     }
 }

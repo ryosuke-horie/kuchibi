@@ -15,10 +15,15 @@ final class WhisperKitAdapter: SpeechRecognitionAdapting {
 
     func initialize(engine: SpeechEngine, language: String) async throws {
         // WhisperKitAdapter は `.whisperKit` 系のみ受理する。
-        // 他エンジンは `KuchibiError.engineMismatch` を返すべきだが、当該ケースは Task 1.5 で追加される。
-        // 1.5 完了までの暫定措置として、異常呼び出しを preconditionFailure で明示的に停止させる。
+        // 他エンジンが渡された場合は `KuchibiError.engineMismatch` を投げてルーター側に判断を委ねる。
         guard case .whisperKit(let model) = engine else {
-            preconditionFailure("WhisperKitAdapter expected .whisperKit engine, got \(engine.modelIdentifier)")
+            Self.logger.error(
+                "想定外のエンジンが渡されました: \(engine.modelIdentifier, privacy: .public)"
+            )
+            throw KuchibiError.engineMismatch(
+                expected: .whisperKit(.base),
+                actual: engine
+            )
         }
 
         let modelName = model.rawValue
