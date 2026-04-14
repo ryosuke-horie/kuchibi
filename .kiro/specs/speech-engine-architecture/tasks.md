@@ -115,7 +115,7 @@
   - _Depends: 4.2_
 
 - [ ] 5. 中核: Service の hot-swap 機構
-- [ ] 5.1 SpeechRecognitionServiceImpl に adapter slot と switchEngine 本体を実装
+- [x] 5.1 SpeechRecognitionServiceImpl に adapter slot と switchEngine 本体を実装
   - 現在の adapter を 1 つだけ保持する slot と、engine に応じた adapter 生成ロジックを実装する
   - `loadInitialEngine(_:language:)` を init 直後のロード経路として提供し、既存の `loadModel(modelName:)` 呼び出しを全て置換する
   - `switchEngine(to:language:)` を実装し、旧 adapter の `finalize()` 完了を待ってから新 adapter を `initialize(engine:language:)` する
@@ -124,7 +124,7 @@
   - _Boundary: SpeechRecognitionServiceImpl_
   - _Depends: 1.3, 4.1, 4.2, 4.3_
 
-- [ ] 5.2 Published プロパティ公開と precondition guard を実装
+- [x] 5.2 Published プロパティ公開と precondition guard を実装
   - `currentEngine` / `isSwitching` / `isModelLoaded` を `@Published` として UI へ露出する
   - `switchEngine` 呼び出し時点で `SessionManagerImpl.state != .idle` の場合は `KuchibiError.sessionActiveDuringSwitch` を throw する
   - `isModelLoaded` が false のとき SessionManagerImpl の既存 `startSession` ガードが録音を阻止することを Mock で確認する
@@ -132,7 +132,7 @@
   - _Boundary: SpeechRecognitionServiceImpl_
   - _Depends: 5.1_
 
-- [ ] 5.3 切替失敗時の rollback と lastSwitchError を実装
+- [x] 5.3 切替失敗時の rollback と lastSwitchError を実装
   - 新 adapter の `initialize` が throw した場合に `AppSettings.speechEngine` を元に戻し、旧 adapter を再度 `initialize` する
   - 再 initialize も失敗した場合はエラーをログして `lastSwitchError` に文字列メッセージを書き、`isSwitching` を false に落とす
   - `NotificationService` 経由でユーザーに失敗理由を通知し、サイレントフォールバックにしない

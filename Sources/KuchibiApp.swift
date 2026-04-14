@@ -19,17 +19,33 @@ final class AppCoordinator: ObservableObject {
 
         // サービス構築
         let audioService = AudioCaptureServiceImpl()
-        let whisperAdapter = WhisperKitAdapter()
         // Task 2.1: `settings.speechEngine` を起動時の初期エンジンとして採用する。
         // 旧 `setting.modelName` からの migration は `AppSettings.init` 内で実施済み。
         let initialEngine: SpeechEngine = settings.speechEngine
-        let speechService = SpeechRecognitionServiceImpl(
-            adapter: whisperAdapter,
-            initialEngine: initialEngine
-        )
         let clipboardService = ClipboardServiceImpl()
         let outputManager = OutputManagerImpl(clipboardService: clipboardService)
         let notificationService = NotificationServiceImpl()
+
+        // Task 5.1: adapter factory で engine kind ごとに実装を切り替える。
+        // Task 5.3: AppSettings / NotificationService を渡して rollback + 通知を有効化。
+        // sessionStateProvider は SessionManager 生成後に参照するため、box 経由の遅延評価で解決する。
+        let sessionManagerBox = SessionManagerBox()
+        let speechService = SpeechRecognitionServiceImpl(
+            adapterFactory: { engine in
+                switch engine.kind {
+                case .whisperKit:
+                    return WhisperKitAdapter()
+                case .kotobaWhisperBilingual:
+                    return WhisperCppAdapter()
+                }
+            },
+            initialEngine: initialEngine,
+            appSettings: settings,
+            notificationService: notificationService,
+            sessionStateProvider: { [sessionManagerBox] in
+                sessionManagerBox.manager?.state ?? .idle
+            }
+        )
 
         let sm = SessionManagerImpl(
             audioService: audioService,
@@ -38,6 +54,7 @@ final class AppCoordinator: ObservableObject {
             notificationService: notificationService,
             appSettings: settings
         )
+        sessionManagerBox.manager = sm
         self.sessionManager = sm
 
         hotKeyController = HotKeyControllerImpl(onToggle: {
@@ -79,6 +96,14 @@ final class AppCoordinator: ObservableObject {
             }
         }
     }
+}
+
+/// `SpeechRecognitionServiceImpl` の `sessionStateProvider` が
+/// `SessionManagerImpl` を遅延参照するための holder。
+/// init 内では sm 生成前に closure を渡すため、box 経由で後から注入する。
+@MainActor
+private final class SessionManagerBox {
+    weak var manager: SessionManagerImpl?
 }
 
 @main
