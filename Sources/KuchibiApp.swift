@@ -184,7 +184,13 @@ struct KuchibiApp: App {
         }
 
         Settings {
-            SettingsView(appSettings: coordinator.appSettings)
+            SettingsView(
+                appSettings: coordinator.appSettings,
+                speechService: coordinator.speechService,
+                permissionObserver: coordinator.permissionObserver,
+                launchPathValidator: coordinator.launchPathValidator,
+                modelAvailability: coordinator.modelAvailability
+            )
         }
     }
 

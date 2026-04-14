@@ -154,7 +154,7 @@
   - _Depends: 2.1, 3.1, 3.2, 3.3, 5.1, 5.2, 5.3_
 
 - [ ] 7. 統合: SettingsView の拡張
-- [ ] 7.1 エンジン × モデルの 2 段 Picker と現在状態表示
+- [x] 7.1 エンジン × モデルの 2 段 Picker と現在状態表示
   - 認識タブに `SpeechEngineKind.allCases` を表示する Picker を追加する
   - 選択エンジンに応じたモデル Picker を `EngineModel.allCases` から生成する
   - 現在のエンジン・モデル名と `isSwitching` に応じた `ProgressView` を同タブに表示する
@@ -164,7 +164,7 @@
   - _Boundary: SettingsView_
   - _Depends: 2.1, 6.1_
 
-- [ ] 7.2 Kotoba モデル未配置時の DL ガイド UI
+- [x] 7.2 Kotoba モデル未配置時の DL ガイド UI
   - `ModelAvailabilityChecker.isAvailable` が false のモデルは Picker 上で disabled にし、ラベルに「モデル未配置」を付与する
   - 未配置時はバナーを出して「HuggingFace で開く」ボタン（`NSWorkspace.shared.open(downloadPageURL)`）と「配置を確認」ボタン（`ModelAvailabilityChecker` の再評価）を配置する
   - 配置完了後に Picker の disabled が解除され、選択可能になる UI 変化をテストで確認する
@@ -172,7 +172,7 @@
   - _Boundary: SettingsView_
   - _Depends: 3.1, 7.1_
 
-- [ ] 7.3 起動経路警告バナー
+- [x] 7.3 起動経路警告バナー
   - `LaunchPathValidator.isApproved == false` のとき認識タブ上部に赤いバナーと `make run` による再インストール案内を表示する
   - 警告バナーのタップで `Bundle.main.bundlePath` を含むヘルプテキストを展開する
   - `LaunchPathValidator` が approved を返すケースではバナーが表示されないことを UI テストで確認する
@@ -180,7 +180,7 @@
   - _Boundary: SettingsView_
   - _Depends: 3.2, 7.1_
 
-- [ ] 7.4 権限状態表示と復旧導線
+- [x] 7.4 権限状態表示と復旧導線
   - マイク権限・アクセシビリティ権限の状態を緑／赤チェックで表示する
   - アクセシビリティ権限欠如時に `AXIsProcessTrustedWithOptions` を呼ぶボタンを設置する
   - マイク権限欠如時は既存 `SessionManagerImpl` のガードで session start が阻止され、その理由（マイク権限欠如）が認識タブに明示されることを UI から確認できるようにする
