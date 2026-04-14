@@ -56,7 +56,7 @@
   - _Depends: 1.1_
 
 - [ ] 3. 中核: 補助サービス
-- [ ] 3.1 (P) ModelAvailabilityChecker を実装
+- [x] 3.1 (P) ModelAvailabilityChecker を実装
   - `~/Library/Application Support/Kuchibi/models/` を標準配置ディレクトリとして解決する
   - WhisperKit 用 engine は常に `isAvailable == true` を返す
   - Kotoba 用 engine は `expectedFileName` をディレクトリ内で FileManager 検索し真偽を返す
@@ -66,7 +66,7 @@
   - _Boundary: ModelAvailabilityChecker_
   - _Depends: 1.2_
 
-- [ ] 3.2 (P) LaunchPathValidator を実装
+- [x] 3.2 (P) LaunchPathValidator を実装
   - `Bundle.main.bundlePath` が `/Applications/Kuchibi.app` と一致するかで `isApproved` を返す
   - `currentPath` で実際の起動パスを公開する
   - `LaunchPathValidatorTests` で承認パス / DerivedData パスの両ケースを `Bundle` 差し替えで検証する
@@ -74,7 +74,7 @@
   - _Boundary: LaunchPathValidator_
   - _Depends: 1.2_
 
-- [ ] 3.3 (P) PermissionStateObserver を実装
+- [x] 3.3 (P) PermissionStateObserver を実装
   - `microphoneGranted` / `accessibilityTrusted` を Published プロパティとして公開する
   - `init` で初回 `refresh()`、`NSApplication.didBecomeActiveNotification` 購読でランタイム再評価する
   - `refresh()` は `AVCaptureDevice.authorizationStatus(for:.audio)` と `AXIsProcessTrusted()` を読む
