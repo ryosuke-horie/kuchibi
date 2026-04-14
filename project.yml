@@ -16,6 +16,8 @@ packages:
   SettingsAccess:
     url: https://github.com/orchetect/SettingsAccess
     from: "2.1.0"
+  WhisperCppKit:
+    path: Packages/WhisperCppKit
 
 targets:
   Kuchibi:
@@ -27,6 +29,7 @@ targets:
       - package: HotKey
       - package: WhisperKit
       - package: SettingsAccess
+      - package: WhisperCppKit
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.kuchibi.app
@@ -40,6 +43,7 @@ targets:
       - path: Tests
     dependencies:
       - target: Kuchibi
+      - package: WhisperCppKit
     settings:
       base:
         GENERATE_INFOPLIST_FILE: YES

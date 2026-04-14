@@ -27,11 +27,12 @@
   - _Boundary: Services/Protocols/SpeechRecognizing_
   - _Depends: 1.1, 1.2_
 
-- [ ] 1.4 project.yml に whisper.cpp の SwiftPM パッケージを追加
-  - `ggml-org/whisper.cpp` を `packages` セクションに追加し、`Kuchibi` ターゲットの `dependencies` にリンクする
-  - `xcodegen generate` が成功し、Xcode 上で `import whisper` が解決することを確認する
+- [x] 1.4 project.yml に WhisperCppKit（whisper.cpp XCFramework）の SwiftPM を追加
+  - `Packages/WhisperCppKit` をローカル SwiftPM として追加し、`ggml-org/whisper.cpp` 公式 XCFramework を `binaryTarget` で包む
+  - `project.yml` で local package を参照し、`Kuchibi` と `KuchibiTests` の `dependencies` に組み込む
+  - `xcodegen generate` が成功し、Xcode 上で `import WhisperCppKit` が解決することを確認する
   - _Requirements: 2.1_
-  - _Boundary: project.yml_
+  - _Boundary: project.yml, Packages/WhisperCppKit/_
 
 - [ ] 1.5 KuchibiError に新規エラーケースを追加
   - `engineMismatch(expected: SpeechEngine, actual: SpeechEngine)` を追加
