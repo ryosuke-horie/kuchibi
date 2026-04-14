@@ -142,7 +142,7 @@
   - _Depends: 5.1, 5.2_
 
 - [ ] 6. 統合: AppCoordinator の配線
-- [ ] 6.1 AppCoordinator に新コンポーネント DI と deferred switchEngine を実装
+- [x] 6.1 AppCoordinator に新コンポーネント DI と deferred switchEngine を実装
   - `ModelAvailabilityChecker` / `LaunchPathValidator` / `PermissionStateObserver` を `AppCoordinator` が生成して `@Published` に保持する
   - `AppSettings.$speechEngine` と `SessionManagerImpl.$state` を Combine で合成し、`state == .idle` の瞬間に最新要求を `SpeechRecognitionServiceImpl.switchEngine` に渡す
   - 起動時は `AppSettings.speechEngine` の `ModelAvailabilityChecker.isAvailable` を確認し、未配置なら `loadInitialEngine` をスキップして `SettingsView` で DL ガイドが出る状態のまま待機する
