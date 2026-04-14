@@ -271,6 +271,16 @@ private struct RecognitionSettingsTab: View {
                             // ModelAvailabilityChecker は非 ObservableObject のため、
                             // View 側の state をインクリメントして body を再評価させる。
                             availabilityRefreshToken &+= 1
+                            // 配置完了により利用可能になった場合、現在選択中の engine を
+                            // speechService へ反映させる（EngineSwitchCoordinator は
+                            // 未配置時に switchEngine を skip しているため、ここで再試行）。
+                            let engine = appSettings.speechEngine
+                            if modelAvailability.isAvailable(for: engine),
+                               speechService.currentEngine != engine {
+                                Task {
+                                    try? await speechService.switchEngine(to: engine, language: "ja")
+                                }
+                            }
                         }
                     }
                 }

@@ -45,6 +45,7 @@ final class EngineSwitchCoordinator {
     private let sessionStateProvider: () -> SessionState
     private let sessionStatePublisher: AnyPublisher<SessionState, Never>
     private let switcher: EngineSwitching
+    private let modelAvailability: ModelAvailabilityChecking?
     private let language: String
 
     private var cancellables = Set<AnyCancellable>()
@@ -60,12 +61,14 @@ final class EngineSwitchCoordinator {
         sessionStatePublisher: AnyPublisher<SessionState, Never>,
         sessionStateProvider: @escaping () -> SessionState,
         switcher: EngineSwitching,
+        modelAvailability: ModelAvailabilityChecking? = nil,
         language: String = "ja"
     ) {
         self.engineRequestPublisher = engineRequestPublisher
         self.sessionStatePublisher = sessionStatePublisher
         self.sessionStateProvider = sessionStateProvider
         self.switcher = switcher
+        self.modelAvailability = modelAvailability
         self.language = language
     }
 
@@ -108,6 +111,17 @@ final class EngineSwitchCoordinator {
         guard let engine = pendingEngineRequest else { return }
         let currentState = currentStateOverride ?? sessionStateProvider()
         guard currentState == .idle else { return }
+
+        // モデル未配置時は switchEngine を呼ばず、AppSettings の選択状態を
+        // 維持したまま pending をクリアする。SettingsView は AppSettings.speechEngine を
+        // 参照して DL ガイドバナーを表示する。再試行はユーザーが「配置を確認」ボタンを
+        // 押下することで `retryPending(with:)` 経由で行われる。
+        if let availability = modelAvailability, !availability.isAvailable(for: engine) {
+            pendingEngineRequest = nil
+            Self.logger.info("switchEngine skipped: model not available for \(engine.modelIdentifier, privacy: .public)")
+            return
+        }
+
         pendingEngineRequest = nil
         appliedCount += 1
         lastAppliedEngine = engine
@@ -122,5 +136,14 @@ final class EngineSwitchCoordinator {
                 Self.logger.error("switchEngine failed: \(error.localizedDescription, privacy: .public)")
             }
         }
+    }
+
+    /// モデルファイル配置後の再試行用エントリポイント。
+    /// SettingsView の「配置を確認」ボタンから呼ばれることを想定し、
+    /// 指定 engine を pending にセットして `tryApplyPending` を呼ぶ。
+    func retryPending(with engine: SpeechEngine) {
+        pendingEngineRequest = engine
+        Self.logger.debug("Engine retry requested: \(engine.modelIdentifier, privacy: .public)")
+        tryApplyPending()
     }
 }

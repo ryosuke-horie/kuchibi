@@ -110,6 +110,7 @@ final class AppCoordinator: ObservableObject {
             sessionStatePublisher: sm.statePublisher,
             sessionStateProvider: { [weak sm] in sm?.state ?? .idle },
             switcher: speechService,
+            modelAvailability: modelAvailability,
             language: "ja"
         )
         self.engineSwitchCoordinator = engineSwitchCoordinator
