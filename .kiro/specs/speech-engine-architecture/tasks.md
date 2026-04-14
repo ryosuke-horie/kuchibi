@@ -191,7 +191,7 @@
   - _Depends: 3.3, 7.1_
 
 - [ ] 8. インフラ: Makefile の codesign 安定化
-- [ ] 8.1 install ターゲットに identifier 明示と metadata 保持を追加
+- [x] 8.1 install ターゲットに identifier 明示と metadata 保持を追加
   - `codesign --force --sign -` を `codesign --force --sign - --identifier com.kuchibi.app --preserve-metadata=entitlements,requirements,flags,runtime` に差し替える
   - `make run` を 2 回連続実行し、2 回目以降の起動でアクセシビリティ権限ダイアログが出ないことを手動で確認する手順を task Implementation Notes に記載する
   - 実行後の `/Applications/Kuchibi.app` が起動することを確認する

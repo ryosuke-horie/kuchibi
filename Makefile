@@ -23,8 +23,12 @@ install:
 	@pkill -x Kuchibi 2>/dev/null || true
 	@sleep 0.5
 	@rsync -a --delete "$(BUILT_APP)/" "$(INSTALL_DIR)/$(APP)/"
-	@codesign --force --sign - "$(INSTALL_DIR)/$(APP)"
+	@codesign --force --sign - \
+		--identifier com.kuchibi.app \
+		--preserve-metadata=entitlements,requirements,flags,runtime \
+		"$(INSTALL_DIR)/$(APP)"
 	@echo "インストール完了"
+	@echo "NOTE: make run を 2 回連続実行し、2 回目以降の起動でアクセシビリティ権限ダイアログが出ないことを確認してください"
 
 ## インストール後に起動
 run: install
