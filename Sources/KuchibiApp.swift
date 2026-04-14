@@ -20,9 +20,9 @@ final class AppCoordinator: ObservableObject {
         // サービス構築
         let audioService = AudioCaptureServiceImpl()
         let whisperAdapter = WhisperKitAdapter()
-        // Task 2.1 で `settings.speechEngine` を参照するよう差し替える。
-        // 本 task（1.3）ではビルドを通すため WhisperKit .base をハードコードする。
-        let initialEngine: SpeechEngine = .whisperKit(.base)
+        // Task 2.1: `settings.speechEngine` を起動時の初期エンジンとして採用する。
+        // 旧 `setting.modelName` からの migration は `AppSettings.init` 内で実施済み。
+        let initialEngine: SpeechEngine = settings.speechEngine
         let speechService = SpeechRecognitionServiceImpl(
             adapter: whisperAdapter,
             initialEngine: initialEngine
@@ -70,11 +70,10 @@ final class AppCoordinator: ObservableObject {
             }
         }
 
-        // モデルの非同期読み込み
-        // Task 2.1 で `settings.speechEngine` を参照するよう差し替える予定。
+        // モデルの非同期読み込み（Task 2.1: `settings.speechEngine` を採用）
         Task {
             do {
-                try await speechService.loadInitialEngine(initialEngine, language: "ja")
+                try await speechService.loadInitialEngine(settings.speechEngine, language: "ja")
             } catch {
                 await notificationService.sendErrorNotification(error: error as? KuchibiError ?? .modelLoadFailed(underlying: error))
             }

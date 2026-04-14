@@ -33,6 +33,20 @@ enum WhisperKitModel: String, CaseIterable, Codable, Equatable, Hashable, Sendab
         case .largeV3Turbo: "最高精度・高速（推奨）"
         }
     }
+
+    /// 旧 `WhisperModel.rawValue`（`tiny` / `base` / `small` / `medium` / `large-v2` / `large-v3`）から
+    /// 新 `WhisperKitModel` に変換する。`large-v2` / `large-v3` は後継として `.largeV3Turbo` に集約する。
+    /// 不明な値は nil を返す。`AppSettings` の `setting.modelName` → `setting.speechEngine` migration で使用する。
+    init?(fromLegacy rawValue: String) {
+        switch rawValue {
+        case "tiny": self = .tiny
+        case "base": self = .base
+        case "small": self = .small
+        case "medium": self = .medium
+        case "large-v2", "large-v3": self = .largeV3Turbo
+        default: return nil
+        }
+    }
 }
 
 /// Kotoba-Whisper Bilingual v1（whisper.cpp GGML 量子化モデル）。

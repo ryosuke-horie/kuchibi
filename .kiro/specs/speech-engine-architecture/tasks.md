@@ -45,7 +45,7 @@
   - _Depends: 1.1_
 
 - [ ] 2. 基盤: AppSettings 拡張と migration
-- [ ] 2.1 AppSettings に speechEngine を追加し旧キー migration を実装
+- [x] 2.1 AppSettings に speechEngine を追加し旧キー migration を実装
   - `setting.speechEngine` を JSON 文字列として永続化する Published プロパティを追加
   - init 時に旧 `setting.modelName` が存在し新キーが無ければ `SpeechEngine.whisperKit(<対応モデル>)` に変換して書き込み、旧キーを削除する
   - デフォルト値を `SpeechEngine.whisperKit(.largeV3Turbo)` に設定する
