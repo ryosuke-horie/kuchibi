@@ -1,7 +1,7 @@
 # Implementation Plan
 
 - [ ] 1. 基盤: 型定義とプロトコル更新
-- [ ] 1.1 SpeechEngine と EngineModel の型定義
+- [x] 1.1 SpeechEngine と EngineModel の型定義
   - `SpeechEngine` enum（`whisperKit` / `kotobaWhisperBilingual` の 2 case）を associated `EngineModel` とともに定義する
   - `WhisperKitModel` enum に `largeV3Turbo` を含む 5 ケースを定義（既存 `WhisperModel` から改名移行）
   - `KotobaWhisperBilingualModel` enum を `v1Q5` / `v1Q8` で定義し、`expectedFileName` と `downloadPageURL` を持たせる
