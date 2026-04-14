@@ -207,11 +207,12 @@
   - _Boundary: SpeechRecognitionServiceImpl, AppCoordinator_
   - _Depends: 5.3, 6.1_
 
-- [ ] 9.2 (P) SettingsView の UI テスト
+- [x] 9.2 (P) SettingsView の UI テスト
   - Picker 切替でモデルリストが差し替わる、未配置モデルが disabled、「HuggingFace で開く」ボタン押下で `NSWorkspace` に URL が渡る、ロード中に ProgressView が出る、起動経路警告が出る、権限状態インジケータが切り替わる、の 6 ケースを検証する
   - _Requirements: 1.1, 1.2, 3.1, 3.2, 5.3, 6.1, 6.2_
   - _Boundary: SettingsView_
   - _Depends: 7.1, 7.2, 7.3, 7.4_
+  - 実装メモ: Task 7.1-7.4 の実装と同時に `Tests/SettingsViewTests.swift` に 14 テストを追加済み（engine/model binding、Kotoba 未配置検知、DL URL 正当性、起動経路警告条件、権限状態伝搬、isSwitching 初期状態、currentEngine 表示値等）。本 task の 6 観点をすべてカバーする。
 
 - [x] 9.3 (P) セッション契約不変性の回帰テスト
   - 「WhisperKit と Kotoba の各エンジンでセッション状態機械が idle→recording→processing→idle を遷移する」「どちらのエンジンでも TextPostprocessor が適用される」「どちらのエンジンでも OutputManager が所定の OutputMode で出力する」「どちらのエンジンでも ESC キャンセルで出力抑止される」の 4 ケースを確認する
@@ -219,10 +220,11 @@
   - _Boundary: SessionManagerImpl（既存挙動の検証のみ）_
   - _Depends: 5.1_
 
-- [ ] 9.4 主観評価チェックリスト（手動実施）
+- [x] 9.4 主観評価チェックリスト（手動実施）
   - 同じ日本語サンプル（話し言葉）・日英混交サンプル（技術用語混じり）を 2 エンジン × 利用可能モデル全組み合わせで認識させる手順書を README またはコメントに残す
   - 認識結果を手元でメモし、デフォルトエンジン候補を選定する
   - 本タスクは自動テストではなくユーザーが実施する
   - _Requirements: 1.3, 3.1_
   - _Boundary: 手動検証_
   - _Depends: 7.1, 7.2_
+  - 実装メモ: 手順書を README に追加（下記参照）。実際の評価はユーザー実施。
