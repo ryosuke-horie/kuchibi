@@ -199,7 +199,7 @@
   - _Boundary: Makefile_
 
 - [ ] 9. 検証: 統合テストと主観評価
-- [ ] 9.1 (P) Hot-swap シナリオの統合テスト
+- [x] 9.1 (P) Hot-swap シナリオの統合テスト
   - 「idle での即時切替成功」「録音中切替要求を idle 後に適用」「新 adapter initialize 失敗時に旧エンジンへ rollback」の 3 シナリオを Swift Testing で実装する
   - 各シナリオで `currentEngine` / `isSwitching` / `lastSwitchError` の遷移を assert する
   - Mock Adapter が idle 以外で `switchEngine` を呼ばれたら throw することを確認する
@@ -213,7 +213,7 @@
   - _Boundary: SettingsView_
   - _Depends: 7.1, 7.2, 7.3, 7.4_
 
-- [ ] 9.3 (P) セッション契約不変性の回帰テスト
+- [x] 9.3 (P) セッション契約不変性の回帰テスト
   - 「WhisperKit と Kotoba の各エンジンでセッション状態機械が idle→recording→processing→idle を遷移する」「どちらのエンジンでも TextPostprocessor が適用される」「どちらのエンジンでも OutputManager が所定の OutputMode で出力する」「どちらのエンジンでも ESC キャンセルで出力抑止される」の 4 ケースを確認する
   - _Requirements: 4.1, 4.2, 4.3, 4.4_
   - _Boundary: SessionManagerImpl（既存挙動の検証のみ）_
