@@ -56,14 +56,14 @@ enum WhisperKitModel: String, CaseIterable, Codable, Equatable, Hashable, Sendab
 /// `downloadPageURL` でモデルページへの導線を提供する。
 enum KotobaWhisperBilingualModel: String, CaseIterable, Codable, Equatable, Hashable, Sendable, Identifiable {
     case v1Q5 = "ggml-kotoba-whisper-bilingual-v1.0-q5_0.bin"
-    case v1Q8 = "ggml-kotoba-whisper-bilingual-v1.0-q8_0.bin"
+    case v1Full = "ggml-kotoba-whisper-bilingual-v1.0.bin"
 
     var id: String { rawValue }
 
     var displayName: String {
         switch self {
-        case .v1Q5: "Kotoba Bilingual v1 (Q5_0)"
-        case .v1Q8: "Kotoba Bilingual v1 (Q8_0)"
+        case .v1Q5: "Kotoba Bilingual v1 (Q5_0 量子化)"
+        case .v1Full: "Kotoba Bilingual v1 (Full)"
         }
     }
 

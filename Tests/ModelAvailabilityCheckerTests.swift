@@ -83,7 +83,7 @@ struct ModelAvailabilityCheckerTests {
 
         let checker = ModelAvailabilityChecker(modelsDirectory: tempDir)
         #expect(checker.isAvailable(for: .kotobaWhisperBilingual(.v1Q5)))
-        #expect(!checker.isAvailable(for: .kotobaWhisperBilingual(.v1Q8)))
+        #expect(!checker.isAvailable(for: .kotobaWhisperBilingual(.v1Full)))
     }
 
     // MARK: - modelPath / downloadPageURL

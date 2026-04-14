@@ -54,9 +54,9 @@ struct SpeechEngineTests {
     @Test("KotobaWhisperBilingualModel: 2 ケースの rawValue / expectedFileName")
     func kotobaModelRawValues() {
         #expect(KotobaWhisperBilingualModel.v1Q5.rawValue == "ggml-kotoba-whisper-bilingual-v1.0-q5_0.bin")
-        #expect(KotobaWhisperBilingualModel.v1Q8.rawValue == "ggml-kotoba-whisper-bilingual-v1.0-q8_0.bin")
+        #expect(KotobaWhisperBilingualModel.v1Full.rawValue == "ggml-kotoba-whisper-bilingual-v1.0.bin")
         #expect(KotobaWhisperBilingualModel.v1Q5.expectedFileName == KotobaWhisperBilingualModel.v1Q5.rawValue)
-        #expect(KotobaWhisperBilingualModel.v1Q8.expectedFileName == KotobaWhisperBilingualModel.v1Q8.rawValue)
+        #expect(KotobaWhisperBilingualModel.v1Full.expectedFileName == KotobaWhisperBilingualModel.v1Full.rawValue)
         #expect(KotobaWhisperBilingualModel.allCases.count == 2)
     }
 
@@ -93,7 +93,7 @@ struct SpeechEngineTests {
             .whisperKit(.medium),
             .whisperKit(.largeV3Turbo),
             .kotobaWhisperBilingual(.v1Q5),
-            .kotobaWhisperBilingual(.v1Q8),
+            .kotobaWhisperBilingual(.v1Full),
         ]
         for engine in cases {
             #expect(!engine.engineDisplayName.isEmpty)

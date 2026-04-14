@@ -83,7 +83,7 @@ struct SettingsViewTests {
 
     @Test("エンジン切替: Kotoba → WhisperKit で .largeV3Turbo がデフォルト選択される")
     func engineKindChangeKotobaToWhisperKit() {
-        let current: SpeechEngine = .kotobaWhisperBilingual(.v1Q8)
+        let current: SpeechEngine = .kotobaWhisperBilingual(.v1Full)
         let next = applyEngineKindChange(to: .whisperKit, current: current)
         #expect(next == .whisperKit(.largeV3Turbo))
     }
@@ -104,10 +104,10 @@ struct SettingsViewTests {
         defer { defaults.removePersistentDomain(forName: suite) }
 
         let settings = AppSettings(defaults: defaults)
-        settings.speechEngine = .kotobaWhisperBilingual(.v1Q8)
+        settings.speechEngine = .kotobaWhisperBilingual(.v1Full)
 
         let reloaded = AppSettings(defaults: defaults)
-        #expect(reloaded.speechEngine == .kotobaWhisperBilingual(.v1Q8))
+        #expect(reloaded.speechEngine == .kotobaWhisperBilingual(.v1Full))
     }
 
     // MARK: - 4. Kotoba モデル未配置時の判定 (Task 7.2)
@@ -116,10 +116,10 @@ struct SettingsViewTests {
     func kotobaUnavailableDetected() {
         let checker = MockModelAvailabilityChecker()
         checker.availabilityOverride[.kotobaWhisperBilingual(.v1Q5)] = false
-        checker.availabilityOverride[.kotobaWhisperBilingual(.v1Q8)] = false
+        checker.availabilityOverride[.kotobaWhisperBilingual(.v1Full)] = false
 
         #expect(!checker.isAvailable(for: .kotobaWhisperBilingual(.v1Q5)))
-        #expect(!checker.isAvailable(for: .kotobaWhisperBilingual(.v1Q8)))
+        #expect(!checker.isAvailable(for: .kotobaWhisperBilingual(.v1Full)))
     }
 
     @Test("ModelAvailabilityChecker が true を返せば Kotoba モデルは配置済み")
