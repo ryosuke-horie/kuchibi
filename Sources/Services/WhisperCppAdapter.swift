@@ -21,7 +21,12 @@ import os
 ///
 /// 注: WhisperKitAdapter とは異なり、`onTextChanged`（部分テキスト）は擬似ストリーミング
 /// では非対応のため、`getPartialText()` は常に空文字列を返す。
-final class WhisperCppAdapter: SpeechRecognitionAdapting {
+///
+/// 並行安全性: 内部状態（`audioBuffer` / `lastAppendedAt` 等）は `OSAllocatedUnfairLock` で
+/// 保護し、`context` は initialize/finalize/deinit 以外では read-only。`whisper_full` は
+/// `processingTask` 上で同期実行されるが、`Task.detached` で協調スレッドプールに逃がす
+/// ことで MainActor を数百 ms〜数秒ブロックしない（UI の音量バーが固まる問題を回避）。
+final class WhisperCppAdapter: SpeechRecognitionAdapting, @unchecked Sendable {
     private static let logger = Logger(subsystem: "com.kuchibi.app", category: "WhisperCppAdapter")
 
     /// サンプリングレート（whisper.cpp は 16kHz mono Float32 を要求）
@@ -133,7 +138,11 @@ final class WhisperCppAdapter: SpeechRecognitionAdapting {
         // 過去の Task が残っていれば停止
         processingTask?.cancel()
 
-        processingTask = Task { [weak self] in
+        // `whisper_full` は同期 C 関数で数百 ms〜数秒ブロックするため、
+        // `Task.detached` で MainActor から切り離し、協調スレッドプールで実行する。
+        // 呼び出し側の `processAudioStream` が MainActor 由来の場合でも、
+        // UI スレッド（音量バーの更新等）をブロックしない。
+        processingTask = Task.detached { [weak self] in
             while !Task.isCancelled {
                 try? await Task.sleep(for: Self.pollInterval)
                 guard !Task.isCancelled, let self else { break }
