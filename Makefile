@@ -7,7 +7,13 @@ INSTALL_DIR = /Applications
 # DerivedDataからビルド済みアプリを検索
 BUILT_APP = $(shell find "$(DERIVED)" -name "$(APP)" -path "*/Debug/$(APP)" 2>/dev/null | head -1)
 
-.PHONY: build install run clean
+# Kotoba-Whisper Bilingual v1.0 モデル配置先
+MODELS_DIR = $(HOME)/Library/Application Support/Kuchibi/models
+KOTOBA_REPO = https://huggingface.co/kotoba-tech/kotoba-whisper-bilingual-v1.0-ggml/resolve/main
+KOTOBA_Q5 = ggml-kotoba-whisper-bilingual-v1.0-q5_0.bin
+KOTOBA_FULL = ggml-kotoba-whisper-bilingual-v1.0.bin
+
+.PHONY: build install run clean fetch-models fetch-kotoba-q5 fetch-kotoba-full
 
 ## ビルドして /Applications にインストールする（デフォルト）
 all: build install
@@ -23,8 +29,12 @@ install:
 	@pkill -x Kuchibi 2>/dev/null || true
 	@sleep 0.5
 	@rsync -a --delete "$(BUILT_APP)/" "$(INSTALL_DIR)/$(APP)/"
-	@codesign --force --sign - "$(INSTALL_DIR)/$(APP)"
+	@codesign --force --sign - \
+		--identifier com.kuchibi.app \
+		--preserve-metadata=entitlements,requirements,flags,runtime \
+		"$(INSTALL_DIR)/$(APP)"
 	@echo "インストール完了"
+	@echo "NOTE: make run を 2 回連続実行し、2 回目以降の起動でアクセシビリティ権限ダイアログが出ないことを確認してください"
 
 ## インストール後に起動
 run: install
@@ -33,3 +43,34 @@ run: install
 ## DerivedDataのビルドキャッシュを削除
 clean:
 	xcodebuild -project $(PROJECT) -scheme $(SCHEME) clean
+
+## Kotoba-Whisper Bilingual v1.0 モデルファイル（Q5 + Full）をダウンロード
+fetch-models: fetch-kotoba-q5 fetch-kotoba-full
+	@echo "モデル配置完了: $(MODELS_DIR)"
+	@ls -lh "$(MODELS_DIR)" | grep -E "ggml-kotoba" || true
+
+## Kotoba v1Q5（軽量量子化版、約 500MB）
+fetch-kotoba-q5:
+	@mkdir -p "$(MODELS_DIR)"
+	@if [ -f "$(MODELS_DIR)/$(KOTOBA_Q5)" ]; then \
+		echo "既に配置済み: $(MODELS_DIR)/$(KOTOBA_Q5)"; \
+	else \
+		echo "ダウンロード中: $(KOTOBA_Q5)"; \
+		curl -L --fail --retry 3 --retry-delay 5 --progress-bar \
+			-o "$(MODELS_DIR)/$(KOTOBA_Q5).tmp" "$(KOTOBA_REPO)/$(KOTOBA_Q5)" \
+			&& mv "$(MODELS_DIR)/$(KOTOBA_Q5).tmp" "$(MODELS_DIR)/$(KOTOBA_Q5)" \
+			|| { rm -f "$(MODELS_DIR)/$(KOTOBA_Q5).tmp"; exit 1; }; \
+	fi
+
+## Kotoba v1 Full（非量子化版、約 1.5GB）
+fetch-kotoba-full:
+	@mkdir -p "$(MODELS_DIR)"
+	@if [ -f "$(MODELS_DIR)/$(KOTOBA_FULL)" ]; then \
+		echo "既に配置済み: $(MODELS_DIR)/$(KOTOBA_FULL)"; \
+	else \
+		echo "ダウンロード中: $(KOTOBA_FULL)"; \
+		curl -L --fail --retry 3 --retry-delay 5 --progress-bar \
+			-o "$(MODELS_DIR)/$(KOTOBA_FULL).tmp" "$(KOTOBA_REPO)/$(KOTOBA_FULL)" \
+			&& mv "$(MODELS_DIR)/$(KOTOBA_FULL).tmp" "$(MODELS_DIR)/$(KOTOBA_FULL)" \
+			|| { rm -f "$(MODELS_DIR)/$(KOTOBA_FULL).tmp"; exit 1; }; \
+	fi

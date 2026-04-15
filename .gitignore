@@ -1,1 +1,6 @@
 .build
+Kuchibi.xcodeproj/**
+!Kuchibi.xcodeproj/project.xcworkspace/
+!Kuchibi.xcodeproj/project.xcworkspace/xcshareddata/
+!Kuchibi.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/
+!Kuchibi.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved

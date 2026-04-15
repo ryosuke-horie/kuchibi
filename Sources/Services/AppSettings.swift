@@ -7,7 +7,9 @@ final class AppSettings: ObservableObject {
     // MARK: - Default Values
 
     static let defaultOutputMode: OutputMode = .autoInput
-    static let defaultModel: WhisperModel = .base
+    /// 音声認識エンジンのデフォルト値。
+    /// WhisperKit Large v3 Turbo を採用。
+    static let defaultSpeechEngine: SpeechEngine = .whisperKit(.largeV3Turbo)
     static let defaultUpdateInterval: Double = 0.5
     static let defaultBufferSize: Int = 1024
     static let defaultNoiseSuppressionEnabled: Bool = true
@@ -21,7 +23,11 @@ final class AppSettings: ObservableObject {
 
     private enum Keys {
         static let outputMode = "setting.outputMode"
+        /// 旧キー（Task 4.1 で `model` プロパティは削除済み）。
+        /// `setting.speechEngine` への migration（init 内）と
+        /// `resetToDefaults` での旧キー除去のためにキー名のみ残している。
         static let modelName = "setting.modelName"
+        static let speechEngine = "setting.speechEngine"
         static let updateInterval = "setting.updateInterval"
         static let bufferSize = "setting.bufferSize"
         static let noiseSuppressionEnabled = "setting.noiseSuppressionEnabled"
@@ -41,10 +47,12 @@ final class AppSettings: ObservableObject {
         }
     }
 
-    @Published var model: WhisperModel {
+    /// 音声認識エンジン設定（エンジン種別 + モデル）。
+    /// JSON 文字列として `setting.speechEngine` に永続化される。
+    @Published var speechEngine: SpeechEngine {
         didSet {
             guard !isResetting else { return }
-            defaults.set(model.rawValue, forKey: Keys.modelName)
+            persistSpeechEngine(speechEngine)
         }
     }
 
@@ -134,11 +142,23 @@ final class AppSettings: ObservableObject {
             self.outputMode = Self.defaultOutputMode
         }
 
-        if let saved = defaults.string(forKey: Keys.modelName),
-           let model = WhisperModel(rawValue: saved) {
-            self.model = model
+        // speechEngine の復元 / migration:
+        // 1) 新キー `setting.speechEngine` があればそれを採用
+        // 2) 無く、旧キー `setting.modelName` が存在すれば WhisperKit + 対応モデルへ migration し、旧キーを削除
+        // 3) どちらも無ければデフォルト (`SpeechEngine.whisperKit(.largeV3Turbo)`)
+        if let json = defaults.string(forKey: Keys.speechEngine),
+           let data = json.data(using: .utf8),
+           let engine = try? JSONDecoder().decode(SpeechEngine.self, from: data) {
+            self.speechEngine = engine
+        } else if let oldName = defaults.string(forKey: Keys.modelName),
+                  let migratedModel = WhisperKitModel(fromLegacy: oldName) {
+            let migrated: SpeechEngine = .whisperKit(migratedModel)
+            self.speechEngine = migrated
+            // didSet は init 中の最初の代入では発火しないため、明示的に書き込む
+            Self.writeSpeechEngine(migrated, to: defaults)
+            defaults.removeObject(forKey: Keys.modelName)
         } else {
-            self.model = Self.defaultModel
+            self.speechEngine = Self.defaultSpeechEngine
         }
 
         let savedInterval = defaults.double(forKey: Keys.updateInterval)
@@ -194,6 +214,7 @@ final class AppSettings: ObservableObject {
 
         defaults.removeObject(forKey: Keys.outputMode)
         defaults.removeObject(forKey: Keys.modelName)
+        defaults.removeObject(forKey: Keys.speechEngine)
         defaults.removeObject(forKey: Keys.updateInterval)
         defaults.removeObject(forKey: Keys.bufferSize)
         defaults.removeObject(forKey: Keys.noiseSuppressionEnabled)
@@ -204,7 +225,7 @@ final class AppSettings: ObservableObject {
         defaults.removeObject(forKey: Keys.sessionSoundEnabled)
 
         outputMode = Self.defaultOutputMode
-        model = Self.defaultModel
+        speechEngine = Self.defaultSpeechEngine
         updateInterval = Self.defaultUpdateInterval
         bufferSize = Self.defaultBufferSize
         noiseSuppressionEnabled = Self.defaultNoiseSuppressionEnabled
@@ -213,5 +234,20 @@ final class AppSettings: ObservableObject {
         textPostprocessingEnabled = Self.defaultTextPostprocessingEnabled
         monitoringEnabled = Self.defaultMonitoringEnabled
         sessionSoundEnabled = Self.defaultSessionSoundEnabled
+    }
+
+    // MARK: - Persistence Helpers
+
+    private func persistSpeechEngine(_ engine: SpeechEngine) {
+        Self.writeSpeechEngine(engine, to: defaults)
+    }
+
+    /// `SpeechEngine` を JSON 文字列にエンコードして UserDefaults に書き込む。
+    /// init 中（`self` がまだ完全に初期化されていない時点）からも呼べるよう static にしている。
+    private static func writeSpeechEngine(_ engine: SpeechEngine, to defaults: UserDefaults) {
+        if let data = try? JSONEncoder().encode(engine),
+           let json = String(data: data, encoding: .utf8) {
+            defaults.set(json, forKey: Keys.speechEngine)
+        }
     }
 }

@@ -16,6 +16,8 @@ packages:
   SettingsAccess:
     url: https://github.com/orchetect/SettingsAccess
     from: "2.1.0"
+  WhisperCppKit:
+    path: Packages/WhisperCppKit
 
 targets:
   Kuchibi:
@@ -27,11 +29,17 @@ targets:
       - package: HotKey
       - package: WhisperKit
       - package: SettingsAccess
+      - package: WhisperCppKit
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.kuchibi.app
         INFOPLIST_FILE: Sources/Info.plist
         ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+        # WhisperCppKit が `whisper` (binaryTarget) を再エクスポートしているが、
+        # SwiftPM の binaryTarget は consumer 側の link line に伝播しないことが
+        # 観測されたため (test target 経由の再 link で `-framework whisper` が落ちる)、
+        # `OTHER_LDFLAGS` で明示的に whisper.framework をリンクする。
+        OTHER_LDFLAGS: $(inherited) -framework whisper
 
   KuchibiTests:
     type: bundle.unit-test
@@ -40,6 +48,7 @@ targets:
       - path: Tests
     dependencies:
       - target: Kuchibi
+      - package: WhisperCppKit
     settings:
       base:
         GENERATE_INFOPLIST_FILE: YES

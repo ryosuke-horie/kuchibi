@@ -122,4 +122,40 @@ struct KuchibiErrorTests {
         let error: any Error = KuchibiError.microphoneUnavailable
         #expect(error is KuchibiError)
     }
+
+    // MARK: - 新規ケース（speech-engine-architecture Task 1.5）
+
+    @Test("engineMismatch の localizedDescription が日本語で空でない")
+    func engineMismatchLocalizedDescription() {
+        let error = KuchibiError.engineMismatch(
+            expected: .whisperKit(.base),
+            actual: .kotobaWhisperBilingual(.v1Q5)
+        )
+        let description = error.errorDescription ?? ""
+        #expect(!description.isEmpty)
+        #expect(description.contains("WhisperKit"))
+        #expect(description.contains("Kotoba-Whisper Bilingual"))
+    }
+
+    @Test("modelFileMissing の localizedDescription が日本語で空でない")
+    func modelFileMissingLocalizedDescription() {
+        let path = "/tmp/model.bin"
+        let error = KuchibiError.modelFileMissing(path: path)
+        let description = error.errorDescription ?? ""
+        #expect(!description.isEmpty)
+        #expect(description.contains(path))
+    }
+
+    @Test("sessionActiveDuringSwitch の localizedDescription が日本語で空でない")
+    func sessionActiveDuringSwitchLocalizedDescription() {
+        let error = KuchibiError.sessionActiveDuringSwitch
+        let description = error.errorDescription ?? ""
+        #expect(!description.isEmpty)
+    }
+
+    @Test("LocalizedError プロトコルに準拠している")
+    func conformsToLocalizedError() {
+        let error: any LocalizedError = KuchibiError.sessionActiveDuringSwitch
+        #expect(error.errorDescription != nil)
+    }
 }

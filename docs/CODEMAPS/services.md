@@ -1,30 +1,36 @@
 # サービス層 コードマップ
 
-最終更新: 2026-03-07
+最終更新: 2026-04-15
 
 ## アーキテクチャ
 
 ```
-SessionManagerImpl
-    ├── AudioCapturing          (AudioCaptureServiceImpl)
-    │       └── AsyncStream<AVAudioPCMBuffer>
-    ├── AudioPreprocessing      (AudioPreprocessorImpl)
-    │       ├── リサンプリング: 任意サンプルレート → 16kHz モノラル（線形補間）
-    │       └── VAD: RMS がしきい値未満のバッファを破棄
-    ├── SpeechRecognizing       (SpeechRecognitionServiceImpl)
-    │       └── SpeechRecognitionAdapting (WhisperKitAdapter)
-    │               └── WhisperKit（500ms 間隔の定期認識ループ）
-    ├── TextPostprocessing      (TextPostprocessorImpl)
-    │       ├── 先頭・末尾空白除去
-    │       ├── 連続スペース正規化
-    │       ├── 日本語フィラー除去（えーと、あー等）
-    │       ├── 日本語文字間スペース除去
-    │       └── 3文字以上の繰り返しフレーズ集約
-    ├── OutputManaging          (OutputManagerImpl)
-    │       └── ClipboardServicing (ClipboardServiceImpl)
-    ├── NotificationServicing   (NotificationServiceImpl)
-    ├── SessionMonitoring       (SessionMonitoringServiceImpl)
-    └── AppSettings
+AppCoordinator（DI + EngineSwitchCoordinator 起動）
+    ├── SessionManagerImpl
+    │       ├── AudioCapturing          (AudioCaptureServiceImpl)
+    │       │       └── AsyncStream<AVAudioPCMBuffer>
+    │       ├── AudioPreprocessing      (AudioPreprocessorImpl)
+    │       │       ├── リサンプリング: 任意サンプルレート → 16kHz モノラル（線形補間）
+    │       │       └── VAD: RMS がしきい値未満のバッファを破棄
+    │       ├── SpeechRecognizing       (SpeechRecognitionServiceImpl)
+    │       │       └── SpeechRecognitionAdapting（hot-swap slot、1 つ常駐）
+    │       │               ├── WhisperKitAdapter（WhisperKit、500ms 定期認識）
+    │       │               └── WhisperCppAdapter（whisper.cpp、30s窓/gap 擬似ストリーミング）
+    │       ├── TextPostprocessing      (TextPostprocessorImpl)
+    │       │       ├── 先頭・末尾空白除去
+    │       │       ├── 連続スペース正規化
+    │       │       ├── 日本語フィラー除去（えーと、あー等）
+    │       │       ├── 日本語文字間スペース除去
+    │       │       └── 3文字以上の繰り返しフレーズ集約
+    │       ├── OutputManaging          (OutputManagerImpl)
+    │       │       └── ClipboardServicing (ClipboardServiceImpl)
+    │       ├── NotificationServicing   (NotificationServiceImpl)
+    │       ├── SessionMonitoring       (SessionMonitoringServiceImpl)
+    │       └── AppSettings（speechEngine 含む）
+    ├── EngineSwitchCoordinator（AppSettings.$speechEngine × SessionState 合成、idle 時のみ適用）
+    ├── ModelAvailabilityChecker（Kotoba GGML ファイル存在判定、DL ガイド連動）
+    ├── LaunchPathValidator（/Applications/Kuchibi.app 判定、起動経路警告）
+    └── PermissionStateObserver（マイク・アクセシビリティ権限 Published）
 ```
 
 ## 主要モジュール
@@ -34,15 +40,22 @@ SessionManagerImpl
 | `SessionManagerImpl` | セッションライフサイクル管理・状態機械 | `Sources/Services/SessionManager.swift` |
 | `AudioCaptureServiceImpl` | AVAudioEngine によるマイク音声キャプチャ | `Sources/Services/AudioCaptureService.swift` |
 | `AudioPreprocessorImpl` | リサンプリング（16kHz モノラル）・VAD | `Sources/Services/AudioPreprocessor.swift` |
-| `SpeechRecognitionServiceImpl` | 音声ストリームを RecognitionEvent に変換 | `Sources/Services/SpeechRecognitionService.swift` |
-| `WhisperKitAdapter` | WhisperKit ライブラリのラッパー | `Sources/Services/WhisperKitAdapter.swift` |
+| `SpeechRecognitionServiceImpl` | adapter slot 保持 + hot-swap + 音声ストリームを RecognitionEvent に変換 | `Sources/Services/SpeechRecognitionService.swift` |
+| `WhisperKitAdapter` | WhisperKit ライブラリのラッパー（Whisper 系モデル） | `Sources/Services/WhisperKitAdapter.swift` |
+| `WhisperCppAdapter` | whisper.cpp（WhisperCppKit XCFramework）のラッパー（Kotoba-Whisper Bilingual）| `Sources/Services/WhisperCppAdapter.swift` |
+| `HallucinationFilter` | Whisper 系共通 hallucination 検出（同一文字連続・低多様性・句読点のみ）| `Sources/Services/HallucinationFilter.swift` |
+| `EngineSwitchCoordinator` | `AppSettings.$speechEngine` × `SessionState` 合成の deferred switchEngine 配線 | `Sources/Services/EngineSwitchCoordinator.swift` |
+| `ModelAvailabilityChecker` | Kotoba GGML ファイル存在判定（DL ガイド連動） | `Sources/Services/ModelAvailabilityChecker.swift` |
+| `LaunchPathValidator` | `Bundle.main.bundlePath` 判定（承認外起動警告） | `Sources/Services/LaunchPathValidator.swift` |
+| `PermissionStateObserver` | マイク・アクセシビリティ権限の Published 観測 | `Sources/Services/PermissionStateObserver.swift` |
 | `TextPostprocessorImpl` | 認識テキストの後処理 | `Sources/Services/TextPostprocessor.swift` |
 | `OutputManagerImpl` | OutputMode に応じたテキスト出力 | `Sources/Services/OutputManager.swift` |
 | `ClipboardServiceImpl` | NSPasteboard + CGEvent による Cmd+V | `Sources/Services/ClipboardService.swift` |
 | `NotificationServiceImpl` | macOS ユーザー通知の送信 | `Sources/Services/NotificationService.swift` |
 | `SessionMonitoringServiceImpl` | セッション統計・監視 | `Sources/Services/SessionMonitoringService.swift` |
 | `HotKeyControllerImpl` | グローバルホットキー登録（Cmd+Shift+Space） | `Sources/Services/HotKeyController.swift` |
-| `AppSettings` | 全設定値の UserDefaults 永続化 | `Sources/Services/AppSettings.swift` |
+| `EscapeKeyMonitorImpl` | ESC キーのグローバル監視（セッションキャンセル） | `Sources/Services/EscapeKeyMonitor.swift` |
+| `AppSettings` | 全設定値の UserDefaults 永続化（`speechEngine` 含む）| `Sources/Services/AppSettings.swift` |
 
 ## ドメインモデル
 
@@ -51,8 +64,10 @@ SessionManagerImpl
 | `SessionState` | `idle` / `recording` / `processing` | `Sources/Models/SessionState.swift` |
 | `RecognitionEvent` | `lineStarted` / `textChanged(String)` / `lineCompleted(String)` | `Sources/Models/RecognitionEvent.swift` |
 | `OutputMode` | `clipboard` / `directInput` / `autoInput` | `Sources/Models/OutputMode.swift` |
-| `WhisperModel` | `tiny` / `base` / `small` / `medium` / `large-v2` / `large-v3` | `Sources/Models/WhisperModel.swift` |
-| `KuchibiError` | `modelLoadFailed` / `microphonePermissionDenied` / `microphoneUnavailable` 等 | `Sources/Models/KuchibiError.swift` |
+| `SpeechEngine` | `whisperKit(WhisperKitModel)` / `kotobaWhisperBilingual(KotobaWhisperBilingualModel)` | `Sources/Models/SpeechEngine.swift` |
+| `WhisperKitModel` | `tiny` / `base` / `small` / `medium` / `largeV3Turbo` | `Sources/Models/EngineModel.swift` |
+| `KotobaWhisperBilingualModel` | `v1Q5` / `v1Full` | `Sources/Models/EngineModel.swift` |
+| `KuchibiError` | `modelLoadFailed` / `microphonePermissionDenied` / `microphoneUnavailable` / `engineMismatch` / `modelFileMissing` / `sessionActiveDuringSwitch` 等 | `Sources/Models/KuchibiError.swift` |
 
 ## セッションライフサイクル
 
