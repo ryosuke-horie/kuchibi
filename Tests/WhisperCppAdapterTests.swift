@@ -12,6 +12,38 @@ import Testing
 ///   modelFileMissing throw / コンテキスト解放後の状態管理）に焦点を絞る。
 @Suite("WhisperCppAdapter")
 struct WhisperCppAdapterTests {
+    // MARK: - filterHallucination
+
+    @Test("hallucination フィルタ: 同一文字連続は空文字を返す")
+    func filterHallucinationDropsRepeatedCharacters() {
+        #expect(WhisperCppAdapter.filterHallucination("aaaaaaaaaaaaaaa") == "")
+        #expect(WhisperCppAdapter.filterHallucination("あああああああああ") == "")
+        #expect(WhisperCppAdapter.filterHallucination("....................") == "")
+    }
+
+    @Test("hallucination フィルタ: 通常テキストは保持する")
+    func filterHallucinationPreservesNormalText() {
+        #expect(WhisperCppAdapter.filterHallucination("こんにちは、世界") == "こんにちは、世界")
+        #expect(WhisperCppAdapter.filterHallucination("Hello world") == "Hello world")
+        // 短いテキストはそのまま通す
+        #expect(WhisperCppAdapter.filterHallucination("あ") == "あ")
+        #expect(WhisperCppAdapter.filterHallucination("aaaa") == "aaaa")  // 5 未満は保持
+    }
+
+    @Test("hallucination フィルタ: 前後の空白は trim される")
+    func filterHallucinationTrimsWhitespace() {
+        #expect(WhisperCppAdapter.filterHallucination("  こんにちは  ") == "こんにちは")
+        #expect(WhisperCppAdapter.filterHallucination("\n\n\naaaaaaaaaaa\n\n") == "")
+    }
+
+    @Test("hallucination フィルタ: 一部重複は許容（60% 未満なら保持）")
+    func filterHallucinationKeepsPartialRepetition() {
+        // 短い連続は phrase として正常（「ああ、そうですか」など）
+        let text = "ああ、そうですか"
+        #expect(WhisperCppAdapter.filterHallucination(text) == text)
+    }
+
+
     // MARK: - initialize: エンジン不一致 / モデル未配置
 
     @Test("非 Kotoba エンジン (.whisperKit) を渡すと engineMismatch を throw する")

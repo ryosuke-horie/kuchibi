@@ -188,7 +188,7 @@ final class WhisperCppAdapter: SpeechRecognitionAdapting, @unchecked Sendable {
         // 3. 残バッファを処理（gap 確定で先に通知済みの場合は空になっている）
         var finalText = ""
         if !leftover.isEmpty, context != nil {
-            finalText = runWhisper(samples: leftover)
+            finalText = Self.filterHallucination(runWhisper(samples: leftover))
             if !finalText.isEmpty {
                 onLineCompleted?(finalText)
             }
@@ -236,8 +236,9 @@ final class WhisperCppAdapter: SpeechRecognitionAdapting, @unchecked Sendable {
         guard let samples = snapshot else { return }
 
         let text = runWhisper(samples: samples)
-        if !text.isEmpty {
-            onLineCompleted?(text)
+        let filtered = Self.filterHallucination(text)
+        if !filtered.isEmpty {
+            onLineCompleted?(filtered)
         }
     }
 
@@ -247,8 +248,18 @@ final class WhisperCppAdapter: SpeechRecognitionAdapting, @unchecked Sendable {
         guard let ctx = context else { return "" }
         guard !samples.isEmpty else { return "" }
 
+        // Pre-check: audio がほぼ無音なら whisper_full を呼ばない（hallucination 回避）
+        let meanSquare = samples.reduce(Float(0)) { $0 + $1 * $1 } / Float(samples.count)
+        let rms = sqrtf(meanSquare)
+        guard rms > 0.003 else {
+            Self.logger.debug("runWhisper skipped (rms=\(rms, privacy: .public) below silence threshold)")
+            return ""
+        }
+
         return currentLanguage.withCString { langPtr -> String in
-            var params = whisper_full_default_params(WHISPER_SAMPLING_GREEDY)
+            // BEAM_SEARCH は GREEDY より hallucination（同一文字連続など）に強い
+            var params = whisper_full_default_params(WHISPER_SAMPLING_BEAM_SEARCH)
+            params.beam_search.beam_size = 5
             params.print_realtime = false
             params.print_progress = false
             params.print_timestamps = false
@@ -258,6 +269,12 @@ final class WhisperCppAdapter: SpeechRecognitionAdapting, @unchecked Sendable {
             params.single_segment = false
             params.language = langPtr
             params.detect_language = false
+            params.suppress_blank = true
+            params.suppress_nst = true
+            params.no_speech_thold = 0.6
+            params.entropy_thold = 2.4
+            params.temperature = 0.0
+            params.temperature_inc = 0.2
             params.n_threads = Int32(max(1, min(8, ProcessInfo.processInfo.activeProcessorCount - 1)))
 
             let result = samples.withUnsafeBufferPointer { bufPtr -> Int32 in
@@ -279,6 +296,33 @@ final class WhisperCppAdapter: SpeechRecognitionAdapting, @unchecked Sendable {
             }
             return collected.trimmingCharacters(in: .whitespacesAndNewlines)
         }
+    }
+
+    /// Whisper の典型的な hallucination（同一文字の長い連続）を検出して除去する。
+    /// 例: `aaaaaaaaaaaa` / `あああああああああ` のように、1 文字が支配的に連続しているテキストは
+    /// ほぼ確実に無音・非音声入力からの decoder 暴走。空文字を返して下流に流さない。
+    static func filterHallucination(_ text: String) -> String {
+        let trimmed = text.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard trimmed.count >= 5 else { return trimmed }
+
+        var prev: Character? = nil
+        var currentRun = 1
+        var maxRun = 1
+        for ch in trimmed {
+            if ch == prev {
+                currentRun += 1
+                maxRun = max(maxRun, currentRun)
+            } else {
+                currentRun = 1
+                prev = ch
+            }
+        }
+
+        // 同一文字が 5 回以上連続 かつ 全文字数の 60% 以上を占める場合は hallucination
+        if maxRun >= 5 && Float(maxRun) / Float(trimmed.count) > 0.6 {
+            return ""
+        }
+        return trimmed
     }
 
     // MARK: - Test Hooks
