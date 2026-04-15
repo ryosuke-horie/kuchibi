@@ -171,7 +171,8 @@ final class WhisperCppAdapter: SpeechRecognitionAdapting {
         let leftover = state.withLock { s -> [Float] in
             let buf = s.audioBuffer
             s.audioBuffer.removeAll(keepingCapacity: false)
-            s.isFinalized = true
+            // isFinalized は使われていない旧フラグなので false のまま（複数録音継続のため）
+            s.isFinalized = false
             return buf
         }
 
@@ -184,15 +185,14 @@ final class WhisperCppAdapter: SpeechRecognitionAdapting {
             }
         }
 
-        // 4. コンテキストを解放（リーク防止）
-        if let ctx = context {
-            whisper_free(ctx)
-            context = nil
-        }
-
-        // 5. コールバック参照を解除
+        // 4. コールバック参照を解除（同一 adapter を次録音で再利用するため context は解放しない）
         onTextChanged = nil
         onLineCompleted = nil
+
+        // コンテキストはここでは解放しない:
+        // - 次の `startStream` で同じコンテキストを再利用する（モデル再ロードを避ける）
+        // - switchEngine で別 adapter に差し替えられた時は deinit が `whisper_free` を呼ぶ
+        // - 同一 engine への再 initialize 時は冒頭で旧コンテキストを free する
 
         return finalText
     }
