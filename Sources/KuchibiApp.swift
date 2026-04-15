@@ -62,12 +62,12 @@ final class AppCoordinator: ObservableObject {
         // sessionStateProvider は SessionManager 生成後に参照するため、box 経由の遅延評価で解決する。
         let sessionManagerBox = SessionManagerBox()
         let speechService = SpeechRecognitionServiceImpl(
-            adapterFactory: { engine in
+            adapterFactory: { [notificationService] engine in
                 switch engine.kind {
                 case .whisperKit:
-                    return WhisperKitAdapter()
+                    return WhisperKitAdapter(notificationService: notificationService)
                 case .kotobaWhisperBilingual:
-                    return WhisperCppAdapter()
+                    return WhisperCppAdapter(notificationService: notificationService)
                 }
             },
             initialEngine: initialEngine,

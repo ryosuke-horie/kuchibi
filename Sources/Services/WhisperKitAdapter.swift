@@ -5,13 +5,20 @@ import os
 /// WhisperKit ライブラリをラップし、SpeechRecognitionAdapting に準拠するアダプター
 final class WhisperKitAdapter: SpeechRecognitionAdapting {
     private static let logger = Logger(subsystem: "com.kuchibi.app", category: "WhisperKitAdapter")
+    /// 連続 `transcribe` 失敗回数の許容上限（超えたら上位へ通知して reset）
+    private static let consecutiveFailureThreshold: Int = 3
 
+    private let notificationService: NotificationServicing?
     private var whisperKit: WhisperKit?
     private var currentLanguage: String = "ja"
     private let state = OSAllocatedUnfairLock(initialState: AdapterState())
     private var recognitionTask: Task<Void, Never>?
     private var onTextChanged: ((String) -> Void)?
     private var onLineCompleted: ((String) -> Void)?
+
+    init(notificationService: NotificationServicing? = nil) {
+        self.notificationService = notificationService
+    }
 
     func initialize(engine: SpeechEngine, language: String) async throws {
         // WhisperKitAdapter は `.whisperKit` 系のみ受理する。
@@ -112,10 +119,11 @@ final class WhisperKitAdapter: SpeechRecognitionAdapting {
             )
             let text = results.map(\.text).joined(separator: " ").trimmingCharacters(in: .whitespaces)
             let filtered = HallucinationFilter.filter(text)
-            return filtered.isEmpty ? HallucinationFilter.filter(currentState.latestText) : filtered
+            // latestText は performRecognition 内で既に filter 済みなのでそのまま返せる
+            return filtered.isEmpty ? currentState.latestText : filtered
         } catch {
             Self.logger.error("最終認識に失敗: \(error.localizedDescription)")
-            return HallucinationFilter.filter(currentState.latestText)
+            return currentState.latestText
         }
     }
 
@@ -125,6 +133,7 @@ final class WhisperKitAdapter: SpeechRecognitionAdapting {
         var audioBuffer: [Float] = []
         var latestText: String = ""
         var isTranscribing: Bool = false
+        var consecutiveFailureCount: Int = 0
     }
 
     private func performRecognition() async {
@@ -148,11 +157,30 @@ final class WhisperKitAdapter: SpeechRecognitionAdapting {
             let text = results.map(\.text).joined(separator: " ").trimmingCharacters(in: .whitespaces)
             let filtered = HallucinationFilter.filter(text)
             if !filtered.isEmpty {
-                state.withLock { $0.latestText = filtered }
+                state.withLock {
+                    $0.latestText = filtered
+                    $0.consecutiveFailureCount = 0
+                }
                 onTextChanged?(filtered)
             }
         } catch {
             Self.logger.error("定期認識に失敗: \(error.localizedDescription)")
+            await handleRecognitionFailure(error: error)
         }
+    }
+
+    /// 連続失敗がしきい値を超えたら NotificationService 経由で通知してカウンターをリセットする。
+    /// transcribe が何らかの理由で毎回失敗する状況（モデル崩壊・OOM 等）をユーザーが察知できるようにする。
+    private func handleRecognitionFailure(error: Error) async {
+        let count = state.withLock { s -> Int in
+            s.consecutiveFailureCount += 1
+            return s.consecutiveFailureCount
+        }
+        guard count >= Self.consecutiveFailureThreshold else { return }
+        state.withLock { $0.consecutiveFailureCount = 0 }
+        Self.logger.fault("WhisperKit 認識が \(count, privacy: .public) 回連続失敗、ユーザーに通知")
+        await notificationService?.sendErrorNotification(
+            error: .modelLoadFailed(underlying: error)
+        )
     }
 }
