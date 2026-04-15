@@ -45,8 +45,44 @@ struct WhisperCppAdapterTests {
 
     @Test("hallucination フィルタ: 低多様性（空白で区切られた繰り返し）も除去")
     func filterHallucinationDropsLowDiversityText() {
+        // meaningfulChars = "aaaaaaaaaa" (unique=1) → 除去
         #expect(HallucinationFilter.filter("a a a a a a a a a a") == "")
+        // meaningfulChars = "あああああああ" (unique=1) → 除去
         #expect(HallucinationFilter.filter("あ あ あ あ あ あ あ") == "")
+        // 2 種交互（unique=2）も除去
+        #expect(HallucinationFilter.filter("a b a b a b a b") == "")
+    }
+
+    @Test("hallucination フィルタ: 3 種以上の文字なら保持")
+    func filterHallucinationKeepsThreeOrMoreUniqueChars() {
+        // meaningfulChars = "abcabcabc" (unique=3) → 保持
+        #expect(HallucinationFilter.filter("abc abc abc") == "abc abc abc")
+    }
+
+    @Test("hallucination フィルタ: 句読点のみのテキストは除去")
+    func filterHallucinationDropsPunctuationOnly() {
+        #expect(HallucinationFilter.filter("。。。。") == "")
+        #expect(HallucinationFilter.filter("、、、") == "")
+        #expect(HallucinationFilter.filter("...") == "")
+        #expect(HallucinationFilter.filter("!?!?") == "")
+    }
+
+    @Test("hallucination フィルタ: 空文字・空白のみは空文字を返す")
+    func filterHallucinationHandlesEmptyAndWhitespace() {
+        #expect(HallucinationFilter.filter("") == "")
+        #expect(HallucinationFilter.filter("   ") == "")
+        #expect(HallucinationFilter.filter("\n\n\n") == "")
+        #expect(HallucinationFilter.filter("\t  \n") == "")
+    }
+
+    @Test("hallucination フィルタ: ratio 境界（60% 前後、3 種以上の文字で diversity チェックを回避）")
+    func filterHallucinationRatioBoundary() {
+        // maxRun=6, count=11, ratio≈0.545 → 保持（60% 未満）
+        #expect(HallucinationFilter.filter("aaaaaabcdef") == "aaaaaabcdef")
+        // maxRun=6, count=10, ratio=0.600 → 保持（`> 0.6` なので boundary はちょうど通過）
+        #expect(HallucinationFilter.filter("aaaaaabcde") == "aaaaaabcde")
+        // maxRun=7, count=10, ratio=0.700 → 除去
+        #expect(HallucinationFilter.filter("aaaaaaabcd") == "")
     }
 
 

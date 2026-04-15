@@ -9,9 +9,17 @@ enum HallucinationFilter {
     /// hallucination と判定した場合は空文字、それ以外は trim 済みテキストを返す。
     static func filter(_ text: String) -> String {
         let trimmed = text.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmed.isEmpty else { return trimmed }
+
+        // 意味のある文字（文字・数字）が 1 つも無いなら hallucination（例: `。。。。` / `、、、、`）
+        let meaningfulChars = trimmed.filter { $0.isLetter || $0.isNumber }
+        if meaningfulChars.isEmpty {
+            return ""
+        }
+
         guard trimmed.count >= 5 else { return trimmed }
 
-        // 1. 連続同一文字パターン（`aaaaaaaaaaaaaa` / `あああああああ`）
+        // 連続同一文字パターン（例: `aaaaaaaa` / `あああああ`）
         var prev: Character? = nil
         var currentRun = 1
         var maxRun = 1
@@ -28,9 +36,8 @@ enum HallucinationFilter {
             return ""
         }
 
-        // 2. 文字多様性: 非空白・非句読点を見て文字種が極端に少ないなら hallucination
-        //    例: `a a a a a a a a` / `あ あ あ あ あ あ` のように空白で区切られたパターンも拾う
-        let meaningfulChars = trimmed.filter { !$0.isWhitespace && !$0.isPunctuation }
+        // 空白区切り繰り返し（例: `a a a a a` / `あ あ あ あ あ`）はランレングスチェックを
+        // すり抜けるため、意味のある文字の種類が極端に少ないケースを別途検出する
         if meaningfulChars.count >= 5 {
             let uniqueChars = Set(meaningfulChars)
             if uniqueChars.count <= 2 {

@@ -56,7 +56,10 @@ fetch-kotoba-q5:
 		echo "既に配置済み: $(MODELS_DIR)/$(KOTOBA_Q5)"; \
 	else \
 		echo "ダウンロード中: $(KOTOBA_Q5)"; \
-		curl -L --fail --progress-bar -o "$(MODELS_DIR)/$(KOTOBA_Q5)" "$(KOTOBA_REPO)/$(KOTOBA_Q5)"; \
+		curl -L --fail --retry 3 --retry-delay 5 --progress-bar \
+			-o "$(MODELS_DIR)/$(KOTOBA_Q5).tmp" "$(KOTOBA_REPO)/$(KOTOBA_Q5)" \
+			&& mv "$(MODELS_DIR)/$(KOTOBA_Q5).tmp" "$(MODELS_DIR)/$(KOTOBA_Q5)" \
+			|| { rm -f "$(MODELS_DIR)/$(KOTOBA_Q5).tmp"; exit 1; }; \
 	fi
 
 ## Kotoba v1 Full（非量子化版、約 1.5GB）
@@ -66,5 +69,8 @@ fetch-kotoba-full:
 		echo "既に配置済み: $(MODELS_DIR)/$(KOTOBA_FULL)"; \
 	else \
 		echo "ダウンロード中: $(KOTOBA_FULL)"; \
-		curl -L --fail --progress-bar -o "$(MODELS_DIR)/$(KOTOBA_FULL)" "$(KOTOBA_REPO)/$(KOTOBA_FULL)"; \
+		curl -L --fail --retry 3 --retry-delay 5 --progress-bar \
+			-o "$(MODELS_DIR)/$(KOTOBA_FULL).tmp" "$(KOTOBA_REPO)/$(KOTOBA_FULL)" \
+			&& mv "$(MODELS_DIR)/$(KOTOBA_FULL).tmp" "$(MODELS_DIR)/$(KOTOBA_FULL)" \
+			|| { rm -f "$(MODELS_DIR)/$(KOTOBA_FULL).tmp"; exit 1; }; \
 	fi

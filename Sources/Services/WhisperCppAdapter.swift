@@ -16,8 +16,9 @@ import os
 ///    無いまま蓄積バッファに音声が残っている場合に `whisper_full` を同期実行し、
 ///    確定テキストを `onLineCompleted` で通知してリングバッファをクリアする（窓境界では
 ///    コンテキストを prompt-shift せず単純リセット = 整合性優先）。
-/// 5. `finalize()` で残バッファを `whisper_full` で処理して結果を返し、`whisper_free` で
-///    コンテキストを解放する（リーク防止）。再 `initialize` で再利用可能。
+/// 5. `finalize()` で残バッファを処理して結果を返す。コンテキストは保持し次録音で再利用する
+///    （連続録音のモデル再ロードを避けるため）。`whisper_free` は `deinit` または
+///    再 `initialize` 時にのみ呼ばれる。
 ///
 /// 注: WhisperKitAdapter とは異なり、`onTextChanged`（部分テキスト）は擬似ストリーミング
 /// では非対応のため、`getPartialText()` は常に空文字列を返す。
