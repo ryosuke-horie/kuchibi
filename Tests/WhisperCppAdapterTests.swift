@@ -16,31 +16,37 @@ struct WhisperCppAdapterTests {
 
     @Test("hallucination フィルタ: 同一文字連続は空文字を返す")
     func filterHallucinationDropsRepeatedCharacters() {
-        #expect(WhisperCppAdapter.filterHallucination("aaaaaaaaaaaaaaa") == "")
-        #expect(WhisperCppAdapter.filterHallucination("あああああああああ") == "")
-        #expect(WhisperCppAdapter.filterHallucination("....................") == "")
+        #expect(HallucinationFilter.filter("aaaaaaaaaaaaaaa") == "")
+        #expect(HallucinationFilter.filter("あああああああああ") == "")
+        #expect(HallucinationFilter.filter("....................") == "")
     }
 
     @Test("hallucination フィルタ: 通常テキストは保持する")
     func filterHallucinationPreservesNormalText() {
-        #expect(WhisperCppAdapter.filterHallucination("こんにちは、世界") == "こんにちは、世界")
-        #expect(WhisperCppAdapter.filterHallucination("Hello world") == "Hello world")
+        #expect(HallucinationFilter.filter("こんにちは、世界") == "こんにちは、世界")
+        #expect(HallucinationFilter.filter("Hello world") == "Hello world")
         // 短いテキストはそのまま通す
-        #expect(WhisperCppAdapter.filterHallucination("あ") == "あ")
-        #expect(WhisperCppAdapter.filterHallucination("aaaa") == "aaaa")  // 5 未満は保持
+        #expect(HallucinationFilter.filter("あ") == "あ")
+        #expect(HallucinationFilter.filter("aaaa") == "aaaa")  // 5 未満は保持
     }
 
     @Test("hallucination フィルタ: 前後の空白は trim される")
     func filterHallucinationTrimsWhitespace() {
-        #expect(WhisperCppAdapter.filterHallucination("  こんにちは  ") == "こんにちは")
-        #expect(WhisperCppAdapter.filterHallucination("\n\n\naaaaaaaaaaa\n\n") == "")
+        #expect(HallucinationFilter.filter("  こんにちは  ") == "こんにちは")
+        #expect(HallucinationFilter.filter("\n\n\naaaaaaaaaaa\n\n") == "")
     }
 
     @Test("hallucination フィルタ: 一部重複は許容（60% 未満なら保持）")
     func filterHallucinationKeepsPartialRepetition() {
         // 短い連続は phrase として正常（「ああ、そうですか」など）
         let text = "ああ、そうですか"
-        #expect(WhisperCppAdapter.filterHallucination(text) == text)
+        #expect(HallucinationFilter.filter(text) == text)
+    }
+
+    @Test("hallucination フィルタ: 低多様性（空白で区切られた繰り返し）も除去")
+    func filterHallucinationDropsLowDiversityText() {
+        #expect(HallucinationFilter.filter("a a a a a a a a a a") == "")
+        #expect(HallucinationFilter.filter("あ あ あ あ あ あ あ") == "")
     }
 
 

@@ -111,10 +111,11 @@ final class WhisperKitAdapter: SpeechRecognitionAdapting {
                 decodeOptions: options
             )
             let text = results.map(\.text).joined(separator: " ").trimmingCharacters(in: .whitespaces)
-            return text.isEmpty ? currentState.latestText : text
+            let filtered = HallucinationFilter.filter(text)
+            return filtered.isEmpty ? HallucinationFilter.filter(currentState.latestText) : filtered
         } catch {
             Self.logger.error("最終認識に失敗: \(error.localizedDescription)")
-            return currentState.latestText
+            return HallucinationFilter.filter(currentState.latestText)
         }
     }
 
@@ -145,9 +146,10 @@ final class WhisperKitAdapter: SpeechRecognitionAdapting {
                 decodeOptions: options
             )
             let text = results.map(\.text).joined(separator: " ").trimmingCharacters(in: .whitespaces)
-            if !text.isEmpty {
-                state.withLock { $0.latestText = text }
-                onTextChanged?(text)
+            let filtered = HallucinationFilter.filter(text)
+            if !filtered.isEmpty {
+                state.withLock { $0.latestText = filtered }
+                onTextChanged?(filtered)
             }
         } catch {
             Self.logger.error("定期認識に失敗: \(error.localizedDescription)")
